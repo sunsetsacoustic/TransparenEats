@@ -8,7 +8,7 @@
 ### 1. Tech Stack & Development Phases
 - [x] **Web App Prototype (Phase 1):**
     - [x] Frontend: React (Vite scaffolded and pushed to GitHub)
-    - [ ] UI Library: Material-UI (MUI) or Chakra UI
+    - [x] UI Library: Material-UI (MUI) installed
     - [ ] Barcode Scanning: react-qr-barcode-scanner or quaggaJS
     - [ ] Backend/API Proxy: Node.js + Express (if needed)
     - [ ] Food Data API: Open Food Facts
