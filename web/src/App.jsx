@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
-import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText, Chip } from '@mui/material';
+import { FOOD_DYES } from './foodDyes';
 
 function fetchProductByBarcode(barcode) {
   // Open Food Facts API for product by barcode
@@ -12,6 +13,17 @@ function searchProductsByName(query) {
   // Open Food Facts API for product search
   return fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`)
     .then(res => res.json());
+}
+
+function findDyes(ingredientText) {
+  if (!ingredientText) return [];
+  const lower = ingredientText.toLowerCase();
+  return FOOD_DYES.filter(dye => {
+    if (lower.includes(dye.name.toLowerCase())) return true;
+    if (dye.aliases.some(alias => lower.includes(alias.toLowerCase()))) return true;
+    if (dye.eNumbers.some(eNum => lower.includes(eNum.toLowerCase()))) return true;
+    return false;
+  });
 }
 
 export default function App() {
@@ -65,6 +77,8 @@ export default function App() {
     setError(null);
   };
 
+  const dyes = product ? findDyes(product.ingredients_text) : [];
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
@@ -107,6 +121,16 @@ export default function App() {
           <Typography variant="h6">{product.product_name || 'No name'}</Typography>
           <Typography variant="subtitle1">Ingredients:</Typography>
           <Typography variant="body2">{product.ingredients_text || 'No ingredient info'}</Typography>
+          {dyes.length > 0 && (
+            <Box mt={2}>
+              <Typography variant="subtitle2" color="warning.main">Identified Food Dyes:</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                {dyes.map(dye => (
+                  <Chip key={dye.name} label={dye.name} color="warning" />
+                ))}
+              </Box>
+            </Box>
+          )}
         </Paper>
       )}
     </Container>
