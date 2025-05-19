@@ -6,8 +6,8 @@
 ## Step-by-Step Checklist
 
 ### 1. Tech Stack & Development Phases
-- [ ] **Web App Prototype (Phase 1):**
-    - [ ] Frontend: React
+- [x] **Web App Prototype (Phase 1):**
+    - [x] Frontend: React (Vite scaffolded and pushed to GitHub)
     - [ ] UI Library: Material-UI (MUI) or Chakra UI
     - [ ] Barcode Scanning: react-qr-barcode-scanner or quaggaJS
     - [ ] Backend/API Proxy: Node.js + Express (if needed)
