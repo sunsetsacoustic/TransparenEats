@@ -11,6 +11,7 @@ import SearchBar from './components/SearchBar';
 import HistoryList from './components/HistoryList';
 import SearchResultsList from './components/SearchResultsList';
 import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
+import BottomNav from './components/BottomNav';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
@@ -168,7 +169,7 @@ export default function App() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
+    <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} centered>
@@ -219,6 +220,7 @@ export default function App() {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+      <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
     </Container>
   );
 } 
