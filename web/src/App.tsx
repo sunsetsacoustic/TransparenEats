@@ -134,7 +134,7 @@ export default function App() {
         handleIngredientClick={() => {}}
       />
     ) : (
-      <Box sx={{ width: '100%', maxWidth: 420, mt: 2, px: 2 }}>
+      <Box sx={{ width: '100%', mt: 2, px: { xs: 2, sm: 0 }, boxSizing: 'border-box' }}>
         {/* Prominent Search Bar */}
         <Box sx={{ mb: 2 }}>
           <SearchBar
@@ -230,7 +230,7 @@ export default function App() {
         justifyContent: 'flex-start',
       }}>
         {tab === 0 && !product ? (
-          <Box sx={{ width: '100%', maxWidth: 420, mt: 2, px: 2 }}>
+          <Box sx={{ width: '100%', mt: 2, px: { xs: 2, sm: 0 }, boxSizing: 'border-box' }}>
             {/* Prominent Search Bar */}
             <Box sx={{ mb: 2 }}>
               <SearchBar
