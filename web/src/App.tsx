@@ -6,6 +6,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
+import InfoIcon from '@mui/icons-material/Info';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
@@ -213,40 +217,68 @@ export default function App() {
       {error && <Typography color="error">{error}</Typography>}
       {product && (
         <Paper sx={{
-          p: 2,
+          p: 3,
           mt: 3,
-          borderRadius: 4,
+          borderRadius: 6,
           background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
           boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-          backdropFilter: 'blur(8px)',
           border: '1.5px solid rgba(255,255,255,0.10)',
-          maxWidth: 340,
-          maxHeight: 420,
+          maxWidth: 380,
           mx: 'auto',
           overflowY: 'auto',
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             {product.image_front_url && (
-              <img src={product.image_front_url} alt={product.product_name} style={{ width: 72, height: 72, borderRadius: 16, objectFit: 'cover', marginRight: 18, border: '2px solid #fff2' }} />
+              <img src={product.image_front_url} alt={product.product_name} style={{ width: 80, height: 80, borderRadius: 18, objectFit: 'cover', marginRight: 18, border: '2px solid #fff2' }} />
             )}
-            <Box>
+            <Box sx={{ flex: 1 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: '#fff' }}>{product.product_name || 'No name'}</Typography>
               <Typography variant="subtitle2" sx={{ color: '#bbb' }}>{product.brands}</Typography>
+            </Box>
+            {/* Score badge */}
+            <Box sx={{ ml: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {(() => {
+                // Simple score: 100 - 15*flagged - 7*dyes, min 0
+                const score = Math.max(0, 100 - 15 * flaggedIngredients.length - 7 * dyes.length);
+                let color = '#4caf50';
+                let label = 'Good';
+                if (score < 40) { color = '#ff5252'; label = 'Bad'; }
+                else if (score < 70) { color = '#ffa726'; label = 'Caution'; }
+                return (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Box sx={{
+                      background: color,
+                      color: '#fff',
+                      borderRadius: '50%',
+                      width: 48,
+                      height: 48,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: 20,
+                      boxShadow: `0 0 0 4px ${color}33`,
+                      mb: 0.5
+                    }}>{score}</Box>
+                    <Typography variant="caption" sx={{ color }}>{label}</Typography>
+                  </Box>
+                );
+              })()}
             </Box>
           </Box>
 
           {/* Negatives Section */}
           {(flaggedIngredients.length > 0 || dyes.length > 0) && (
             <Box mb={2}>
-              <Typography variant="subtitle1" sx={{ color: '#ff5252', fontWeight: 600, mb: 1 }}>
-                ⚠️ Negatives
+              <Typography variant="subtitle1" sx={{ color: '#ff5252', fontWeight: 600, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <WarningIcon sx={{ fontSize: 22, mr: 0.5 }} /> Negatives
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {flaggedIngredients.map(ing => (
                   <Chip
                     key={ing.name}
                     label={ing.name}
-                    icon={<span style={{ color: '#ff5252', fontSize: 18 }}>⚠️</span>}
+                    icon={<WarningIcon sx={{ color: '#ff5252' }} />}
                     sx={{ background: 'rgba(255,82,82,0.13)', color: '#ff5252', fontWeight: 600, border: '1.5px solid #ff5252' }}
                     onClick={() => handleIngredientClick(ing.name)}
                   />
@@ -255,7 +287,7 @@ export default function App() {
                   <Chip
                     key={dye.name}
                     label={dye.name}
-                    icon={<span style={{ color: '#ffa751', fontSize: 18 }}>🎨</span>}
+                    icon={<PaletteIcon sx={{ color: '#ffa751' }} />}
                     sx={{ background: 'rgba(255,167,81,0.13)', color: '#ffa751', fontWeight: 600, border: '1.5px solid #ffa751' }}
                     onClick={() => handleIngredientClick(dye.name)}
                   />
@@ -264,10 +296,35 @@ export default function App() {
             </Box>
           )}
 
+          {/* Positives Section (fiber, protein) */}
+          {product && (product.nutriments?.fiber_100g || product.nutriments?.proteins_100g) && (
+            <Box mb={2}>
+              <Typography variant="subtitle1" sx={{ color: '#4caf50', fontWeight: 600, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircleIcon sx={{ fontSize: 22, mr: 0.5 }} /> Positives
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {product.nutriments?.fiber_100g && (
+                  <Chip
+                    label={`Fiber: ${product.nutriments.fiber_100g}g`}
+                    icon={<CheckCircleIcon sx={{ color: '#4caf50' }} />}
+                    sx={{ background: 'rgba(76,175,80,0.13)', color: '#4caf50', fontWeight: 600, border: '1.5px solid #4caf50' }}
+                  />
+                )}
+                {product.nutriments?.proteins_100g && (
+                  <Chip
+                    label={`Protein: ${product.nutriments.proteins_100g}g`}
+                    icon={<CheckCircleIcon sx={{ color: '#4caf50' }} />}
+                    sx={{ background: 'rgba(76,175,80,0.13)', color: '#4caf50', fontWeight: 600, border: '1.5px solid #4caf50' }}
+                  />
+                )}
+              </Box>
+            </Box>
+          )}
+
           {/* Other Ingredients Section */}
           <Box mb={2}>
-            <Typography variant="subtitle1" sx={{ color: '#7fff7f', fontWeight: 600, mb: 1 }}>
-              ✅ Other Ingredients
+            <Typography variant="subtitle1" sx={{ color: '#7fff7f', fontWeight: 600, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <InfoIcon sx={{ color: '#7fff7f', fontSize: 22, mr: 0.5 }} /> Other Ingredients
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {(() => {
@@ -281,7 +338,7 @@ export default function App() {
                   <Chip
                     key={idx}
                     label={ing}
-                    icon={<span style={{ color: '#7fff7f', fontSize: 18 }}>✅</span>}
+                    icon={<CheckCircleIcon sx={{ color: '#7fff7f' }} />}
                     sx={{ background: 'rgba(127,255,127,0.10)', color: '#7fff7f', fontWeight: 500, border: '1.5px solid #7fff7f' }}
                     onClick={() => handleIngredientClick(ing)}
                   />
