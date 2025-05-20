@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
-import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText, Chip, Tabs, Tab } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Tabs, Tab } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningIcon from '@mui/icons-material/Warning';
-import InfoIcon from '@mui/icons-material/Info';
-import PaletteIcon from '@mui/icons-material/Palette';
 import ProductCard from './components/ProductCard';
 import SearchBar from './components/SearchBar';
 import HistoryList from './components/HistoryList';
