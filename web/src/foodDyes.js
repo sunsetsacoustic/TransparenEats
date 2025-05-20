@@ -1,3 +1,6 @@
+// Data module for food dyes and critical ingredients used in the app.
+// Provides FOOD_DYES and CRITICAL_INGREDIENTS arrays for ingredient analysis.
+//
 // List of common artificial food dyes, aliases, and E-numbers
 export const FOOD_DYES = [
   { name: 'Red 40', aliases: ['Allura Red'], eNumbers: ['E129'] },
