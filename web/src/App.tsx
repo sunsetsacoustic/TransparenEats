@@ -74,6 +74,7 @@ export default function App() {
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
+        setTab(0);
       } else {
         setError('Product not found.');
       }
