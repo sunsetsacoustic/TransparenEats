@@ -101,3 +101,66 @@ To provide users with a simple way to scan food barcodes or search for food item
 * Integration with shopping lists and meal planning
 * Product recommendation engine for alternatives
 * Premium subscription model for advanced features
+
+## 8. Visual Walkthrough
+
+### Step 1: Home Screen
+- User is greeted with a clean interface featuring two tabs: "Search" and "History".
+- Prominent title: "Ingredient Aware (MVP)".
+
+### Step 2: Barcode Scanning
+- User clicks the barcode scanner area or holds a product barcode up to their device camera.
+- The scanner detects the barcode and automatically fetches product data.
+- Loading spinner appears while fetching.
+
+### Step 3: Manual Search
+- User types a product name into the search field and clicks "Search".
+- A list of matching products appears; user selects one to view details.
+
+### Step 4: Product & Ingredient Display
+- Product name and ingredient list are shown in a glassy, modern card.
+- Each ingredient is displayed as a clickable pill.
+- Artificial food dyes are highlighted (e.g., with a 🎨 icon and colored background).
+- Flagged ingredients show a warning (e.g., ⚠️ icon and warning color).
+
+### Step 5: Ingredient Details
+- Clicking an ingredient pill opens a dialog with:
+  - The ingredient name
+  - A warning or note if it is a dye or flagged ingredient
+  - Otherwise, a generic message: "No additional information available."
+
+### Step 6: History
+- The "History" tab shows the last 10-20 scanned/searched products.
+- User can click any item to revisit its details instantly.
+
+---
+
+## 9. Demo Script
+
+**1. Start the App**
+- "Let's open Ingredient Aware. Notice the simple, clean interface with Search and History tabs."
+
+**2. Scan a Barcode**
+- "I'll scan a food product barcode using my device's camera."
+- (Hold up a barcode; wait for detection)
+- "The app instantly fetches the product and displays its name and full ingredient list."
+
+**3. Highlighted Ingredients**
+- "Notice how artificial food dyes are highlighted with a paint palette icon, and flagged ingredients show a warning."
+- (Click a dye or flagged ingredient pill)
+- "Clicking an ingredient shows a dialog with a warning or note."
+
+**4. Manual Search**
+- "If I don't have a barcode, I can search by product name."
+- (Type a product name, select from results)
+- "Again, the ingredient list is shown, with dyes and flagged ingredients highlighted."
+
+**5. History**
+- "The History tab lets me revisit my last 10-20 scans or searches. I can click any to view details again."
+
+**6. Privacy and Simplicity**
+- "All data is stored locally. No AI, no cloud sync, just fast, private ingredient transparency."
+
+---
+
+_This walkthrough and script can be used for demos, onboarding, or user testing._
