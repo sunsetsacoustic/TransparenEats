@@ -1,67 +1,13 @@
-import { useState, useEffect } from 'react';
-import BarcodeScannerComponent from './components/BarcodeScannerComponent';
-import { Container, Typography, Box, CircularProgress, Tabs, Tab } from '@mui/material';
+import { useState } from 'react';
+import { Container, Typography, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import ProductCard from './components/ProductCard';
-import SearchBar from './components/SearchBar';
-import HistoryList from './components/HistoryList';
-import SearchResultsList from './components/SearchResultsList';
-import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
 import BottomNav from './components/BottomNav';
+import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
 
-/**
- * Loads the scan/search history from localStorage.
- */
-function loadHistory(): Product[] {
-  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-}
-
-/**
- * Saves a product to the scan/search history in localStorage.
- */
-function saveToHistory(product: Product) {
-  if (!product || !product.code) return;
-  let history: Product[] = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-  // Remove if already exists
-  history = history.filter((item: Product) => item.code !== product.code);
-  // Add to front
-  history.unshift({
-    code: product.code,
-    product_name: product.product_name,
-    brands: product.brands,
-    ingredients_text: product.ingredients_text,
-    image_front_url: product.image_front_url,
-    nutriments: product.nutriments,
-  });
-  // Limit history
-  if (history.length > HISTORY_LIMIT) history = history.slice(0, HISTORY_LIMIT);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-}
-
-/**
- * Fetches product data from Open Food Facts by barcode.
- */
-function fetchProductByBarcode(barcode: string): Promise<{ status: number; product: Product }> {
-  return fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`).then(res => res.json());
-}
-
-/**
- * Searches for products by name using Open Food Facts.
- */
-function searchProductsByName(query: string): Promise<{ products: Product[] }> {
-  return fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`).then(res => res.json());
-}
-
-/**
- * Finds food dyes in the ingredient text.
- */
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
@@ -73,9 +19,6 @@ function findDyes(ingredientText: string | null | undefined): Dye[] {
   });
 }
 
-/**
- * Finds flagged (critical) ingredients in the ingredient text.
- */
 function findFlaggedIngredients(ingredientText: string | null | undefined): CriticalIngredient[] {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
@@ -86,101 +29,43 @@ function findFlaggedIngredients(ingredientText: string | null | undefined): Crit
   });
 }
 
-/**
- * Main application component for Ingredient Aware.
- */
 export default function App() {
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [searching, setSearching] = useState<boolean>(false);
-  const [history, setHistory] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState(0);
   const [ingredientInfo, setIngredientInfo] = useState<IngredientInfo | null>(null);
 
-  useEffect(() => {
-    setHistory(loadHistory());
-  }, []);
-
-  const handleDetected = async (code: string) => {
-    setProduct(null);
-    setError(null);
-    setLoading(true);
-    try {
-      const data = await fetchProductByBarcode(code);
-      if (data.status === 1) {
-        setProduct(data.product);
-        saveToHistory(data.product);
-        setHistory(loadHistory());
-      } else {
-        setError('Product not found.');
-      }
-    } catch (e) {
-      setError('Error fetching product.');
-    }
-    setLoading(false);
+  // Example product for demo
+  const demoProduct: Product = {
+    code: '123456',
+    product_name: 'Cereal Honey Nut',
+    brands: 'Cheerios',
+    image_front_url: 'https://static.openfoodfacts.org/images/products/001/600/014/5892/front_en.4.400.jpg',
+    nutriments: {
+      sugars_100g: 32,
+      'energy-kcal_100g': 393,
+      sodium_100g: 571,
+      fiber_100g: 3.6,
+      proteins_100g: 7.1,
+    },
   };
 
-  const handleSearch = async () => {
-    setProduct(null);
-    setError(null);
-    setSearchResults([]);
-    setSearching(true);
-    try {
-      const data = await searchProductsByName(search);
-      if (data.products && data.products.length > 0) {
-        setSearchResults(data.products);
-      } else {
-        setError('No products found.');
-      }
-    } catch (e) {
-      setError('Error searching for products.');
-    }
-    setSearching(false);
-  };
-
-  const handleSelectProduct = (prod: Product) => {
-    setProduct(prod);
-    setSearchResults([]);
-    setError(null);
-    saveToHistory(prod);
-    setHistory(loadHistory());
-  };
-
-  const dyes = product ? findDyes(product.ingredients_text) : [];
-  const flaggedIngredients = product ? findFlaggedIngredients(product.ingredients_text) : [];
-
-  // Helper to get info for an ingredient
-  function handleIngredientClick(ingredient: string) {
-    const flagged = flaggedIngredients.find(f => ingredient.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ingredient.toLowerCase().includes(a.toLowerCase())));
-    const dye = dyes.find(d => ingredient.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ingredient.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ingredient.toLowerCase().includes(e.toLowerCase())));
-    if (flagged) {
-      setIngredientInfo({ name: flagged.name, info: flagged.warning, isFlagged: true, isDye: false });
-      return;
-    }
-    if (dye) {
-      setIngredientInfo({ name: dye.name, info: `This is a food dye. Also known as: ${[dye.name, ...dye.aliases, ...dye.eNumbers].join(', ')}`, isFlagged: false, isDye: true });
-      return;
-    }
-    // For non-flagged, non-dye ingredients, show a generic message or nothing
-    setIngredientInfo({ name: ingredient, info: 'No additional information available.', isFlagged: false, isDye: false });
-  }
+  // For demo, always show the demo product
+  const dyes = findDyes(demoProduct.ingredients_text);
+  const flaggedIngredients = findFlaggedIngredients(demoProduct.ingredients_text);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      {product && (
-        <ProductCard
-          product={product}
-          flaggedIngredients={flaggedIngredients}
-          dyes={dyes}
-          handleIngredientClick={handleIngredientClick}
-        />
-      )}
+      <ProductCard
+        product={demoProduct}
+        flaggedIngredients={flaggedIngredients}
+        dyes={dyes}
+        handleIngredientClick={() => {}}
+      />
       <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }}>
         <DialogTitle>{ingredientInfo?.name}</DialogTitle>
         <DialogContent>
