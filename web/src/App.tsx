@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress } from '@mui/material';
-import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
+import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
 import HistoryList from './components/HistoryList';
 import SearchBar from './components/SearchBar';
 import SearchResultsList from './components/SearchResultsList';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
-import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
+import type { Product, Dye, IngredientInfo } from './types';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -15,17 +15,17 @@ function findDyes(ingredientText: string | null | undefined): Dye[] {
   return FOOD_DYES.filter((dye: Dye) => {
     if (lower.includes(dye.name.toLowerCase())) return true;
     if (dye.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
-    if (dye.eNumbers.some((eNum: string) => lower.includes(eNum.toLowerCase()))) return true;
+    if (dye.eNumbers && dye.eNumbers.some((eNum: string) => lower.includes(eNum.toLowerCase()))) return true;
     return false;
   });
 }
 
-function findFlaggedIngredients(ingredientText: string | null | undefined): CriticalIngredient[] {
+function findFlaggedIngredients(ingredientText: string | null | undefined) {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
-  return CRITICAL_INGREDIENTS.filter((ing: CriticalIngredient) => {
-    if (lower.includes(ing.name.toLowerCase())) return true;
-    if (ing.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
+  return FLAGGED_INGREDIENTS.filter((item) => {
+    if (lower.includes(item.name.toLowerCase())) return true;
+    if (item.aliases && item.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
     return false;
   });
 }
@@ -74,7 +74,7 @@ export default function App() {
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
-        setTab(0);
+        setTab(0); // Switch to Home tab after successful scan
       } else {
         setError('Product not found.');
       }

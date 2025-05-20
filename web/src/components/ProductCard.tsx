@@ -6,6 +6,7 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import GrainIcon from '@mui/icons-material/Grain';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import type { Product, CriticalIngredient, Dye } from '../types';
 
 /**
@@ -15,9 +16,16 @@ import type { Product, CriticalIngredient, Dye } from '../types';
  * @property dyes - Array of dye objects found in the product.
  * @property handleIngredientClick - Callback for when an ingredient chip is clicked.
  */
+interface FlaggedIngredient {
+  name: string;
+  aliases: string[];
+  severity: 'critical' | 'caution';
+  warning: string;
+}
+
 interface ProductCardProps {
   product: Product;
-  flaggedIngredients: CriticalIngredient[];
+  flaggedIngredients: FlaggedIngredient[];
   dyes: Dye[];
   handleIngredientClick: (ing: string) => void;
 }
@@ -87,7 +95,7 @@ const POSITIVE_FIELDS = [
   },
 ];
 
-const getScore = (flaggedIngredients: CriticalIngredient[], dyes: Dye[]) => {
+const getScore = (flaggedIngredients: FlaggedIngredient[], dyes: Dye[]) => {
   // Example: 100 - 10*flagged - 5*dyes, clamp 0-100
   let score = 100 - 10 * flaggedIngredients.length - 5 * dyes.length;
   if (score < 0) score = 0;
@@ -140,6 +148,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           </Box>
         </Box>
       </Box>
+      <Divider sx={{ my: 2 }} />
+      {/* Flagged Ingredients Section */}
+      {flaggedIngredients.length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Flagged Ingredients</Typography>
+          {flaggedIngredients.map((flag, idx) => (
+            <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 1, gap: 1 }}>
+              {flag.severity === 'critical' ? (
+                <WarningIcon color="error" fontSize="small" sx={{ mt: 0.5 }} />
+              ) : (
+                <ReportProblemIcon sx={{ color: '#FFA726', fontSize: 20, mt: 0.5 }} />
+              )}
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 500, color: flag.severity === 'critical' ? '#F44336' : '#FFA726' }}>{flag.name}</Typography>
+                <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 0.5 }}>{flag.warning}</Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      )}
       <Divider sx={{ my: 2 }} />
       {/* Negatives */}
       <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Negatives</Typography>
