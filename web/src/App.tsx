@@ -183,7 +183,7 @@ export default function App() {
   } else if (tab === 1) {
     // Scan
     content = (
-      <BarcodeScannerComponent onDetected={fetchProductByBarcode} />
+      <BarcodeScannerComponent onDetected={fetchProductByBarcode} autoStart={true} />
     );
   } else if (tab === 2) {
     // History

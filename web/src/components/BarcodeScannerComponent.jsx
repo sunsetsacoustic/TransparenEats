@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-export default function BarcodeScannerComponent({ onDetected }) {
+export default function BarcodeScannerComponent({ onDetected, autoStart = false }) {
   const videoRef = useRef(null);
   const [error, setError] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -48,6 +48,13 @@ export default function BarcodeScannerComponent({ onDetected }) {
       if (scanLineInterval.current) clearInterval(scanLineInterval.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (autoStart) {
+      startScanner();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart]);
 
   const startScanner = async () => {
     setError(null);
