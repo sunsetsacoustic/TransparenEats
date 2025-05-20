@@ -11,6 +11,9 @@ import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import PaletteIcon from '@mui/icons-material/Palette';
 import ProductCard from './components/ProductCard';
+import SearchBar from './components/SearchBar';
+import HistoryList from './components/HistoryList';
+import SearchResultsList from './components/SearchResultsList';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
@@ -158,54 +161,22 @@ export default function App() {
         </Tabs>
       </Box>
       {tab === 0 && (
-        <Box mb={2}>
-          <TextField
-            label="Search for a food item"
+        <>
+          <SearchBar
             value={search}
             onChange={e => setSearch(e.target.value)}
-            fullWidth
-            sx={{ mb: 1 }}
+            onSearch={handleSearch}
+            loading={searching}
           />
-          <Button variant="contained" onClick={handleSearch} disabled={!search || searching} fullWidth>
-            {searching ? 'Searching...' : 'Search'}
-          </Button>
           {searchResults.length > 0 && (
-            <Paper sx={{ p: 2, mt: 2 }}>
-              <Typography variant="subtitle1">Search Results:</Typography>
-              <List>
-                {searchResults.map((prod, idx) => (
-                  <ListItem key={prod.code || idx} disablePadding>
-                    <ListItemButton onClick={() => handleSelectProduct(prod)}>
-                      <ListItemText
-                        primary={prod.product_name || 'No name'}
-                        secondary={prod.brands}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
+            <SearchResultsList results={searchResults} onSelect={handleSelectProduct} />
           )}
-        </Box>
+        </>
       )}
       {tab === 1 && (
         <Box mb={2}>
           {history.length > 0 ? (
-            <Paper sx={{ p: 2, mb: 2 }}>
-              <Typography variant="subtitle1">Recent Scans/Searches:</Typography>
-              <List>
-                {history.map((item, idx) => (
-                  <ListItem key={item.code || idx} disablePadding>
-                    <ListItemButton onClick={() => handleSelectProduct(item)}>
-                      <ListItemText
-                        primary={item.product_name || 'No name'}
-                        secondary={item.brands}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
+            <HistoryList history={history} onSelect={handleSelectProduct} />
           ) : (
             <Typography color="text.secondary">No history yet.</Typography>
           )}
