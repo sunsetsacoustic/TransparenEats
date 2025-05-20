@@ -5,6 +5,13 @@ import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import PaletteIcon from '@mui/icons-material/Palette';
 
+/**
+ * Props for the ProductCard component.
+ * @property product - The product object to display.
+ * @property flaggedIngredients - Array of flagged ingredient objects.
+ * @property dyes - Array of dye objects found in the product.
+ * @property handleIngredientClick - Callback for when an ingredient chip is clicked.
+ */
 interface ProductCardProps {
   product: any;
   flaggedIngredients: any[];
@@ -12,6 +19,9 @@ interface ProductCardProps {
   handleIngredientClick: (ing: string) => void;
 }
 
+/**
+ * Displays a product card with image, name, score, negatives, positives, and ingredients.
+ */
 const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes, handleIngredientClick }) => {
   if (!product) return null;
   // Simple score: 100 - 15*flagged - 7*dyes, min 0
@@ -120,6 +130,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         {(() => {
           const text = product.ingredients_text || '';
           const items = text.split(/,|;|\./).map((i: string) => i.trim()).filter(Boolean);
+          // Only show ingredients that are not flagged or dyes
           return items.filter((ing: string) => {
             const isFlagged = flaggedIngredients.some(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
             const isDye = dyes.some(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));

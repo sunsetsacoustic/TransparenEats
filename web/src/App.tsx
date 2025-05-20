@@ -18,6 +18,16 @@ import SearchResultsList from './components/SearchResultsList';
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
 
+/**
+ * Loads the scan/search history from localStorage.
+ */
+function loadHistory(): any[] {
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+}
+
+/**
+ * Saves a product to the scan/search history in localStorage.
+ */
 function saveToHistory(product: any) {
   if (!product || !product.code) return;
   let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -35,22 +45,25 @@ function saveToHistory(product: any) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
-function loadHistory(): any[] {
-  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-}
-
+/**
+ * Fetches product data from Open Food Facts by barcode.
+ */
 function fetchProductByBarcode(barcode: string) {
-  // Open Food Facts API for product by barcode
   return fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
     .then(res => res.json());
 }
 
+/**
+ * Searches for products by name using Open Food Facts.
+ */
 function searchProductsByName(query: string) {
-  // Open Food Facts API for product search
   return fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`)
     .then(res => res.json());
 }
 
+/**
+ * Finds food dyes in the ingredient text.
+ */
 function findDyes(ingredientText: string | null | undefined) {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
@@ -62,6 +75,9 @@ function findDyes(ingredientText: string | null | undefined) {
   });
 }
 
+/**
+ * Finds flagged (critical) ingredients in the ingredient text.
+ */
 function findFlaggedIngredients(ingredientText: string | null | undefined) {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
@@ -72,6 +88,9 @@ function findFlaggedIngredients(ingredientText: string | null | undefined) {
   });
 }
 
+/**
+ * Main application component for Ingredient Aware.
+ */
 export default function App() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -136,9 +155,9 @@ export default function App() {
   const flaggedIngredients = product ? findFlaggedIngredients(product.ingredients_text) : [];
 
   // Helper to get info for an ingredient
-  function handleIngredientClick(ing: string) {
-    const flagged = flaggedIngredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
-    const dye = dyes.find(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));
+  function handleIngredientClick(ingredient: string) {
+    const flagged = flaggedIngredients.find(f => ingredient.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ingredient.toLowerCase().includes(a.toLowerCase())));
+    const dye = dyes.find(d => ingredient.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ingredient.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ingredient.toLowerCase().includes(e.toLowerCase())));
     if (flagged) {
       setIngredientInfo({ name: flagged.name, info: flagged.warning, isFlagged: true, isDye: false });
       return;
@@ -148,7 +167,7 @@ export default function App() {
       return;
     }
     // For non-flagged, non-dye ingredients, show a generic message or nothing
-    setIngredientInfo({ name: ing, info: 'No additional information available.', isFlagged: false, isDye: false });
+    setIngredientInfo({ name: ingredient, info: 'No additional information available.', isFlagged: false, isDye: false });
   }
 
   return (
