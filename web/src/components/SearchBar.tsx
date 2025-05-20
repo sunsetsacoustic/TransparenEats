@@ -7,19 +7,21 @@ import { Box, TextField, Button } from '@mui/material';
  * @property onChange - Handler for input value change.
  * @property onSearch - Handler for search button click.
  * @property loading - Whether a search is in progress.
+ * @property sx - Optional custom styling for the outer Box.
  */
 interface SearchBarProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSearch: () => void;
   loading: boolean;
+  sx?: object;
 }
 
 /**
  * Renders a search input and button for food item search.
  */
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch, loading }) => (
-  <Box mb={2}>
+const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch, loading, sx }) => (
+  <Box mb={2} sx={sx}>
     <TextField
       label="Search for a food item"
       value={value}

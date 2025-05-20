@@ -9,6 +9,8 @@ import SearchResultsList from './components/SearchResultsList';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
 import type { Product, Dye, IngredientInfo } from './types';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
+import Button from '@mui/material/Button';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -132,14 +134,35 @@ export default function App() {
         handleIngredientClick={() => {}}
       />
     ) : (
-      <Box sx={{ mt: 10, textAlign: 'center', color: '#888', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <EmojiFoodBeverageIcon sx={{ fontSize: 64, color: '#bdbdbd', mb: 2 }} />
-        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: 22, mb: 1 }}>
-          Welcome!
-        </Typography>
-        <Typography variant="body1" sx={{ fontSize: 18, color: '#888' }}>
-          Scan a barcode or search for a product to get started.
-        </Typography>
+      <Box sx={{ width: '100%', maxWidth: 420, mt: 2, px: 2 }}>
+        {/* Prominent Search Bar */}
+        <Box sx={{ mb: 2 }}>
+          <SearchBar
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
+            loading={loading}
+          />
+        </Box>
+        {/* Scan Barcode Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          size="large"
+          startIcon={<QrCodeScannerIcon />}
+          sx={{
+            borderRadius: 2,
+            fontWeight: 700,
+            fontSize: 18,
+            py: 1.5,
+            boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
+            mb: 2,
+          }}
+          onClick={() => setTab(1)}
+        >
+          Scan Barcode
+        </Button>
       </Box>
     );
   } else if (tab === 1) {
@@ -207,14 +230,35 @@ export default function App() {
         justifyContent: 'flex-start',
       }}>
         {tab === 0 && !product ? (
-          <Box sx={{ mt: 10, textAlign: 'center', color: '#888', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <EmojiFoodBeverageIcon sx={{ fontSize: 64, color: '#bdbdbd', mb: 2 }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: 22, mb: 1 }}>
-              Welcome!
-            </Typography>
-            <Typography variant="body1" sx={{ fontSize: 18, color: '#888' }}>
-              Scan a barcode or search for a product to get started.
-            </Typography>
+          <Box sx={{ width: '100%', maxWidth: 420, mt: 2, px: 2 }}>
+            {/* Prominent Search Bar */}
+            <Box sx={{ mb: 2 }}>
+              <SearchBar
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
+                loading={loading}
+              />
+            </Box>
+            {/* Scan Barcode Button */}
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
+              startIcon={<QrCodeScannerIcon />}
+              sx={{
+                borderRadius: 2,
+                fontWeight: 700,
+                fontSize: 18,
+                py: 1.5,
+                boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
+                mb: 2,
+              }}
+              onClick={() => setTab(1)}
+            >
+              Scan Barcode
+            </Button>
           </Box>
         ) : content}
         <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
