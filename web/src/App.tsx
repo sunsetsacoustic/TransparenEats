@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -134,9 +134,9 @@ export default function App() {
         handleIngredientClick={() => {}}
       />
     ) : (
-      <Box sx={{ width: '100%', mt: 2, px: { xs: 2, sm: 0 }, boxSizing: 'border-box' }}>
+      <Box sx={{ width: '100%', mt: 2, boxSizing: 'border-box' }}>
         {/* Prominent Search Bar */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2, width: '100%' }}>
           <SearchBar
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -158,6 +158,7 @@ export default function App() {
             py: 1.5,
             boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
             mb: 2,
+            width: '100%',
           }}
           onClick={() => setTab(1)}
         >
@@ -216,11 +217,12 @@ export default function App() {
         </Toolbar>
       </AppBar>
       {/* Main Content */}
-      <Container maxWidth="sm" disableGutters sx={{
+      <Box sx={{
         pt: { xs: 8, sm: 10 },
         pb: 10,
-        px: { xs: 0, sm: 2 },
-        width: { xs: '100vw', sm: 'auto' },
+        px: { xs: 2, sm: 0 },
+        width: '100vw',
+        maxWidth: '100vw',
         minHeight: '100vh',
         boxSizing: 'border-box',
         flex: 1,
@@ -230,9 +232,9 @@ export default function App() {
         justifyContent: 'flex-start',
       }}>
         {tab === 0 && !product ? (
-          <Box sx={{ width: '100%', mt: 2, px: { xs: 2, sm: 0 }, boxSizing: 'border-box' }}>
+          <Box sx={{ width: '100%', mt: 2, boxSizing: 'border-box' }}>
             {/* Prominent Search Bar */}
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2, width: '100%' }}>
               <SearchBar
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -254,6 +256,7 @@ export default function App() {
                 py: 1.5,
                 boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
                 mb: 2,
+                width: '100%',
               }}
               onClick={() => setTab(1)}
             >
@@ -269,7 +272,7 @@ export default function App() {
             </DialogContentText>
           </DialogContent>
         </Dialog>
-      </Container>
+      </Box>
       {/* Bottom Navigation with elevation */}
       <Box sx={{
         position: 'fixed',
