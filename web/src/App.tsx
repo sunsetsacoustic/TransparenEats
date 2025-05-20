@@ -27,7 +27,7 @@ function findFlaggedIngredients(ingredientText: string | null | undefined) {
     if (lower.includes(item.name.toLowerCase())) return true;
     if (item.aliases && item.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
     return false;
-  });
+  }).map(item => ({ ...item, severity: item.severity as 'critical' | 'caution' }));
 }
 
 const HISTORY_KEY = 'ingredientAwareHistory';

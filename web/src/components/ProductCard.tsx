@@ -7,7 +7,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import GrainIcon from '@mui/icons-material/Grain';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import type { Product, CriticalIngredient, Dye } from '../types';
+import type { Product, Dye } from '../types';
 
 /**
  * Props for the ProductCard component.
