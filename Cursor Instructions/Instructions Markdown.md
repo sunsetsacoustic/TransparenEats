@@ -1,6 +1,6 @@
 # Project: Ingredient Aware (Food Scanner) - MVP Document
 
-**Version:** 0.1  
+**Version:** 1.0  
 **Date:** May 19, 2025
 
 ## 1. MVP Core Goal
@@ -17,7 +17,7 @@ To provide users with a simple way to scan food barcodes or search for food item
 
 ### 3.1. Barcode Scanning
 * **Description:** Users can scan UPC/EAN barcodes on food packaging using their device's camera.
-* **Technology:** Integrate a mobile barcode scanning SDK (e.g., native AVFoundation/ML Kit, or a commercial SDK with free/low-cost tier).
+* **Technology:** Integrate a barcode scanning SDK or web camera solution.
 * **Outcome:** Barcode is decoded and used to query the food database.
 
 ### 3.2. Manual Food Item Search
@@ -42,35 +42,27 @@ To provide users with a simple way to scan food barcodes or search for food item
 
 ### 3.6. Scan History
 * **Description:** The app locally stores the last 10-20 scanned/searched items for quick reference.
-* **Technology:** Local device storage (SQLite, CoreData, or SharedPreferences).
+* **Technology:** Local device storage (localStorage for web, SQLite/AsyncStorage for mobile).
 * **Outcome:** Users can revisit recently viewed items without re-scanning/searching.
 
 ## 4. Technology Stack & Implementation
 
-### 4.1. Mobile Development
-* **Framework Options:**
-  * **Native:** iOS (Swift) or Android (Kotlin)
-  * **Cross-platform:** React Native or Flutter for faster development across platforms
+### 4.1. Web Development
+* **Frontend:** React + Material-UI
+* **Barcode Scanning:** react-qr-barcode-scanner or similar
+* **API:** Open Food Facts (free, extensive, user-contributed)
+* **Backend:** Node.js + Express (for proxying/normalization if needed)
 
-### 4.2. Backend Requirements
-* Lightweight backend service for:
-  * API proxying to food databases
-  * Data normalization for consistent ingredient display
-  * Basic analytics collection
-
-### 4.3. Data Sources
+### 4.2. Data Sources
 * **Food Product Database API:**
-  * **Primary:** Open Food Facts (free, extensive, user-contributed)
-  * **Alternatives:** Edamam, FatSecret, or USDA FoodData Central (free tiers)
-* **Barcode Scanning:**
-  * Native capabilities (AVFoundation/ML Kit) to minimize costs
+  * **Primary:** Open Food Facts
 * **Ingredient Database:**
   * Curated internal list of food dyes with US & EU naming conventions
   * ~10 other "flagged" ingredients with standardized warning messages
   * Sources: FDA guidelines, CSPI, EWG (publicly available information)
 
-### 4.4. Storage & Persistence
-* Local database for scan history and offline access to core warnings
+### 4.3. Storage & Persistence
+* Local storage for scan/search history and warnings
 * No cloud synchronization for MVP phase
 
 ## 5. Non-Goals for MVP (Future Roadmap)
@@ -98,19 +90,13 @@ To provide users with a simple way to scan food barcodes or search for food item
 
 ## 7. Post-MVP Roadmap
 
-### Short-term Enhancements
 * Expanded ingredient database with more additives and preservatives
-* Detailed information links for identified ingredients
 * UI/UX refinements based on initial user feedback
 * Offline mode with basic functionality
-
-### Medium-term Features
 * User profiles with personalized ingredient avoidance lists
 * Full nutritional information display
 * "Free From" categorization and advanced allergen flagging
 * Social sharing capabilities
-
-### Long-term Vision
 * Machine learning for ingredient image recognition (label photos)
 * Integration with shopping lists and meal planning
 * Product recommendation engine for alternatives
