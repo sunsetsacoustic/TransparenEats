@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
 import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText, Chip, Tabs, Tab } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
-import type { ChangeEvent } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -66,7 +65,6 @@ function findFlaggedIngredients(ingredientText: string | null | undefined) {
 }
 
 export default function App() {
-  const [barcode, setBarcode] = useState<string>('');
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +80,6 @@ export default function App() {
   }, []);
 
   const handleDetected = async (code: string) => {
-    setBarcode(code);
     setProduct(null);
     setError(null);
     setLoading(true);
