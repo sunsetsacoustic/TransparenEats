@@ -1,5 +1,6 @@
 import React from 'react';
 import { Paper, Typography, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import type { Product } from '../types';
 
 /**
  * Props for the SearchResultsList component.
@@ -7,8 +8,8 @@ import { Paper, Typography, List, ListItem, ListItemButton, ListItemText } from 
  * @property onSelect - Handler for selecting a product from search results.
  */
 interface SearchResultsListProps {
-  results: any[];
-  onSelect: (item: any) => void;
+  results: Product[];
+  onSelect: (item: Product) => void;
 }
 
 /**

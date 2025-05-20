@@ -14,6 +14,7 @@ import ProductCard from './components/ProductCard';
 import SearchBar from './components/SearchBar';
 import HistoryList from './components/HistoryList';
 import SearchResultsList from './components/SearchResultsList';
+import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
@@ -21,24 +22,26 @@ const HISTORY_LIMIT = 20;
 /**
  * Loads the scan/search history from localStorage.
  */
-function loadHistory(): any[] {
+function loadHistory(): Product[] {
   return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
 }
 
 /**
  * Saves a product to the scan/search history in localStorage.
  */
-function saveToHistory(product: any) {
+function saveToHistory(product: Product) {
   if (!product || !product.code) return;
-  let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  let history: Product[] = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
   // Remove if already exists
-  history = history.filter((item: any) => item.code !== product.code);
+  history = history.filter((item: Product) => item.code !== product.code);
   // Add to front
   history.unshift({
     code: product.code,
     product_name: product.product_name,
     brands: product.brands,
-    ingredients_text: product.ingredients_text
+    ingredients_text: product.ingredients_text,
+    image_front_url: product.image_front_url,
+    nutriments: product.nutriments,
   });
   // Limit history
   if (history.length > HISTORY_LIMIT) history = history.slice(0, HISTORY_LIMIT);
@@ -48,26 +51,24 @@ function saveToHistory(product: any) {
 /**
  * Fetches product data from Open Food Facts by barcode.
  */
-function fetchProductByBarcode(barcode: string) {
-  return fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
-    .then(res => res.json());
+function fetchProductByBarcode(barcode: string): Promise<{ status: number; product: Product }> {
+  return fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`).then(res => res.json());
 }
 
 /**
  * Searches for products by name using Open Food Facts.
  */
-function searchProductsByName(query: string) {
-  return fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`)
-    .then(res => res.json());
+function searchProductsByName(query: string): Promise<{ products: Product[] }> {
+  return fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`).then(res => res.json());
 }
 
 /**
  * Finds food dyes in the ingredient text.
  */
-function findDyes(ingredientText: string | null | undefined) {
+function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
-  return FOOD_DYES.filter(dye => {
+  return FOOD_DYES.filter((dye: Dye) => {
     if (lower.includes(dye.name.toLowerCase())) return true;
     if (dye.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
     if (dye.eNumbers.some((eNum: string) => lower.includes(eNum.toLowerCase()))) return true;
@@ -78,10 +79,10 @@ function findDyes(ingredientText: string | null | undefined) {
 /**
  * Finds flagged (critical) ingredients in the ingredient text.
  */
-function findFlaggedIngredients(ingredientText: string | null | undefined) {
+function findFlaggedIngredients(ingredientText: string | null | undefined): CriticalIngredient[] {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
-  return CRITICAL_INGREDIENTS.filter(ing => {
+  return CRITICAL_INGREDIENTS.filter((ing: CriticalIngredient) => {
     if (lower.includes(ing.name.toLowerCase())) return true;
     if (ing.aliases.some((alias: string) => lower.includes(alias.toLowerCase()))) return true;
     return false;
@@ -92,15 +93,15 @@ function findFlaggedIngredients(ingredientText: string | null | undefined) {
  * Main application component for Ingredient Aware.
  */
 export default function App() {
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [searching, setSearching] = useState<boolean>(false);
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<Product[]>([]);
   const [tab, setTab] = useState(0);
-  const [ingredientInfo, setIngredientInfo] = useState<{ name: string, info: string, isFlagged: boolean, isDye: boolean } | null>(null);
+  const [ingredientInfo, setIngredientInfo] = useState<IngredientInfo | null>(null);
 
   useEffect(() => {
     setHistory(loadHistory());
@@ -143,7 +144,7 @@ export default function App() {
     setSearching(false);
   };
 
-  const handleSelectProduct = (prod: any) => {
+  const handleSelectProduct = (prod: Product) => {
     setProduct(prod);
     setSearchResults([]);
     setError(null);

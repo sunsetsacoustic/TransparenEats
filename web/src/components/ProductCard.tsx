@@ -4,6 +4,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import PaletteIcon from '@mui/icons-material/Palette';
+import type { Product, Dye, CriticalIngredient } from '../types';
 
 /**
  * Props for the ProductCard component.
@@ -13,9 +14,9 @@ import PaletteIcon from '@mui/icons-material/Palette';
  * @property handleIngredientClick - Callback for when an ingredient chip is clicked.
  */
 interface ProductCardProps {
-  product: any;
-  flaggedIngredients: any[];
-  dyes: any[];
+  product: Product;
+  flaggedIngredients: CriticalIngredient[];
+  dyes: Dye[];
   handleIngredientClick: (ing: string) => void;
 }
 
