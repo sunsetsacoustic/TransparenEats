@@ -160,6 +160,24 @@ export default function App() {
         >
           Scan Barcode
         </Button>
+        {/* Featured categories placeholder */}
+        <Box sx={{ width: '100%', maxWidth: 400, mt: 2, mb: 2 }}>
+          <Box sx={{
+            background: 'linear-gradient(90deg, #e3f2fd 0%, #fce4ec 100%)',
+            borderRadius: 3,
+            p: 2,
+            minHeight: 80,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#888',
+            fontWeight: 500,
+            fontSize: 18,
+            boxShadow: '0 1px 4px 0 rgba(25, 118, 210, 0.06)',
+          }}>
+            <span>🌟 Featured categories coming soon!</span>
+          </Box>
+        </Box>
       </Box>
     );
   } else if (tab === 1) {
@@ -189,86 +207,100 @@ export default function App() {
       minHeight: '100vh',
       width: '100vw',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
+      position: 'relative',
       pb: 0,
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-    }}>
-      {/* AppBar/Header */}
-      <AppBar position="fixed" color="inherit" elevation={1} sx={{
-        background: 'rgba(255,255,255,0.95)',
-        boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
-        borderBottom: '1px solid #e0e0e0',
-        zIndex: 1201,
-        width: '100vw',
-        left: 0,
+      '::before': {
+        content: '""',
+        position: 'absolute',
         top: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        px: { xs: 0, sm: 2 },
-      }}>
-        <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
-          <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 22, letterSpacing: 0.5, color: '#1976d2', textAlign: 'center', flex: 1 }}>
-            Ingredient Aware
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      {/* Main Content */}
-      <Box sx={{
-        pt: { xs: 10, sm: 12 },
-        pb: 10,
-        px: { xs: 2, sm: 0 },
-        width: '100vw',
-        maxWidth: '100vw',
-        minHeight: '100vh',
-        boxSizing: 'border-box',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        {content}
-        <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
-          <DialogTitle>{ingredientInfo?.name}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {ingredientInfo?.info}
-            </DialogContentText>
-          </DialogContent>
-        </Dialog>
-        {/* Product details dialog for history */}
-        <Dialog open={!!selectedHistoryProduct} onClose={() => setSelectedHistoryProduct(null)} fullWidth maxWidth="sm">
-          {selectedHistoryProduct && (
-            <ProductCard
-              product={selectedHistoryProduct}
-              flaggedIngredients={findFlaggedIngredients(selectedHistoryProduct.ingredients_text)}
-              dyes={findDyes(selectedHistoryProduct.ingredients_text)}
-              handleIngredientClick={() => {}}
-            />
-          )}
-        </Dialog>
-      </Box>
-      {/* Bottom Navigation with elevation and safe area */}
-      <Box sx={{
-        position: 'fixed',
         left: 0,
-        bottom: 0,
         width: '100vw',
-        boxShadow: '0 -2px 12px 0 rgba(0,0,0,0.08)',
-        background: '#fff',
-        zIndex: 1202,
-        borderTop: '1px solid #e0e0e0',
-        pb: { xs: 'env(safe-area-inset-bottom)', sm: 0 },
-        px: { xs: 0, sm: 0 },
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
+        height: '100vh',
+        background: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect width=\'40\' height=\'40\' fill=\'%23e3f2fd\'/%3E%3Ccircle cx=\'20\' cy=\'20\' r=\'2\' fill=\'%23bbdefb\'/%3E%3C/svg%3E")',
+        opacity: 0.15,
+        zIndex: 0,
+      },
+    }}>
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100vw', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* AppBar/Header */}
+        <AppBar position="fixed" color="inherit" elevation={1} sx={{
+          background: 'rgba(255,255,255,0.95)',
+          boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
+          borderBottom: '1px solid #e0e0e0',
+          zIndex: 1201,
+          width: '100vw',
+          left: 0,
+          top: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { xs: 0, sm: 2 },
+        }}>
+          <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
+            <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 900, fontSize: 24, letterSpacing: 1, color: 'primary.main', textAlign: 'center', flex: 1, fontFamily: 'Montserrat, Arial, sans-serif', textShadow: '0 2px 8px #e3f2fd' }}>
+              Ingredient Aware
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        {/* Main Content */}
+        <Box sx={{
+          pt: { xs: 10, sm: 12 },
+          pb: 10,
+          px: { xs: 2, sm: 0 },
+          width: '100vw',
+          maxWidth: '100vw',
+          minHeight: '100vh',
+          boxSizing: 'border-box',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {content}
+          <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
+            <DialogTitle>{ingredientInfo?.name}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                {ingredientInfo?.info}
+              </DialogContentText>
+            </DialogContent>
+          </Dialog>
+          {/* Product details dialog for history */}
+          <Dialog open={!!selectedHistoryProduct} onClose={() => setSelectedHistoryProduct(null)} fullWidth maxWidth="sm">
+            {selectedHistoryProduct ? (
+              <ProductCard
+                product={selectedHistoryProduct}
+                flaggedIngredients={findFlaggedIngredients(selectedHistoryProduct.ingredients_text)}
+                dyes={findDyes(selectedHistoryProduct.ingredients_text)}
+                handleIngredientClick={() => {}}
+              />
+            ) : null}
+          </Dialog>
+        </Box>
+        {/* Bottom Navigation with elevation and safe area */}
+        <Box sx={{
+          position: 'fixed',
+          left: 0,
+          bottom: 0,
+          width: '100vw',
+          boxShadow: '0 -2px 12px 0 rgba(0,0,0,0.08)',
+          background: '#fff',
+          zIndex: 1202,
+          borderTop: '1px solid #e0e0e0',
+          pb: { xs: 'env(safe-area-inset-bottom)', sm: 0 },
+          px: { xs: 0, sm: 0 },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
+        </Box>
       </Box>
     </Box>
   );
