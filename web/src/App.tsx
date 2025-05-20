@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
@@ -49,6 +49,19 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Ensure viewport meta tag for mobile scaling
+    let viewport = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null;
+    if (!viewport) {
+      viewport = document.createElement('meta') as HTMLMetaElement;
+      viewport.name = 'viewport';
+      viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+      document.head.appendChild(viewport);
+    } else {
+      viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+    }
+  }, []);
 
   // Save history to localStorage
   const saveHistory = (newHistory: Product[]) => {
@@ -145,10 +158,20 @@ export default function App() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
-      <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
+    <Container maxWidth="sm" sx={{
+      mt: { xs: 1, sm: 4 },
+      pb: 8,
+      px: { xs: 0, sm: 2 },
+      width: { xs: '100vw', sm: 'auto' },
+      minHeight: '100vh',
+      boxSizing: 'border-box',
+      background: '#fafbfc',
+    }}>
+      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: 22, sm: 32 }, textAlign: 'center', mt: { xs: 2, sm: 4 } }}>
+        Ingredient Aware (MVP)
+      </Typography>
       {content}
-      <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }}>
+      <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
         <DialogTitle>{ingredientInfo?.name}</DialogTitle>
         <DialogContent>
           <DialogContentText>
