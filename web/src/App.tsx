@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
-import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText, Chip } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Paper, TextField, Button, List, ListItem, ListItemButton, ListItemText, Chip, Tabs, Tab } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
 import type { ChangeEvent } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 
 const HISTORY_KEY = 'ingredientAwareHistory';
 const HISTORY_LIMIT = 20;
@@ -70,7 +74,8 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState<boolean>(false);
   const [history, setHistory] = useState<any[]>([]);
-  const [historyOpen, setHistoryOpen] = useState<boolean>(false);
+  const [tab, setTab] = useState(0);
+  const [ingredientInfo, setIngredientInfo] = useState<{ name: string, info: string, isFlagged: boolean, isDye: boolean } | null>(null);
 
   useEffect(() => {
     setHistory(loadHistory());
@@ -125,62 +130,87 @@ export default function App() {
   const dyes = product ? findDyes(product.ingredients_text) : [];
   const flaggedIngredients = product ? findFlaggedIngredients(product.ingredients_text) : [];
 
+  // Helper to get info for an ingredient
+  function handleIngredientClick(ing: string) {
+    const flagged = flaggedIngredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
+    const dye = dyes.find(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));
+    if (flagged) {
+      setIngredientInfo({ name: flagged.name, info: flagged.warning, isFlagged: true, isDye: false });
+      return;
+    }
+    if (dye) {
+      setIngredientInfo({ name: dye.name, info: `This is a food dye. Also known as: ${[dye.name, ...dye.aliases, ...dye.eNumbers].join(', ')}`, isFlagged: false, isDye: true });
+      return;
+    }
+    // For non-flagged, non-dye ingredients, show a generic message or nothing
+    setIngredientInfo({ name: ing, info: 'No additional information available.', isFlagged: false, isDye: false });
+  }
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
-      <Box mb={2}>
-        <BarcodeScannerComponent onDetected={handleDetected} />
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs value={tab} onChange={(_, v) => setTab(v)} centered>
+          <Tab label="Search" />
+          <Tab label="History" />
+        </Tabs>
       </Box>
-      <Box mb={2}>
-        <TextField
-          label="Search for a food item"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          fullWidth
-          sx={{ mb: 1 }}
-        />
-        <Button variant="contained" onClick={handleSearch} disabled={!search || searching}>
-          {searching ? 'Searching...' : 'Search'}
-        </Button>
-      </Box>
-      {searchResults.length > 0 && (
-        <Paper sx={{ p: 2, mt: 2 }}>
-          <Typography variant="subtitle1">Search Results:</Typography>
-          <List>
-            {searchResults.map((prod, idx) => (
-              <ListItem key={prod.code || idx} disablePadding>
-                <ListItemButton onClick={() => handleSelectProduct(prod)}>
-                  <ListItemText
-                    primary={prod.product_name || 'No name'}
-                    secondary={prod.brands}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
+      {tab === 0 && (
+        <Box mb={2}>
+          <TextField
+            label="Search for a food item"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            fullWidth
+            sx={{ mb: 1 }}
+          />
+          <Button variant="contained" onClick={handleSearch} disabled={!search || searching} fullWidth>
+            {searching ? 'Searching...' : 'Search'}
+          </Button>
+          {searchResults.length > 0 && (
+            <Paper sx={{ p: 2, mt: 2 }}>
+              <Typography variant="subtitle1">Search Results:</Typography>
+              <List>
+                {searchResults.map((prod, idx) => (
+                  <ListItem key={prod.code || idx} disablePadding>
+                    <ListItemButton onClick={() => handleSelectProduct(prod)}>
+                      <ListItemText
+                        primary={prod.product_name || 'No name'}
+                        secondary={prod.brands}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          )}
+        </Box>
+      )}
+      {tab === 1 && (
+        <Box mb={2}>
+          {history.length > 0 ? (
+            <Paper sx={{ p: 2, mb: 2 }}>
+              <Typography variant="subtitle1">Recent Scans/Searches:</Typography>
+              <List>
+                {history.map((item, idx) => (
+                  <ListItem key={item.code || idx} disablePadding>
+                    <ListItemButton onClick={() => handleSelectProduct(item)}>
+                      <ListItemText
+                        primary={item.product_name || 'No name'}
+                        secondary={item.brands}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          ) : (
+            <Typography color="text.secondary">No history yet.</Typography>
+          )}
+        </Box>
       )}
       <Box mb={2}>
-        <Button variant="outlined" onClick={() => setHistoryOpen(h => !h)} sx={{ mb: 1 }}>
-          {historyOpen ? 'Hide' : 'Show'} Scan/Search History
-        </Button>
-        {historyOpen && history.length > 0 && (
-          <Paper sx={{ p: 2, mb: 2 }}>
-            <Typography variant="subtitle1">Recent Scans/Searches:</Typography>
-            <List>
-              {history.map((item, idx) => (
-                <ListItem key={item.code || idx} disablePadding>
-                  <ListItemButton onClick={() => handleSelectProduct(item)}>
-                    <ListItemText
-                      primary={item.product_name || 'No name'}
-                      secondary={item.brands}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        )}
+        <BarcodeScannerComponent onDetected={handleDetected} />
       </Box>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
@@ -212,13 +242,14 @@ export default function App() {
             {(() => {
               // Split ingredients by comma, semicolon, or period
               const text = product.ingredients_text || '';
-              const items = text.split(/,|;|\./).map(i => i.trim()).filter(Boolean);
-              return items.map((ing, idx) => {
-                const isFlagged = flaggedIngredients.some(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some(a => ing.toLowerCase().includes(a.toLowerCase())));
-                const isDye = dyes.some(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some(a => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some(e => ing.toLowerCase().includes(e.toLowerCase())));
+              const items = text.split(/,|;|\./).map((i: string) => i.trim()).filter(Boolean);
+              return items.map((ing: string, idx: number) => {
+                const isFlagged = flaggedIngredients.some(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
+                const isDye = dyes.some(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));
                 return (
                   <span
                     key={idx}
+                    onClick={() => handleIngredientClick(ing)}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -236,6 +267,7 @@ export default function App() {
                       boxShadow: isFlagged || isDye ? '0 2px 8px rgba(255,82,82,0.12)' : 'none',
                       border: isFlagged ? '2px solid #ff5252' : isDye ? '2px solid #ffa751' : 'none',
                       transition: 'background 0.3s',
+                      cursor: 'pointer',
                     }}
                   >
                     {isFlagged && <span style={{ marginRight: 6, fontSize: 18 }}>⚠️</span>}
@@ -268,6 +300,14 @@ export default function App() {
           )}
         </Paper>
       )}
+      <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }}>
+        <DialogTitle>{ingredientInfo?.name}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {ingredientInfo?.info}
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 } 
