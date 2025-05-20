@@ -2,8 +2,6 @@ import React from 'react';
 import { Paper, Box, Typography, Divider } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
-import InfoIcon from '@mui/icons-material/Info';
-import PaletteIcon from '@mui/icons-material/Palette';
 import type { Product, CriticalIngredient, Dye } from '../types';
 
 /**
@@ -31,7 +29,7 @@ const POSITIVE_FIELDS = [
   { key: 'proteins_100g', label: 'Protein', icon: <CheckCircleIcon color="success" fontSize="small" /> },
 ];
 
-const getScore = (product: Product, flaggedIngredients: CriticalIngredient[], dyes: Dye[]) => {
+const getScore = (flaggedIngredients: CriticalIngredient[], dyes: Dye[]) => {
   // Example: 10 - flagged - dyes, clamp 0-10
   let score = 10 - flaggedIngredients.length - dyes.length;
   if (score < 0) score = 0;
@@ -44,7 +42,7 @@ const getScore = (product: Product, flaggedIngredients: CriticalIngredient[], dy
  */
 const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes }) => {
   if (!product) return null;
-  const score = getScore(product, flaggedIngredients, dyes);
+  const score = getScore(flaggedIngredients, dyes);
   const nutriments = product.nutriments || {};
   // For demo, count flagged ingredients as "additives"
   const additivesCount = flaggedIngredients.length;
