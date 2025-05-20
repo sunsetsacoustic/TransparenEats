@@ -217,83 +217,89 @@ export default function App() {
       {product && (
         <Paper sx={{
           p: 2,
-          mt: 2,
+          mt: 3,
           borderRadius: 4,
-          background: 'rgba(255,255,255,0.08)',
+          background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
           boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
           backdropFilter: 'blur(8px)',
-          border: '1.5px solid rgba(255,255,255,0.18)',
+          border: '1.5px solid rgba(255,255,255,0.10)',
+          maxWidth: 340,
+          maxHeight: 420,
+          mx: 'auto',
+          overflowY: 'auto',
         }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>{product.product_name || 'No name'}</Typography>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>Ingredients:</Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-              maxHeight: 120,
-              overflowY: 'auto',
-              mb: 2,
-              p: 1,
-              borderRadius: 2,
-              background: 'rgba(255,255,255,0.04)',
-            }}
-          >
-            {(() => {
-              // Split ingredients by comma, semicolon, or period
-              const text = product.ingredients_text || '';
-              const items = text.split(/,|;|\./).map((i: string) => i.trim()).filter(Boolean);
-              return items.map((ing: string, idx: number) => {
-                const isFlagged = flaggedIngredients.some(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
-                const isDye = dyes.some(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));
-                return (
-                  <span
-                    key={idx}
-                    onClick={() => handleIngredientClick(ing)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '6px 14px',
-                      margin: '2px',
-                      borderRadius: 16,
-                      fontWeight: 500,
-                      fontSize: 15,
-                      background: isFlagged
-                        ? 'linear-gradient(90deg, #ffb347 0%, #ff5252 100%)'
-                        : isDye
-                        ? 'linear-gradient(90deg, #ffe259 0%, #ffa751 100%)'
-                        : 'rgba(255,255,255,0.13)',
-                      color: isFlagged || isDye ? '#222' : '#fff',
-                      boxShadow: isFlagged || isDye ? '0 2px 8px rgba(255,82,82,0.12)' : 'none',
-                      border: isFlagged ? '2px solid #ff5252' : isDye ? '2px solid #ffa751' : 'none',
-                      transition: 'background 0.3s',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {isFlagged && <span style={{ marginRight: 6, fontSize: 18 }}>⚠️</span>}
-                    {isDye && !isFlagged && <span style={{ marginRight: 6, fontSize: 18 }}>🎨</span>}
-                    {ing}
-                  </span>
-                );
-              });
-            })()}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            {product.image_front_url && (
+              <img src={product.image_front_url} alt={product.product_name} style={{ width: 72, height: 72, borderRadius: 16, objectFit: 'cover', marginRight: 18, border: '2px solid #fff2' }} />
+            )}
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: '#fff' }}>{product.product_name || 'No name'}</Typography>
+              <Typography variant="subtitle2" sx={{ color: '#bbb' }}>{product.brands}</Typography>
+            </Box>
           </Box>
+
+          {/* Negatives Section */}
+          {(flaggedIngredients.length > 0 || dyes.length > 0) && (
+            <Box mb={2}>
+              <Typography variant="subtitle1" sx={{ color: '#ff5252', fontWeight: 600, mb: 1 }}>
+                ⚠️ Negatives
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {flaggedIngredients.map(ing => (
+                  <Chip
+                    key={ing.name}
+                    label={ing.name}
+                    icon={<span style={{ color: '#ff5252', fontSize: 18 }}>⚠️</span>}
+                    sx={{ background: 'rgba(255,82,82,0.13)', color: '#ff5252', fontWeight: 600, border: '1.5px solid #ff5252' }}
+                    onClick={() => handleIngredientClick(ing.name)}
+                  />
+                ))}
+                {dyes.filter(dye => !flaggedIngredients.some(f => f.name === dye.name)).map(dye => (
+                  <Chip
+                    key={dye.name}
+                    label={dye.name}
+                    icon={<span style={{ color: '#ffa751', fontSize: 18 }}>🎨</span>}
+                    sx={{ background: 'rgba(255,167,81,0.13)', color: '#ffa751', fontWeight: 600, border: '1.5px solid #ffa751' }}
+                    onClick={() => handleIngredientClick(dye.name)}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {/* Other Ingredients Section */}
+          <Box mb={2}>
+            <Typography variant="subtitle1" sx={{ color: '#7fff7f', fontWeight: 600, mb: 1 }}>
+              ✅ Other Ingredients
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {(() => {
+                const text = product.ingredients_text || '';
+                const items = text.split(/,|;|\./).map((i: string) => i.trim()).filter(Boolean);
+                return items.filter((ing: string) => {
+                  const isFlagged = flaggedIngredients.some(f => ing.toLowerCase().includes(f.name.toLowerCase()) || f.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())));
+                  const isDye = dyes.some(d => ing.toLowerCase().includes(d.name.toLowerCase()) || d.aliases.some((a: string) => ing.toLowerCase().includes(a.toLowerCase())) || d.eNumbers.some((e: string) => ing.toLowerCase().includes(e.toLowerCase())));
+                  return !isFlagged && !isDye;
+                }).map((ing: string, idx: number) => (
+                  <Chip
+                    key={idx}
+                    label={ing}
+                    icon={<span style={{ color: '#7fff7f', fontSize: 18 }}>✅</span>}
+                    sx={{ background: 'rgba(127,255,127,0.10)', color: '#7fff7f', fontWeight: 500, border: '1.5px solid #7fff7f' }}
+                    onClick={() => handleIngredientClick(ing)}
+                  />
+                ));
+              })()}
+            </Box>
+          </Box>
+
+          {/* Ingredient Warnings (detailed) */}
           {flaggedIngredients.length > 0 && (
             <Box mt={2}>
               <Typography variant="subtitle2" color="error.main">Ingredient Warnings:</Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
                 {flaggedIngredients.map(ing => (
                   <Chip key={ing.name} label={ing.warning} color="error" variant="outlined" />
-                ))}
-              </Box>
-            </Box>
-          )}
-          {dyes.length > 0 && (
-            <Box mt={2}>
-              <Typography variant="subtitle2" color="warning.main">Identified Food Dyes:</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                {dyes.map(dye => (
-                  <Chip key={dye.name} label={dye.name} color="warning" />
                 ))}
               </Box>
             </Box>
