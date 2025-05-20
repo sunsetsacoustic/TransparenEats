@@ -134,9 +134,9 @@ export default function App() {
         handleIngredientClick={() => {}}
       />
     ) : (
-      <Box sx={{ width: '100%', mt: 2, boxSizing: 'border-box' }}>
-        {/* Prominent Search Bar */}
-        <Box sx={{ mb: 2, width: '100%' }}>
+      <Box sx={{ width: '100%', maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+        {/* Responsive Search Bar */}
+        <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
           <SearchBar
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -152,13 +152,15 @@ export default function App() {
           size="large"
           startIcon={<QrCodeScannerIcon />}
           sx={{
-            borderRadius: 2,
+            borderRadius: 3,
             fontWeight: 700,
-            fontSize: 18,
-            py: 1.5,
+            fontSize: { xs: 18, sm: 20 },
+            py: 1.7,
+            px: 2,
             boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
             mb: 2,
-            width: '100%',
+            mt: 1,
+            maxWidth: 400,
           }}
           onClick={() => setTab(1)}
         >
@@ -208,17 +210,21 @@ export default function App() {
         width: '100vw',
         left: 0,
         top: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        px: { xs: 0, sm: 2 },
       }}>
-        <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+        <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
           <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 22, letterSpacing: 0.5, color: '#1976d2' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 22, letterSpacing: 0.5, color: '#1976d2', textAlign: 'center', flex: 1 }}>
             Ingredient Aware
           </Typography>
         </Toolbar>
       </AppBar>
       {/* Main Content */}
       <Box sx={{
-        pt: { xs: 8, sm: 10 },
+        pt: { xs: 10, sm: 12 },
         pb: 10,
         px: { xs: 2, sm: 0 },
         width: '100vw',
@@ -229,12 +235,12 @@ export default function App() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
       }}>
         {tab === 0 && !product ? (
-          <Box sx={{ width: '100%', mt: 2, boxSizing: 'border-box' }}>
-            {/* Prominent Search Bar */}
-            <Box sx={{ mb: 2, width: '100%' }}>
+          <Box sx={{ width: '100%', maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            {/* Responsive Search Bar */}
+            <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
               <SearchBar
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -250,13 +256,15 @@ export default function App() {
               size="large"
               startIcon={<QrCodeScannerIcon />}
               sx={{
-                borderRadius: 2,
+                borderRadius: 3,
                 fontWeight: 700,
-                fontSize: 18,
-                py: 1.5,
+                fontSize: { xs: 18, sm: 20 },
+                py: 1.7,
+                px: 2,
                 boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
                 mb: 2,
-                width: '100%',
+                mt: 1,
+                maxWidth: 400,
               }}
               onClick={() => setTab(1)}
             >
@@ -273,7 +281,7 @@ export default function App() {
           </DialogContent>
         </Dialog>
       </Box>
-      {/* Bottom Navigation with elevation */}
+      {/* Bottom Navigation with elevation and safe area */}
       <Box sx={{
         position: 'fixed',
         left: 0,
@@ -283,6 +291,11 @@ export default function App() {
         background: '#fff',
         zIndex: 1202,
         borderTop: '1px solid #e0e0e0',
+        pb: { xs: 'env(safe-area-inset-bottom)', sm: 0 },
+        px: { xs: 0, sm: 0 },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
         <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
       </Box>
