@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { Container, Typography, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
+import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
 import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
-
-const HISTORY_KEY = 'ingredientAwareHistory';
-const HISTORY_LIMIT = 20;
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -30,9 +27,6 @@ function findFlaggedIngredients(ingredientText: string | null | undefined): Crit
 }
 
 export default function App() {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState(0);
   const [ingredientInfo, setIngredientInfo] = useState<IngredientInfo | null>(null);
 
@@ -58,8 +52,6 @@ export default function App() {
   return (
     <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
-      {loading && <CircularProgress />}
-      {error && <Typography color="error">{error}</Typography>}
       <ProductCard
         product={demoProduct}
         flaggedIngredients={flaggedIngredients}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Paper, Box, Typography, Divider, Avatar } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
@@ -22,14 +22,22 @@ interface ProductCardProps {
   handleIngredientClick: (ing: string) => void;
 }
 
-const NEGATIVE_FIELDS = [
+const NEGATIVE_FIELDS: {
+  key: string;
+  label: string;
+  icon: JSX.Element;
+  desc: string;
+  color: string;
+  getValue: (value: number | Record<string, any>) => string | number;
+  isAdditives: boolean;
+}[] = [
   {
     key: 'additives',
     label: 'Additives',
     icon: <WarningIcon color="error" fontSize="small" />,
     desc: 'Contains additives to avoid',
     color: '#F44336',
-    getValue: (additivesCount: number) => additivesCount,
+    getValue: (value) => typeof value === 'number' ? value : '-',
     isAdditives: true,
   },
   {
@@ -38,7 +46,7 @@ const NEGATIVE_FIELDS = [
     icon: <RestaurantIcon color="error" fontSize="small" />,
     desc: 'Too sweet',
     color: '#F44336',
-    getValue: (nutriments: any) => nutriments.sugars_100g !== undefined ? `${nutriments.sugars_100g}g` : '-',
+    getValue: (value) => typeof value === 'object' && value.sugars_100g !== undefined ? `${value.sugars_100g}g` : '-',
     isAdditives: false,
   },
   {
@@ -47,7 +55,7 @@ const NEGATIVE_FIELDS = [
     icon: <LocalFireDepartmentIcon color="error" fontSize="small" />,
     desc: 'A bit too caloric',
     color: '#F44336',
-    getValue: (nutriments: any) => nutriments['energy-kcal_100g'] !== undefined ? `${nutriments['energy-kcal_100g']} Cal` : '-',
+    getValue: (value) => typeof value === 'object' && value['energy-kcal_100g'] !== undefined ? `${value['energy-kcal_100g']} Cal` : '-',
     isAdditives: false,
   },
   {
@@ -56,7 +64,7 @@ const NEGATIVE_FIELDS = [
     icon: <OpacityIcon color="warning" fontSize="small" />,
     desc: 'A bit too salty',
     color: '#FFA726',
-    getValue: (nutriments: any) => nutriments.sodium_100g !== undefined ? `${nutriments.sodium_100g}mg` : '-',
+    getValue: (value) => typeof value === 'object' && value.sodium_100g !== undefined ? `${value.sodium_100g}mg` : '-',
     isAdditives: false,
   },
 ];
