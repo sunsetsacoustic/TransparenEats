@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
+import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress } from '@mui/material';
 import { FOOD_DYES, CRITICAL_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
+import HistoryList from './components/HistoryList';
+import SearchBar from './components/SearchBar';
+import SearchResultsList from './components/SearchResultsList';
+import BarcodeScannerComponent from './components/BarcodeScannerComponent';
 import type { Product, Dye, CriticalIngredient, IngredientInfo } from './types';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
@@ -26,38 +30,123 @@ function findFlaggedIngredients(ingredientText: string | null | undefined): Crit
   });
 }
 
+const HISTORY_KEY = 'ingredientAwareHistory';
+const HISTORY_LIMIT = 20;
+
 export default function App() {
   const [tab, setTab] = useState(0);
+  const [product, setProduct] = useState<Product | null>(null);
   const [ingredientInfo, setIngredientInfo] = useState<IngredientInfo | null>(null);
+  const [history, setHistory] = useState<Product[]>(() => {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Example product for demo
-  const demoProduct: Product = {
-    code: '123456',
-    product_name: 'Cereal Honey Nut',
-    brands: 'Cheerios',
-    image_front_url: 'https://static.openfoodfacts.org/images/products/001/600/014/5892/front_en.4.400.jpg',
-    nutriments: {
-      sugars_100g: 32,
-      'energy-kcal_100g': 393,
-      sodium_100g: 571,
-      fiber_100g: 3.6,
-      proteins_100g: 7.1,
-    },
+  // Save history to localStorage
+  const saveHistory = (newHistory: Product[]) => {
+    setHistory(newHistory);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
   };
 
-  // For demo, always show the demo product
-  const dyes = findDyes(demoProduct.ingredients_text);
-  const flaggedIngredients = findFlaggedIngredients(demoProduct.ingredients_text);
+  // Add product to history (no duplicates, most recent first)
+  const addToHistory = (prod: Product) => {
+    const filtered = history.filter((h) => h.code !== prod.code);
+    const newHistory = [prod, ...filtered].slice(0, HISTORY_LIMIT);
+    saveHistory(newHistory);
+  };
+
+  // Fetch product by barcode from OpenFoodFacts
+  const fetchProductByBarcode = async (barcode: string) => {
+    setLoading(true);
+    setError(null);
+    setProduct(null);
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}`);
+      const data = await res.json();
+      if (data && data.product) {
+        setProduct(data.product);
+        addToHistory(data.product);
+      } else {
+        setError('Product not found.');
+      }
+    } catch (e) {
+      setError('Error fetching product.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search products by name from OpenFoodFacts
+  const searchProducts = async () => {
+    if (!search) return;
+    setLoading(true);
+    setError(null);
+    setSearchResults([]);
+    try {
+      const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+      const data = await res.json();
+      if (data && data.products) {
+        setSearchResults(data.products);
+      } else {
+        setError('No results found.');
+      }
+    } catch (e) {
+      setError('Error searching products.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tab content rendering
+  let content = null;
+  if (tab === 0) {
+    // Home
+    content = product ? (
+      <ProductCard
+        product={product}
+        flaggedIngredients={findFlaggedIngredients(product.ingredients_text)}
+        dyes={findDyes(product.ingredients_text)}
+        handleIngredientClick={() => {}}
+      />
+    ) : (
+      <Box sx={{ mt: 6, textAlign: 'center', color: '#888' }}>
+        <Typography variant="h6">Scan a barcode or search for a product to get started.</Typography>
+      </Box>
+    );
+  } else if (tab === 1) {
+    // Scan
+    content = (
+      <BarcodeScannerComponent onDetected={fetchProductByBarcode} />
+    );
+  } else if (tab === 2) {
+    // History
+    content = (
+      <HistoryList history={history} onSelect={(prod) => { setProduct(prod); setTab(0); }} />
+    );
+  } else if (tab === 3) {
+    // Search
+    content = (
+      <Box>
+        <SearchBar value={search} onChange={e => setSearch(e.target.value)} onSearch={searchProducts} loading={loading} />
+        {loading && <CircularProgress sx={{ display: 'block', mx: 'auto', my: 2 }} />}
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+        <SearchResultsList results={searchResults} onSelect={(prod) => { setProduct(prod); addToHistory(prod); setTab(0); }} />
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
-      <ProductCard
-        product={demoProduct}
-        flaggedIngredients={flaggedIngredients}
-        dyes={dyes}
-        handleIngredientClick={() => {}}
-      />
+      {content}
       <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }}>
         <DialogTitle>{ingredientInfo?.name}</DialogTitle>
         <DialogContent>
