@@ -24,13 +24,13 @@
 - [ ] Highlight or separately list identified dyes
 
 ### 5. Basic Ingredient Warning System
-- [ ] Curate list of critical ingredients (e.g., Aspartame, HFCS)
-- [ ] Map ingredients to warning messages
-- [ ] Display warnings for flagged ingredients
+- [x] Curate list of critical ingredients (e.g., Aspartame, HFCS)
+- [x] Map ingredients to warning messages
+- [x] Display warnings for flagged ingredients
 
 ### 6. Scan/Search History
-- [ ] Store last 10-20 scanned/searched items locally
-- [ ] Allow users to revisit recent items
+- [x] Store last 10-20 scanned/searched items locally
+- [x] Allow users to revisit recent items
 
 ### 7. Technology & Data
 - [ ] Choose mobile framework (Native, React Native, or Flutter)
