@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress } from '@mui/material';
+import { Container, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -8,6 +8,7 @@ import SearchBar from './components/SearchBar';
 import SearchResultsList from './components/SearchResultsList';
 import BarcodeScannerComponent from './components/BarcodeScannerComponent';
 import type { Product, Dye, IngredientInfo } from './types';
+import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -131,8 +132,14 @@ export default function App() {
         handleIngredientClick={() => {}}
       />
     ) : (
-      <Box sx={{ mt: 6, textAlign: 'center', color: '#888' }}>
-        <Typography variant="h6">Scan a barcode or search for a product to get started.</Typography>
+      <Box sx={{ mt: 10, textAlign: 'center', color: '#888', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <EmojiFoodBeverageIcon sx={{ fontSize: 64, color: '#bdbdbd', mb: 2 }} />
+        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: 22, mb: 1 }}>
+          Welcome!
+        </Typography>
+        <Typography variant="body1" sx={{ fontSize: 18, color: '#888' }}>
+          Scan a barcode or search for a product to get started.
+        </Typography>
       </Box>
     );
   } else if (tab === 1) {
@@ -158,28 +165,80 @@ export default function App() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{
-      mt: { xs: 1, sm: 4 },
-      pb: 8,
-      px: { xs: 0, sm: 2 },
-      width: { xs: '100vw', sm: 'auto' },
+    <Box sx={{
       minHeight: '100vh',
+      width: '100vw',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
+      pb: 0,
       boxSizing: 'border-box',
-      background: '#fafbfc',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     }}>
-      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: 22, sm: 32 }, textAlign: 'center', mt: { xs: 2, sm: 4 } }}>
-        Ingredient Aware (MVP)
-      </Typography>
-      {content}
-      <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
-        <DialogTitle>{ingredientInfo?.name}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {ingredientInfo?.info}
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
-      <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
-    </Container>
+      {/* AppBar/Header */}
+      <AppBar position="fixed" color="inherit" elevation={1} sx={{
+        background: 'rgba(255,255,255,0.95)',
+        boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
+        borderBottom: '1px solid #e0e0e0',
+        zIndex: 1201,
+        width: '100vw',
+        left: 0,
+        top: 0,
+      }}>
+        <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+          <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
+          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 22, letterSpacing: 0.5, color: '#1976d2' }}>
+            Ingredient Aware
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      {/* Main Content */}
+      <Container maxWidth="sm" disableGutters sx={{
+        pt: { xs: 8, sm: 10 },
+        pb: 10,
+        px: { xs: 0, sm: 2 },
+        width: { xs: '100vw', sm: 'auto' },
+        minHeight: '100vh',
+        boxSizing: 'border-box',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+      }}>
+        {tab === 0 && !product ? (
+          <Box sx={{ mt: 10, textAlign: 'center', color: '#888', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <EmojiFoodBeverageIcon sx={{ fontSize: 64, color: '#bdbdbd', mb: 2 }} />
+            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: 22, mb: 1 }}>
+              Welcome!
+            </Typography>
+            <Typography variant="body1" sx={{ fontSize: 18, color: '#888' }}>
+              Scan a barcode or search for a product to get started.
+            </Typography>
+          </Box>
+        ) : content}
+        <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
+          <DialogTitle>{ingredientInfo?.name}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {ingredientInfo?.info}
+            </DialogContentText>
+          </DialogContent>
+        </Dialog>
+      </Container>
+      {/* Bottom Navigation with elevation */}
+      <Box sx={{
+        position: 'fixed',
+        left: 0,
+        bottom: 0,
+        width: '100vw',
+        boxShadow: '0 -2px 12px 0 rgba(0,0,0,0.08)',
+        background: '#fff',
+        zIndex: 1202,
+        borderTop: '1px solid #e0e0e0',
+      }}>
+        <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
+      </Box>
+    </Box>
   );
 } 
