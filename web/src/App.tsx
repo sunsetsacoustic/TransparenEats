@@ -40,6 +40,7 @@ export default function App() {
   const [tab, setTab] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [ingredientInfo, setIngredientInfo] = useState<IngredientInfo | null>(null);
+  const [selectedHistoryProduct, setSelectedHistoryProduct] = useState<Product | null>(null);
   const [history, setHistory] = useState<Product[]>(() => {
     try {
       const raw = localStorage.getItem(HISTORY_KEY);
@@ -126,14 +127,7 @@ export default function App() {
   let content = null;
   if (tab === 0) {
     // Home
-    content = product ? (
-      <ProductCard
-        product={product}
-        flaggedIngredients={findFlaggedIngredients(product.ingredients_text)}
-        dyes={findDyes(product.ingredients_text)}
-        handleIngredientClick={() => {}}
-      />
-    ) : (
+    content = product ? null : (
       <Box sx={{ width: '100%', maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
         {/* Responsive Search Bar */}
         <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
@@ -176,7 +170,7 @@ export default function App() {
   } else if (tab === 2) {
     // History
     content = (
-      <HistoryList history={history} onSelect={(prod) => { setProduct(prod); setTab(0); }} />
+      <HistoryList history={history} onSelect={(prod) => setSelectedHistoryProduct(prod)} />
     );
   } else if (tab === 3) {
     // Search
@@ -237,41 +231,7 @@ export default function App() {
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {tab === 0 && !product ? (
-          <Box sx={{ width: '100%', maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-            {/* Responsive Search Bar */}
-            <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
-              <SearchBar
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
-                loading={loading}
-              />
-            </Box>
-            {/* Scan Barcode Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              size="large"
-              startIcon={<QrCodeScannerIcon />}
-              sx={{
-                borderRadius: 3,
-                fontWeight: 700,
-                fontSize: { xs: 18, sm: 20 },
-                py: 1.7,
-                px: 2,
-                boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
-                mb: 2,
-                mt: 1,
-                maxWidth: 400,
-              }}
-              onClick={() => setTab(1)}
-            >
-              Scan Barcode
-            </Button>
-          </Box>
-        ) : content}
+        {content}
         <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
           <DialogTitle>{ingredientInfo?.name}</DialogTitle>
           <DialogContent>
@@ -279,6 +239,17 @@ export default function App() {
               {ingredientInfo?.info}
             </DialogContentText>
           </DialogContent>
+        </Dialog>
+        {/* Product details dialog for history */}
+        <Dialog open={!!selectedHistoryProduct} onClose={() => setSelectedHistoryProduct(null)} fullWidth maxWidth="sm">
+          {selectedHistoryProduct && (
+            <ProductCard
+              product={selectedHistoryProduct}
+              flaggedIngredients={findFlaggedIngredients(selectedHistoryProduct.ingredients_text)}
+              dyes={findDyes(selectedHistoryProduct.ingredients_text)}
+              handleIngredientClick={() => {}}
+            />
+          )}
         </Dialog>
       </Box>
       {/* Bottom Navigation with elevation and safe area */}
