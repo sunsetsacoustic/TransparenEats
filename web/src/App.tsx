@@ -171,37 +171,6 @@ export default function App() {
   return (
     <Container maxWidth="sm" sx={{ mt: 4, pb: 8 }}>
       <Typography variant="h4" gutterBottom>Ingredient Aware (MVP)</Typography>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} centered>
-          <Tab label="Search" />
-          <Tab label="History" />
-        </Tabs>
-      </Box>
-      {tab === 0 && (
-        <>
-          <SearchBar
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            onSearch={handleSearch}
-            loading={searching}
-          />
-          {searchResults.length > 0 && (
-            <SearchResultsList results={searchResults} onSelect={handleSelectProduct} />
-          )}
-        </>
-      )}
-      {tab === 1 && (
-        <Box mb={2}>
-          {history.length > 0 ? (
-            <HistoryList history={history} onSelect={handleSelectProduct} />
-          ) : (
-            <Typography color="text.secondary">No history yet.</Typography>
-          )}
-        </Box>
-      )}
-      <Box mb={2}>
-        <BarcodeScannerComponent onDetected={handleDetected} />
-      </Box>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
       {product && (

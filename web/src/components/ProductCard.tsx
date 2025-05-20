@@ -1,12 +1,11 @@
 import React from 'react';
-import { Paper, Box, Typography, Divider, Chip, Avatar } from '@mui/material';
+import { Paper, Box, Typography, Divider, Avatar } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import GrainIcon from '@mui/icons-material/Grain';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import type { Product, CriticalIngredient, Dye } from '../types';
 
 /**
@@ -31,6 +30,7 @@ const NEGATIVE_FIELDS = [
     desc: 'Contains additives to avoid',
     color: '#F44336',
     getValue: (additivesCount: number) => additivesCount,
+    isAdditives: true,
   },
   {
     key: 'sugars_100g',
@@ -39,6 +39,7 @@ const NEGATIVE_FIELDS = [
     desc: 'Too sweet',
     color: '#F44336',
     getValue: (nutriments: any) => nutriments.sugars_100g !== undefined ? `${nutriments.sugars_100g}g` : '-',
+    isAdditives: false,
   },
   {
     key: 'energy-kcal_100g',
@@ -47,6 +48,7 @@ const NEGATIVE_FIELDS = [
     desc: 'A bit too caloric',
     color: '#F44336',
     getValue: (nutriments: any) => nutriments['energy-kcal_100g'] !== undefined ? `${nutriments['energy-kcal_100g']} Cal` : '-',
+    isAdditives: false,
   },
   {
     key: 'sodium_100g',
@@ -55,6 +57,7 @@ const NEGATIVE_FIELDS = [
     desc: 'A bit too salty',
     color: '#FFA726',
     getValue: (nutriments: any) => nutriments.sodium_100g !== undefined ? `${nutriments.sodium_100g}mg` : '-',
+    isAdditives: false,
   },
 ];
 const POSITIVE_FIELDS = [
@@ -143,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               </Box>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.key === 'additives' ? field.getValue(additivesCount) : field.getValue(nutriments)}</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.isAdditives ? field.getValue(additivesCount) : field.getValue(nutriments)}</Typography>
               <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: field.color, ml: 1 }} />
             </Box>
           </Box>
