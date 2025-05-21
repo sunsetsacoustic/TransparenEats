@@ -107,7 +107,10 @@ export default function App() {
           },
         };
         setProduct(nutriProduct);
+        setSelectedHistoryProduct(nutriProduct);
         addToHistory(nutriProduct);
+        setTab(0);
+        setSearch('');
         setLoading(false);
         return;
       }
@@ -133,7 +136,10 @@ export default function App() {
           },
         };
         setProduct(usdaProduct);
+        setSelectedHistoryProduct(usdaProduct);
         addToHistory(usdaProduct);
+        setTab(0);
+        setSearch('');
         setLoading(false);
         return;
       }
@@ -142,7 +148,10 @@ export default function App() {
       const data = await res.json();
       if (data && data.product) {
         setProduct(data.product);
+        setSelectedHistoryProduct(data.product);
         addToHistory(data.product);
+        setTab(0);
+        setSearch('');
         setLoading(false);
         return;
       }
@@ -151,7 +160,10 @@ export default function App() {
       const beautyData = await beautyRes.json();
       if (beautyData && beautyData.product) {
         setProduct(beautyData.product);
+        setSelectedHistoryProduct(beautyData.product);
         addToHistory(beautyData.product);
+        setTab(0);
+        setSearch('');
         setLoading(false);
         return;
       }
@@ -278,6 +290,7 @@ export default function App() {
             options={searchResults}
             onSelect={prod => {
               setProduct(prod);
+              setSelectedHistoryProduct(prod);
               addToHistory(prod);
               setTab(0);
               setSearch('');
@@ -355,6 +368,7 @@ export default function App() {
           options={searchResults}
           onSelect={prod => {
             setProduct(prod);
+            setSelectedHistoryProduct(prod);
             addToHistory(prod);
             setTab(0);
             setSearch('');
@@ -362,7 +376,7 @@ export default function App() {
         />
         {loading && <CircularProgress sx={{ display: 'block', mx: 'auto', my: 2 }} />}
         {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-        <SearchResultsList results={searchResults} onSelect={(prod) => { setProduct(prod); addToHistory(prod); setTab(0); }} />
+        <SearchResultsList results={searchResults} onSelect={(prod) => { setProduct(prod); setSelectedHistoryProduct(prod); addToHistory(prod); setTab(0); }} />
       </Box>
     );
   }
