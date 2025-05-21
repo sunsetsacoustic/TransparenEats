@@ -58,6 +58,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -241,6 +242,22 @@ export default function App() {
       scannerRef.current.stopScanner();
     }
   }, [tab]);
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Trigger searchProducts when debouncedSearch changes (but not on select/search button)
+  useEffect(() => {
+    if (debouncedSearch && debouncedSearch !== product?.product_name) {
+      searchProducts();
+    }
+    // eslint-disable-next-line
+  }, [debouncedSearch]);
 
   // Tab content rendering
   let content = null;
