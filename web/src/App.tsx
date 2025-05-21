@@ -11,7 +11,6 @@ import type { Product, Dye, IngredientInfo } from './types';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import ProductUploadDialog from './components/ProductUploadDialog';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
@@ -58,12 +57,6 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [productType, setProductType] = useState<'food' | 'cosmetics' | 'cleaning'>('food');
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [pendingBarcode, setPendingBarcode] = useState<string | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -98,26 +91,17 @@ export default function App() {
     return 'https://world.openfoodfacts.org';
   };
 
-  // Show upload dialog when product not found
-  useEffect(() => {
-    if (error === 'Product not found.' && pendingBarcode) {
-      setShowUploadDialog(true);
-    }
-  }, [error, pendingBarcode]);
-
-  // Modified fetchProductByBarcode to try Nutritionix first, then Open Facts
+  // Modified fetchProductByBarcode to try Nutritionix first, then USDA, then Open Facts
   const fetchProductByBarcode = async (barcode: string) => {
     setTab(0); // Immediately switch to Home tab to unmount scanner and release camera
     setLoading(true);
     setError(null);
     setProduct(null);
-    setPendingBarcode(barcode);
     try {
       // 1. Try Nutritionix
       const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
       const nutriData = await nutriRes.json();
       if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
-        // Map Nutritionix data to Product shape
         const hit = nutriData.hits[0].fields;
         const nutriProduct: Product = {
           code: barcode,
@@ -130,17 +114,34 @@ export default function App() {
         };
         setProduct(nutriProduct);
         addToHistory(nutriProduct);
-        setPendingBarcode(null);
         setLoading(false);
         return;
       }
-      // 2. Fallback to Open Facts
+      // 2. Try USDA
+      const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(barcode)}`);
+      const usdaData = await usdaRes.json();
+      if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
+        const food = usdaData.foods[0];
+        const usdaProduct: Product = {
+          code: barcode,
+          product_name: food.description,
+          brands: food.brandOwner,
+          ingredients_text: food.ingredients,
+          nutriments: {
+            'energy-kcal_100g': food.foodNutrients?.find((n: any) => n.nutrientName === 'Energy')?.value,
+          },
+        };
+        setProduct(usdaProduct);
+        addToHistory(usdaProduct);
+        setLoading(false);
+        return;
+      }
+      // 3. Fallback to Open Facts
       const res = await fetch(`${getApiBaseUrl()}/api/v2/product/${barcode}`);
       const data = await res.json();
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
-        setPendingBarcode(null);
       } else {
         setError('Product not found.');
       }
@@ -151,7 +152,7 @@ export default function App() {
     }
   };
 
-  // Modified searchProducts to try Nutritionix first, then Open Facts
+  // Modified searchProducts to try Nutritionix first, then USDA, then Open Facts
   const searchProducts = async () => {
     if (!search) return;
     setLoading(true);
@@ -162,7 +163,6 @@ export default function App() {
       const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
       const nutriData = await nutriRes.json();
       if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
-        // Map Nutritionix data to Product shape array
         const nutriProducts: Product[] = nutriData.hits.map((hit: any) => ({
           code: hit.fields.item_id || hit.fields.nix_item_id || '',
           product_name: hit.fields.item_name,
@@ -176,7 +176,24 @@ export default function App() {
         setLoading(false);
         return;
       }
-      // 2. Fallback to Open Facts
+      // 2. Try USDA
+      const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(search)}`);
+      const usdaData = await usdaRes.json();
+      if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
+        const usdaProducts: Product[] = usdaData.foods.map((food: any) => ({
+          code: food.fdcId || '',
+          product_name: food.description,
+          brands: food.brandOwner,
+          ingredients_text: food.ingredients,
+          nutriments: {
+            'energy-kcal_100g': food.foodNutrients?.find((n: any) => n.nutrientName === 'Energy')?.value,
+          },
+        }));
+        setSearchResults(usdaProducts);
+        setLoading(false);
+        return;
+      }
+      // 3. Fallback to Open Facts
       const res = await fetch(`${getApiBaseUrl()}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
       const data = await res.json();
       if (data && data.products) {
@@ -197,50 +214,6 @@ export default function App() {
       scannerRef.current.stopScanner();
     }
   }, [tab]);
-
-  // Upload handler for ProductUploadDialog
-  const handleProductUpload = async (form: {
-    barcode: string;
-    product_name: string;
-    ingredients_text: string;
-    image_front?: File;
-    image_ingredients?: File;
-    image_nutrition?: File;
-  }) => {
-    setUploadLoading(true);
-    setUploadError(null);
-    setUploadSuccess(false);
-    setUploadStatus('Uploading product data...');
-    try {
-      // 1. Upload product data and images as FormData to backend
-      const formData = new FormData();
-      formData.append('barcode', form.barcode);
-      formData.append('product_name', form.product_name);
-      formData.append('ingredients_text', form.ingredients_text);
-      if (form.image_front) formData.append('image_front', form.image_front);
-      if (form.image_ingredients) formData.append('image_ingredients', form.image_ingredients);
-      if (form.image_nutrition) formData.append('image_nutrition', form.image_nutrition);
-      const productRes = await fetch(`${BACKEND_URL}/api/v1/uploadProduct`, {
-        method: 'POST',
-        body: formData,
-      });
-      setUploadStatus('Processing images...');
-      const productData = await productRes.json();
-      if (!productData.success) {
-        throw new Error(productData.error || 'Failed to upload product data.');
-      }
-      setUploadSuccess(true);
-      setShowUploadDialog(false);
-      setError(null);
-      setPendingBarcode(null);
-      setUploadStatus(null);
-    } catch (e: any) {
-      setUploadError(e.message || 'Failed to upload product.');
-      setUploadStatus(null);
-    } finally {
-      setUploadLoading(false);
-    }
-  };
 
   // Tab content rendering
   let content = null;
@@ -280,7 +253,7 @@ export default function App() {
           Scan Barcode
         </Button>
         {/* Error message if product not found and upload dialog is not open */}
-        {error && !showUploadDialog && (
+        {error && (
           <Typography color="error" sx={{ mt: 2, mb: 1, textAlign: 'center' }}>{error}</Typography>
         )}
         {/* Featured categories placeholder */}
@@ -401,28 +374,6 @@ export default function App() {
           justifyContent: 'center',
         }}>
           {content}
-          {/* Product Upload Dialog */}
-          <ProductUploadDialog
-            open={showUploadDialog}
-            barcode={pendingBarcode || ''}
-            onClose={() => { setShowUploadDialog(false); setError(null); setPendingBarcode(null); }}
-            onSubmit={handleProductUpload}
-            loading={uploadLoading}
-            error={uploadError}
-            statusMessage={uploadStatus}
-          />
-          {/* Upload Success Message */}
-          {uploadSuccess && (
-            <Dialog open onClose={() => setUploadSuccess(false)}>
-              <DialogTitle>Thank you!</DialogTitle>
-              <DialogContent>
-                <Typography>Product submitted successfully. It will appear in the database after review.</Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setUploadSuccess(false)}>Close</Button>
-              </DialogActions>
-            </Dialog>
-          )}
           <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
             <DialogTitle>{ingredientInfo?.name}</DialogTitle>
             <DialogContent>
