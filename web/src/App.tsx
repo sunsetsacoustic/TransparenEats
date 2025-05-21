@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -54,6 +54,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
+  const [productType, setProductType] = useState<'food' | 'cosmetics' | 'cleaning'>('food');
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -81,13 +82,20 @@ export default function App() {
     saveHistory(newHistory);
   };
 
-  // Fetch product by barcode from OpenFoodFacts
+  // Helper to get API base URL
+  const getApiBaseUrl = () => {
+    if (productType === 'cosmetics') return 'https://world.openbeautyfacts.org';
+    if (productType === 'cleaning') return 'https://world.openproductsfacts.org';
+    return 'https://world.openfoodfacts.org';
+  };
+
+  // Fetch product by barcode from selected API
   const fetchProductByBarcode = async (barcode: string) => {
     setLoading(true);
     setError(null);
     setProduct(null);
     try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}`);
+      const res = await fetch(`${getApiBaseUrl()}/api/v2/product/${barcode}`);
       const data = await res.json();
       if (data && data.product) {
         setProduct(data.product);
@@ -103,14 +111,14 @@ export default function App() {
     }
   };
 
-  // Search products by name from OpenFoodFacts
+  // Search products by name from selected API
   const searchProducts = async () => {
     if (!search) return;
     setLoading(true);
     setError(null);
     setSearchResults([]);
     try {
-      const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+      const res = await fetch(`${getApiBaseUrl()}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
       const data = await res.json();
       if (data && data.products) {
         setSearchResults(data.products);
@@ -254,6 +262,21 @@ export default function App() {
               Ingredient Aware
             </Typography>
           </Toolbar>
+          {/* Product Type Selector */}
+          <FormControl size="small" sx={{ minWidth: 160, position: 'absolute', right: 24, top: 10 }}>
+            <InputLabel id="product-type-label">Product Type</InputLabel>
+            <Select
+              labelId="product-type-label"
+              id="product-type-select"
+              value={productType}
+              label="Product Type"
+              onChange={e => setProductType(e.target.value as 'food' | 'cosmetics' | 'cleaning')}
+            >
+              <MenuItem value="food">Food</MenuItem>
+              <MenuItem value="cosmetics">Cosmetics</MenuItem>
+              <MenuItem value="cleaning">Cleaning</MenuItem>
+            </Select>
+          </FormControl>
         </AppBar>
         {/* Main Content */}
         <Box sx={{
