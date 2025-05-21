@@ -516,7 +516,9 @@ export default function App() {
   return (
     <Box sx={{
       minHeight: '100vh',
+      height: '100vh',
       width: '100vw',
+      overflow: 'hidden',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
       position: 'relative',
       pb: 0,
@@ -562,13 +564,15 @@ export default function App() {
           px: { xs: 2, sm: 0 },
           width: '100vw',
           maxWidth: '100vw',
-          minHeight: '100vh',
+          minHeight: 'calc(100vh - 56px - 56px)',
+          height: 'calc(100vh - 56px - 56px)',
           boxSizing: 'border-box',
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          overflowY: 'auto',
         }}>
           {content}
           <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
