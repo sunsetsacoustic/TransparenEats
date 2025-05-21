@@ -1,5 +1,5 @@
 import React, { type JSX } from 'react';
-import { Paper, Box, Typography, Divider, Avatar } from '@mui/material';
+import { Paper, Box, Typography, Divider, Avatar, Chip } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -119,71 +119,87 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const nutriments = product.nutriments || {};
   const additivesCount = flaggedIngredients.length;
 
+  // Helper: get value or fallback
+  const get = (obj: any, ...fields: string[]) => fields.reduce((v, f) => v && v[f], obj);
+
+  // Collect extra fields
+  const servingSize = product.serving_size || product.quantity || get(product, 'servingSize') || get(product, 'servingSizeUnit') || '';
+  const categories = product.categories || product.categories_tags || product.category || '';
+  const labels = product.labels || product.labels_tags || '';
+  const allergens = product.allergens || product.allergens_tags || '';
+  const additives = product.additives_tags || product.additives || '';
+  const nutriScore = product.nutriscore_grade || product.nutriscore_score;
+  const ecoScore = product.ecoscore_grade || product.ecoscore_score;
+  const novaGroup = product.nova_group;
+  const publicationDate = product.publicationDate || product.modifiedDate;
+  const dataType = product.dataType;
+  const barcode = product.code || product.gtinUpc || product.fdcId;
+  const image = product.image_front_url || product.image_url || product.photo || '';
+
+  // Collect all nutrients present
+  const nutrientFields = [
+    { key: 'energy-kcal_100g', label: 'Calories', unit: 'kcal' },
+    { key: 'proteins_100g', label: 'Protein', unit: 'g' },
+    { key: 'fat_100g', label: 'Fat', unit: 'g' },
+    { key: 'carbohydrates_100g', label: 'Carbs', unit: 'g' },
+    { key: 'fiber_100g', label: 'Fiber', unit: 'g' },
+    { key: 'sugars_100g', label: 'Sugars', unit: 'g' },
+    { key: 'sodium_100g', label: 'Sodium', unit: 'mg' },
+  ];
+
   return (
-    <Paper sx={{ p: 2, mt: 3, borderRadius: 4, maxWidth: 420, mx: 'auto', boxShadow: 3, background: '#fff', color: '#222' }}>
-      {/* Top section: photo, name, brand, score */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        {product.image_front_url && (
-          <Avatar src={product.image_front_url} alt={product.product_name} variant="rounded" sx={{ width: 72, height: 72, mr: 2, boxShadow: 1 }} />
-        )}
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>{product.product_name || 'No name'}</Typography>
-          <Typography variant="subtitle2" sx={{ color: '#888', mb: 1 }}>{product.brands}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{
-              background: scoreColor,
-              color: '#fff',
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: 18,
-              mr: 1
-            }}>{score}</Box>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>{scoreLabel}</Typography>
-            <Typography variant="body2" sx={{ ml: 0.5, color: scoreColor }}>{score}/100</Typography>
-          </Box>
-        </Box>
-      </Box>
-      {/* Ingredients List Section */}
-      {product.ingredients && product.ingredients.length > 0 && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Ingredients</Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {product.ingredients.map((ing: any, idx: number) => (
-              <Box
-                key={ing.id || ing.text || idx}
-                component="span"
-                sx={{
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 2,
-                  background: '#f5f5f5',
-                  fontWeight: 500,
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  border: '1px solid #e0e0e0',
-                  mb: 0.5,
-                }}
-                onClick={() => handleIngredientClick && handleIngredientClick(ing.text || ing)}
-              >
-                {ing.text || ing}
-              </Box>
-            ))}
-          </Box>
+    <Paper sx={{ p: 2, mt: 3, borderRadius: 4, maxWidth: 420, mx: 'auto', boxShadow: 3, background: '#fff', color: '#222', maxHeight: '80vh', overflowY: 'auto' }}>
+      {/* Barcode */}
+      {barcode && <Typography variant="caption" sx={{ color: '#888', mb: 1 }}>Barcode: {barcode}</Typography>}
+      {/* Image */}
+      {image && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Avatar src={image} alt={product.product_name} variant="rounded" sx={{ width: 96, height: 96, boxShadow: 1 }} />
         </Box>
       )}
-      {/* Fallback for plain text ingredients if array is missing */}
-      {(!product.ingredients || product.ingredients.length === 0) && product.ingredients_text && (
+      {/* Name, Brand */}
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>{product.product_name || 'No name'}</Typography>
+      {product.brands && <Typography variant="subtitle2" sx={{ color: '#888', mb: 1 }}>{product.brands}</Typography>}
+      {/* Score */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Box sx={{ background: scoreColor, color: '#fff', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, mr: 1 }}>{score}</Box>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>{scoreLabel}</Typography>
+        <Typography variant="body2" sx={{ ml: 0.5, color: scoreColor }}>{score}/100</Typography>
+      </Box>
+      {/* Ingredients */}
+      {product.ingredients_text && (
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Ingredients</Typography>
           <Typography variant="body2" sx={{ color: '#444' }}>{product.ingredients_text}</Typography>
         </Box>
       )}
-      <Divider sx={{ my: 2 }} />
+      {/* Serving Size, Categories, Labels, Allergens, Additives, Data Type, Publication Date */}
+      <Box sx={{ mb: 2 }}>
+        {servingSize && <Typography variant="body2">Serving Size: {servingSize}</Typography>}
+        {categories && <Typography variant="body2">Categories: {categories}</Typography>}
+        {labels && <Typography variant="body2">Labels: {labels}</Typography>}
+        {allergens && <Typography variant="body2">Allergens: {allergens}</Typography>}
+        {additives && <Typography variant="body2">Additives: {additives}</Typography>}
+        {dataType && <Typography variant="body2">Data Type: {dataType}</Typography>}
+        {publicationDate && <Typography variant="body2">Publication Date: {publicationDate}</Typography>}
+      </Box>
+      {/* Scores */}
+      <Box sx={{ mb: 2 }}>
+        {nutriScore && <Chip label={`Nutri-Score: ${nutriScore}`} sx={{ mr: 1, mb: 1 }} />}
+        {ecoScore && <Chip label={`Eco-Score: ${ecoScore}`} sx={{ mr: 1, mb: 1 }} />}
+        {novaGroup && <Chip label={`NOVA Group: ${novaGroup}`} sx={{ mr: 1, mb: 1 }} />}
+      </Box>
+      {/* Nutritional Info */}
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Nutritional Info (per 100g)</Typography>
+      <Box sx={{ mb: 2 }}>
+        {nutrientFields.map(field => (
+          nutriments[field.key] !== undefined && (
+            <Typography key={field.key} variant="body2">
+              {field.label}: {nutriments[field.key]} {field.unit}
+            </Typography>
+          )
+        ))}
+      </Box>
       {/* Flagged Ingredients Section */}
       {flaggedIngredients.length > 0 && (
         <Box sx={{ mb: 2 }}>
@@ -203,7 +219,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           ))}
         </Box>
       )}
-      <Divider sx={{ my: 2 }} />
       {/* Negatives */}
       <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Negatives</Typography>
       <Box>

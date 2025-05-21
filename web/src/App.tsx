@@ -13,6 +13,8 @@ import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
+const OPEN_BEAUTY_FACTS_URL = 'https://world.openbeautyfacts.org';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -56,7 +58,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
-  const [productType, setProductType] = useState<'food' | 'cosmetics' | 'cleaning'>('food');
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -84,14 +85,6 @@ export default function App() {
     saveHistory(newHistory);
   };
 
-  // Helper to get API base URL
-  const getApiBaseUrl = () => {
-    if (productType === 'cosmetics') return 'https://world.openbeautyfacts.org';
-    if (productType === 'cleaning') return 'https://world.openproductsfacts.org';
-    return 'https://world.openfoodfacts.org';
-  };
-
-  // Modified fetchProductByBarcode to try Nutritionix first, then USDA, then Open Facts
   const fetchProductByBarcode = async (barcode: string) => {
     setTab(0); // Immediately switch to Home tab to unmount scanner and release camera
     setLoading(true);
@@ -143,15 +136,25 @@ export default function App() {
         setLoading(false);
         return;
       }
-      // 3. Fallback to Open Facts
-      const res = await fetch(`${getApiBaseUrl()}/api/v2/product/${barcode}`);
+      // 3. Try Open Food Facts
+      const res = await fetch(`${OPEN_FOOD_FACTS_URL}/api/v2/product/${barcode}`);
       const data = await res.json();
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
-      } else {
-        setError('Product not found.');
+        setLoading(false);
+        return;
       }
+      // 4. Final fallback: Open Beauty Facts
+      const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/api/v2/product/${barcode}`);
+      const beautyData = await beautyRes.json();
+      if (beautyData && beautyData.product) {
+        setProduct(beautyData.product);
+        addToHistory(beautyData.product);
+        setLoading(false);
+        return;
+      }
+      setError('Product not found.');
     } catch (e) {
       setError('Error fetching product.');
     } finally {
@@ -159,7 +162,6 @@ export default function App() {
     }
   };
 
-  // Modified searchProducts to try Nutritionix first, then USDA, then Open Facts
   const searchProducts = async () => {
     if (!search) return;
     setLoading(true);
@@ -209,14 +211,23 @@ export default function App() {
         setLoading(false);
         return;
       }
-      // 3. Fallback to Open Facts
-      const res = await fetch(`${getApiBaseUrl()}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+      // 3. Try Open Food Facts
+      const res = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
       const data = await res.json();
       if (data && data.products) {
         setSearchResults(data.products);
-      } else {
-        setError('No results found.');
+        setLoading(false);
+        return;
       }
+      // 4. Final fallback: Open Beauty Facts
+      const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+      const beautyData = await beautyRes.json();
+      if (beautyData && beautyData.products) {
+        setSearchResults(beautyData.products);
+        setLoading(false);
+        return;
+      }
+      setError('No results found.');
     } catch (e) {
       setError('Error searching products.');
     } finally {
@@ -358,21 +369,6 @@ export default function App() {
               Ingredient Aware
             </Typography>
           </Toolbar>
-          {/* Product Type Selector */}
-          <FormControl size="small" sx={{ minWidth: 160, position: 'absolute', right: 24, top: 10 }}>
-            <InputLabel id="product-type-label">Product Type</InputLabel>
-            <Select
-              labelId="product-type-label"
-              id="product-type-select"
-              value={productType}
-              label="Product Type"
-              onChange={e => setProductType(e.target.value as 'food' | 'cosmetics' | 'cleaning')}
-            >
-              <MenuItem value="food">Food</MenuItem>
-              <MenuItem value="cosmetics">Cosmetics</MenuItem>
-              <MenuItem value="cleaning">Cleaning</MenuItem>
-            </Select>
-          </FormControl>
         </AppBar>
         {/* Main Content */}
         <Box sx={{
