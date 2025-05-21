@@ -12,7 +12,7 @@ import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://transpareneats.onrender.com';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
 const OPEN_BEAUTY_FACTS_URL = 'https://world.openbeautyfacts.org';
 
@@ -278,7 +278,7 @@ export default function App() {
     if (tab !== 3) return;
     setCategoriesLoading(true);
     setCategoriesError(null);
-    fetch(`${BACKEND_URL}/api/off/categories`)
+    fetch(`${BACKEND_URL}/api/v1/off/categories`)
       .then(res => res.json())
       .then(data => {
         setCategories(data.tags.slice(0, 12)); // Limit to 12 for UI
@@ -295,7 +295,7 @@ export default function App() {
     if (tab !== 3) return;
     setTrendingLoading(true);
     setTrendingError(null);
-    fetch(`${BACKEND_URL}/api/off/popular`)
+    fetch(`${BACKEND_URL}/api/v1/off/popular`)
       .then(res => res.json())
       .then(data => {
         setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
