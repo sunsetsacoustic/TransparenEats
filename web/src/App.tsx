@@ -252,9 +252,19 @@ export default function App() {
         <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
           <SearchBar
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={val => {
+              if (typeof val === 'string') setSearch(val);
+              else if (val && 'target' in val) setSearch(val.target.value);
+            }}
             onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
             loading={loading}
+            options={searchResults}
+            onSelect={prod => {
+              setProduct(prod);
+              addToHistory(prod);
+              setTab(0);
+              setSearch('');
+            }}
           />
         </Box>
         {/* Scan Barcode Button */}
@@ -317,7 +327,22 @@ export default function App() {
     // Search
     content = (
       <Box>
-        <SearchBar value={search} onChange={e => setSearch(e.target.value)} onSearch={searchProducts} loading={loading} />
+        <SearchBar
+          value={search}
+          onChange={val => {
+            if (typeof val === 'string') setSearch(val);
+            else if (val && 'target' in val) setSearch(val.target.value);
+          }}
+          onSearch={searchProducts}
+          loading={loading}
+          options={searchResults}
+          onSelect={prod => {
+            setProduct(prod);
+            addToHistory(prod);
+            setTab(0);
+            setSearch('');
+          }}
+        />
         {loading && <CircularProgress sx={{ display: 'block', mx: 'auto', my: 2 }} />}
         {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
         <SearchResultsList results={searchResults} onSelect={(prod) => { setProduct(prod); addToHistory(prod); setTab(0); }} />
