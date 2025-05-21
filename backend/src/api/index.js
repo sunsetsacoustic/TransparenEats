@@ -102,4 +102,26 @@ router.get('/usda/search', async (req, res) => {
   }
 });
 
+// Proxy for Open Food Facts categories
+router.get('/off/categories', async (req, res) => {
+  try {
+    const response = await fetch('https://world.openfoodfacts.org/categories.json');
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch categories from Open Food Facts.' });
+  }
+});
+
+// Proxy for Open Food Facts popular products
+router.get('/off/popular', async (req, res) => {
+  try {
+    const response = await fetch('https://world.openfoodfacts.org/popular.json');
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch popular products from Open Food Facts.' });
+  }
+});
+
 module.exports = router;
