@@ -9,6 +9,7 @@ export interface Product {
     proteins_100g?: number;
     [key: string]: any;
   };
+  ingredients?: { id?: string; text: string }[];
 }
 
 export interface Dye {

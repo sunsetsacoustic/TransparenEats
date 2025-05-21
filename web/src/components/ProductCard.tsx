@@ -112,7 +112,7 @@ const getScoreLabel = (score: number) => {
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes, handleIngredientClick }) => {
   if (!product) return null;
   const score = getScore(flaggedIngredients, dyes);
   const { label: scoreLabel, color: scoreColor } = getScoreLabel(score);
@@ -148,6 +148,41 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           </Box>
         </Box>
       </Box>
+      {/* Ingredients List Section */}
+      {product.ingredients && product.ingredients.length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Ingredients</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {product.ingredients.map((ing: any, idx: number) => (
+              <Box
+                key={ing.id || ing.text || idx}
+                component="span"
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 2,
+                  background: '#f5f5f5',
+                  fontWeight: 500,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  border: '1px solid #e0e0e0',
+                  mb: 0.5,
+                }}
+                onClick={() => handleIngredientClick && handleIngredientClick(ing.text || ing)}
+              >
+                {ing.text || ing}
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
+      {/* Fallback for plain text ingredients if array is missing */}
+      {(!product.ingredients || product.ingredients.length === 0) && product.ingredients_text && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Ingredients</Typography>
+          <Typography variant="body2" sx={{ color: '#444' }}>{product.ingredients_text}</Typography>
+        </Box>
+      )}
       <Divider sx={{ my: 2 }} />
       {/* Flagged Ingredients Section */}
       {flaggedIngredients.length > 0 && (
