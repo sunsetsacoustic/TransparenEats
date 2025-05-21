@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
 export interface BarcodeScannerComponentProps {
@@ -98,14 +98,14 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
         await html5QrCodeRef.current.start(
           { facingMode: 'environment' },
           config,
-          (decodedText: string, result: any) => {
+          (decodedText: string) => {
             setDebug(`Barcode detected: ${decodedText}`);
             setScanSuccess(true);
             setTimeout(() => setScanSuccess(false), 1200);
             stopScanner();
             onDetected(decodedText);
           },
-          (err: any) => {
+          () => {
             setDebug(`Frame processed. No barcode detected.`);
           }
         );
