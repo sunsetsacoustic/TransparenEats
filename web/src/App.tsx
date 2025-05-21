@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, RefObject } from 'react';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
@@ -53,6 +53,7 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const scannerRef = useRef<any>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -123,6 +124,13 @@ export default function App() {
     }
   };
 
+  // Stop scanner when leaving Scan tab
+  useEffect(() => {
+    if (tab !== 1 && scannerRef.current && typeof scannerRef.current.stopScanner === 'function') {
+      scannerRef.current.stopScanner();
+    }
+  }, [tab]);
+
   // Tab content rendering
   let content = null;
   if (tab === 0) {
@@ -183,7 +191,7 @@ export default function App() {
   } else if (tab === 1) {
     // Scan
     content = (
-      <BarcodeScannerComponent onDetected={fetchProductByBarcode} autoStart={true} />
+      <BarcodeScannerComponent ref={scannerRef} onDetected={fetchProductByBarcode} autoStart={true} />
     );
   } else if (tab === 2) {
     // History

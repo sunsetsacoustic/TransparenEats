@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-export default function BarcodeScannerComponent({ onDetected, autoStart = false }) {
+/**
+ * @param {{ onDetected: function, autoStart?: boolean }} props
+ * @param {React.Ref<any>} ref
+ */
+const BarcodeScannerComponent = forwardRef(function BarcodeScannerComponent(
+  { onDetected, autoStart = false },
+  ref
+) {
   const videoRef = useRef(null);
   const [error, setError] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -11,6 +18,10 @@ export default function BarcodeScannerComponent({ onDetected, autoStart = false 
   const [scanLineDir, setScanLineDir] = useState(1);
   const html5QrCodeRef = useRef(null);
   const scanLineInterval = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    stopScanner,
+  }));
 
   // Scan line animation
   useEffect(() => {
@@ -262,4 +273,6 @@ export default function BarcodeScannerComponent({ onDetected, autoStart = false 
       )}
     </div>
   );
-} 
+});
+
+export default BarcodeScannerComponent; 
