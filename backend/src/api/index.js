@@ -76,14 +76,21 @@ router.get('/nutritionix/search', async (req, res) => {
   const appId = process.env.NUTRITIONIX_APP_ID;
   const apiKey = process.env.NUTRITIONIX_API_KEY;
   if (!query) return res.status(400).json({ error: 'Missing query parameter.' });
+  if (!appId || !apiKey) return res.status(500).json({ error: 'Nutritionix API credentials not set.' });
   try {
     const response = await fetch(
       `https://api.nutritionix.com/v1_1/search/${encodeURIComponent(query)}?results=0:1&fields=item_name,brand_name,nf_calories,nf_ingredient_statement&appId=${appId}&appKey=${apiKey}`
     );
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Nutritionix API error:', text);
+      return res.status(500).json({ error: 'Nutritionix API error', details: text });
+    }
     const data = await response.json();
     res.json(data);
   } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch from Nutritionix.' });
+    console.error('Failed to fetch from Nutritionix:', e);
+    res.status(500).json({ error: 'Failed to fetch from Nutritionix.', details: e.message });
   }
 });
 
@@ -118,13 +125,22 @@ router.get('/off/categories', async (req, res) => {
 
 // Proxy for Open Food Facts popular products
 router.get('/off/popular', async (req, res) => {
-  console.log('GET /off/popular called');
   try {
     const response = await fetch('https://world.openfoodfacts.org/popular.json');
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Open Food Facts API error:', text);
+      return res.status(500).json({ error: 'Open Food Facts API error', details: text });
+    }
     const data = await response.json();
+    if (!data.products) {
+      console.error('No popular products found in Open Food Facts response:', data);
+      return res.status(500).json({ error: 'No popular products found.' });
+    }
     res.json(data);
   } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch popular products from Open Food Facts.' });
+    console.error('Failed to fetch popular products from Open Food Facts:', e);
+    res.status(500).json({ error: 'Failed to fetch popular products from Open Food Facts.', details: e.message });
   }
 });
 
