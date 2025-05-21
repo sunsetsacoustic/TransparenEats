@@ -276,9 +276,40 @@ export default function App() {
   if (tab === 0) {
     // Home
     content = product ? null : (
-      <Box sx={{ width: '100%', maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-        {/* Responsive Search Bar */}
-        <Box sx={{ mb: 2, width: '100%', maxWidth: 400 }}>
+      <Box sx={{
+        width: '100vw',
+        minHeight: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
+        py: 6,
+      }}>
+        <Box sx={{
+          width: '100%',
+          maxWidth: 420,
+          mx: 'auto',
+          p: { xs: 2, sm: 4 },
+          borderRadius: 5,
+          boxShadow: '0 4px 32px 0 rgba(25, 118, 210, 0.08)',
+          background: '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 4,
+        }}>
+          {/* Organic Illustration */}
+          <Box sx={{ mb: 2 }}>
+            <span style={{ fontSize: 56, display: 'block' }}>🥦🥕🍃</span>
+          </Box>
+          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: 'primary.main', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+            Ingredient Aware
+          </Typography>
+          <Typography variant="subtitle1" sx={{ color: '#4caf50', mb: 3, fontWeight: 500 }}>
+            Discover what's really in your food.
+          </Typography>
+          {/* SearchBar with pill shape */}
           <SearchBar
             value={search}
             onChange={val => {
@@ -295,50 +326,66 @@ export default function App() {
               setTab(0);
               setSearch('');
             }}
+            sx={{
+              mb: 2,
+              '& .MuiInputBase-root': {
+                borderRadius: 99,
+                fontSize: 18,
+                px: 2,
+                background: '#f8fafc',
+              },
+            }}
           />
+          {/* Scan Button */}
+          <Button
+            variant="contained"
+            fullWidth
+            size="large"
+            startIcon={<QrCodeScannerIcon />}
+            sx={{
+              borderRadius: 99,
+              fontWeight: 700,
+              fontSize: 20,
+              py: 2,
+              px: 2,
+              background: 'linear-gradient(90deg, #a8e063 0%, #56ab2f 100%)',
+              color: '#fff',
+              boxShadow: '0 2px 12px 0 rgba(76, 175, 80, 0.12)',
+              mb: 2,
+              mt: 1,
+              transition: 'background 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                background: 'linear-gradient(90deg, #56ab2f 0%, #a8e063 100%)',
+                boxShadow: '0 4px 24px 0 rgba(76, 175, 80, 0.18)',
+              },
+            }}
+            onClick={() => setTab(1)}
+          >
+            Scan Barcode
+          </Button>
         </Box>
-        {/* Scan Barcode Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          size="large"
-          startIcon={<QrCodeScannerIcon />}
-          sx={{
-            borderRadius: 3,
-            fontWeight: 700,
-            fontSize: { xs: 18, sm: 20 },
-            py: 1.7,
-            px: 2,
-            boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
-            mb: 2,
-            mt: 1,
-            maxWidth: 400,
-          }}
-          onClick={() => setTab(1)}
-        >
-          Scan Barcode
-        </Button>
-        {/* Error message if product not found and upload dialog is not open */}
-        {error && (
-          <Typography color="error" sx={{ mt: 2, mb: 1, textAlign: 'center' }}>{error}</Typography>
-        )}
-        {/* Featured categories placeholder */}
-        <Box sx={{ width: '100%', maxWidth: 400, mt: 2, mb: 2 }}>
-          <Box sx={{
-            background: 'linear-gradient(90deg, #e3f2fd 0%, #fce4ec 100%)',
-            borderRadius: 3,
-            p: 2,
-            minHeight: 80,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#888',
-            fontWeight: 500,
-            fontSize: 18,
-            boxShadow: '0 1px 4px 0 rgba(25, 118, 210, 0.06)',
-          }}>
-            <span>🌟 Featured categories coming soon!</span>
+        {/* Featured Categories Card */}
+        <Box sx={{
+          width: '100%',
+          maxWidth: 420,
+          mx: 'auto',
+          mt: 2,
+          p: 3,
+          borderRadius: 4,
+          background: 'linear-gradient(90deg, #e8f5e9 0%, #fce4ec 100%)',
+          boxShadow: '0 1px 8px 0 rgba(76, 175, 80, 0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+        }}>
+          <span style={{ fontSize: 32 }}>🌱</span>
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#388e3c' }}>
+              Featured categories coming soon!
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#888' }}>
+              Explore healthy, plant-based, and trending foods soon.
+            </Typography>
           </Box>
         </Box>
       </Box>
