@@ -466,8 +466,8 @@ export default function App() {
                 key={cat.id}
                 label={cat.name}
                 clickable
-                color={selectedCategory === cat.id ? 'primary' : 'default'}
-                onClick={() => setSelectedCategory(cat.id)}
+                color={selectedCategory === cat.id.replace(/^en:/, "") ? 'primary' : 'default'}
+                onClick={() => setSelectedCategory(cat.id.replace(/^en:/, ""))}
                 sx={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}
               />
             ))}
@@ -475,7 +475,7 @@ export default function App() {
         )}
         {selectedCategory && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Products in "{categories.find(c => c.id === selectedCategory)?.name || selectedCategory}"</Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Products in "{categories.find(c => c.id.replace(/^en:/, "") === selectedCategory)?.name || selectedCategory}"</Typography>
             {categoryProductsLoading ? <CircularProgress /> : categoryProductsError ? <Typography color="error">{categoryProductsError}</Typography> : (
               <Grid container spacing={2}>
                 {categoryProducts.map(prod => (
