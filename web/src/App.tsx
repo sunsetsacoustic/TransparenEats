@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel, DialogActions } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -109,7 +109,7 @@ export default function App() {
           brands: hit.brand_name,
           ingredients_text: hit.nf_ingredient_statement,
           nutriments: {
-            'energy-kcal_100g': hit.nf_calories,
+            'energy-kcal_100g': hit.fields.nf_calories,
           },
         };
         setProduct(nutriProduct);
@@ -122,13 +122,20 @@ export default function App() {
       const usdaData = await usdaRes.json();
       if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
         const food = usdaData.foods[0];
+        const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
         const usdaProduct: Product = {
-          code: barcode,
+          code: food.gtinUpc || food.fdcId?.toString() || barcode,
           product_name: food.description,
           brands: food.brandOwner,
           ingredients_text: food.ingredients,
           nutriments: {
-            'energy-kcal_100g': food.foodNutrients?.find((n: any) => n.nutrientName === 'Energy')?.value,
+            'energy-kcal_100g': getNutrient('Energy'),
+            'proteins_100g': getNutrient('Protein'),
+            'fat_100g': getNutrient('Total lipid (fat)'),
+            'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
+            'fiber_100g': getNutrient('Fiber, total dietary'),
+            'sugars_100g': getNutrient('Sugars, total including NLEA'),
+            'sodium_100g': getNutrient('Sodium, Na'),
           },
         };
         setProduct(usdaProduct);
@@ -180,15 +187,24 @@ export default function App() {
       const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(search)}`);
       const usdaData = await usdaRes.json();
       if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
-        const usdaProducts: Product[] = usdaData.foods.map((food: any) => ({
-          code: food.fdcId || '',
-          product_name: food.description,
-          brands: food.brandOwner,
-          ingredients_text: food.ingredients,
-          nutriments: {
-            'energy-kcal_100g': food.foodNutrients?.find((n: any) => n.nutrientName === 'Energy')?.value,
-          },
-        }));
+        const usdaProducts: Product[] = usdaData.foods.map((food: any) => {
+          const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
+          return {
+            code: food.gtinUpc || food.fdcId?.toString() || '',
+            product_name: food.description,
+            brands: food.brandOwner,
+            ingredients_text: food.ingredients,
+            nutriments: {
+              'energy-kcal_100g': getNutrient('Energy'),
+              'proteins_100g': getNutrient('Protein'),
+              'fat_100g': getNutrient('Total lipid (fat)'),
+              'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
+              'fiber_100g': getNutrient('Fiber, total dietary'),
+              'sugars_100g': getNutrient('Sugars, total including NLEA'),
+              'sodium_100g': getNutrient('Sodium, Na'),
+            },
+          };
+        });
         setSearchResults(usdaProducts);
         setLoading(false);
         return;
