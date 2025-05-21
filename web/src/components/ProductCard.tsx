@@ -1,5 +1,5 @@
-import React, { type JSX } from 'react';
-import { Paper, Box, Typography, Divider, Avatar, Chip } from '@mui/material';
+import React, { useState } from 'react';
+import { Paper, Box, Typography, Divider, Avatar, Chip, Collapse, Button, Tooltip } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -7,6 +7,8 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import GrainIcon from '@mui/icons-material/Grain';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import type { Product, Dye } from '../types';
 
 /**
@@ -31,7 +33,7 @@ interface ProductCardProps {
 const NEGATIVE_FIELDS: {
   key: string;
   label: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   desc: string;
   color: string;
   getValue: (value: number | Record<string, any>) => string | number;
@@ -107,11 +109,19 @@ const getScoreLabel = (score: number) => {
   return { label: 'Good', color: '#4CAF50' };
 };
 
+const SCORE_DEFINITIONS: Record<string, string> = {
+  'Nutri-Score': 'A nutrition label that grades food from A (best) to E (worst) based on its nutritional quality.',
+  'Eco-Score': 'An environmental impact score from A (low impact) to E (high impact).',
+  'NOVA Group': 'A classification of food processing, from 1 (unprocessed) to 4 (ultra-processed).',
+};
+
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
 const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes }) => {
   if (!product) return null;
+  const [showAllIngredients, setShowAllIngredients] = useState(false);
+  const [showAllFlagged, setShowAllFlagged] = useState(false);
   const score = getScore(flaggedIngredients, dyes);
   const { label: scoreLabel, color: scoreColor } = getScoreLabel(score);
   const nutriments = product.nutriments || {};
@@ -145,6 +155,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     { key: 'sodium_100g', label: 'Sodium', unit: 'mg' },
   ];
 
+  // Collapsible logic for ingredients
+  const ingredientLines = (product.ingredients_text || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
+  const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
+  const flaggedHasMore = flaggedIngredients.length > 3;
+
   return (
     <Paper sx={{ p: 2, mt: 3, borderRadius: 4, maxWidth: 420, mx: 'auto', boxShadow: 3, background: '#fff', color: '#222', maxHeight: '80vh', overflowY: 'auto' }}>
       {/* Barcode */}
@@ -156,40 +171,68 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         </Box>
       )}
       {/* Name, Brand */}
-      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>{product.product_name || 'No name'}</Typography>
+      <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>{product.product_name || 'No name'}</Typography>
       {product.brands && <Typography variant="subtitle2" sx={{ color: '#888', mb: 1 }}>{product.brands}</Typography>}
       {/* Score */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <Box sx={{ background: scoreColor, color: '#fff', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, mr: 1 }}>{score}</Box>
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>{scoreLabel}</Typography>
+        <Typography variant="body1" sx={{ fontWeight: 600 }}>{scoreLabel}</Typography>
         <Typography variant="body2" sx={{ ml: 0.5, color: scoreColor }}>{score}/100</Typography>
       </Box>
-      {/* Ingredients */}
-      {product.ingredients_text && (
+      <Divider sx={{ my: 2 }} />
+      {/* Ingredients (collapsible) */}
+      {ingredientLines.length > 0 && (
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Ingredients</Typography>
-          <Typography variant="body2" sx={{ color: '#444' }}>{product.ingredients_text}</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Ingredients</Typography>
+          <Collapse in={showAllIngredients || ingredientLines.length <= 3} collapsedSize={72}>
+            <Typography variant="body2" sx={{ color: '#444', whiteSpace: 'pre-line' }}>
+              {showAllIngredients ? ingredientLines.join(', ') : ingredientLines.slice(0, 3).join(', ') + (ingredientLines.length > 3 ? ', ...' : '')}
+            </Typography>
+          </Collapse>
+          {ingredientLines.length > 3 && (
+            <Button size="small" onClick={() => setShowAllIngredients(v => !v)} sx={{ mt: 1 }} endIcon={showAllIngredients ? <ExpandLessIcon /> : <ExpandMoreIcon />}>
+              {showAllIngredients ? 'Show Less' : 'Show More'}
+            </Button>
+          )}
         </Box>
       )}
-      {/* Serving Size, Categories, Labels, Allergens, Additives, Data Type, Publication Date */}
+      <Divider sx={{ my: 2 }} />
+      {/* Details Section (chips) */}
       <Box sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Details</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+          {categories && <Chip label={`Categories: ${categories}`} size="small" />}
+          {labels && <Chip label={`Labels: ${labels}`} size="small" />}
+          {allergens && <Chip label={`Allergens: ${allergens}`} size="small" color="warning" />}
+          {additives && <Chip label={`Additives: ${additives}`} size="small" color="error" />}
+        </Box>
         {servingSize && <Typography variant="body2">Serving Size: {servingSize}</Typography>}
-        {categories && <Typography variant="body2">Categories: {categories}</Typography>}
-        {labels && <Typography variant="body2">Labels: {labels}</Typography>}
-        {allergens && <Typography variant="body2">Allergens: {allergens}</Typography>}
-        {additives && <Typography variant="body2">Additives: {additives}</Typography>}
         {dataType && <Typography variant="body2">Data Type: {dataType}</Typography>}
         {publicationDate && <Typography variant="body2">Publication Date: {publicationDate}</Typography>}
       </Box>
-      {/* Scores */}
-      <Box sx={{ mb: 2 }}>
-        {nutriScore && <Chip label={`Nutri-Score: ${nutriScore}`} sx={{ mr: 1, mb: 1 }} />}
-        {ecoScore && <Chip label={`Eco-Score: ${ecoScore}`} sx={{ mr: 1, mb: 1 }} />}
-        {novaGroup && <Chip label={`NOVA Group: ${novaGroup}`} sx={{ mr: 1, mb: 1 }} />}
+      <Divider sx={{ my: 2 }} />
+      {/* Scores with tooltips */}
+      <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+        {nutriScore && (
+          <Tooltip title={SCORE_DEFINITIONS['Nutri-Score']} arrow>
+            <Chip label={`Nutri-Score: ${nutriScore}`} sx={{ mb: 1, cursor: 'pointer' }} />
+          </Tooltip>
+        )}
+        {ecoScore && (
+          <Tooltip title={SCORE_DEFINITIONS['Eco-Score']} arrow>
+            <Chip label={`Eco-Score: ${ecoScore}`} sx={{ mb: 1, cursor: 'pointer' }} />
+          </Tooltip>
+        )}
+        {novaGroup && (
+          <Tooltip title={SCORE_DEFINITIONS['NOVA Group']} arrow>
+            <Chip label={`NOVA Group: ${novaGroup}`} sx={{ mb: 1, cursor: 'pointer' }} />
+          </Tooltip>
+        )}
       </Box>
-      {/* Nutritional Info */}
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Nutritional Info (per 100g)</Typography>
-      <Box sx={{ mb: 2 }}>
+      <Divider sx={{ my: 2 }} />
+      {/* Nutritional Info (main, with background) */}
+      <Box sx={{ mb: 2, p: 2, borderRadius: 2, background: '#f5f7fa' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Nutritional Info (per 100g)</Typography>
         {nutrientFields.map(field => (
           nutriments[field.key] !== undefined && (
             <Typography key={field.key} variant="body2">
@@ -198,64 +241,74 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           )
         ))}
       </Box>
-      {/* Flagged Ingredients Section */}
-      {flaggedIngredients.length > 0 && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Flagged Ingredients</Typography>
-          {flaggedIngredients.map((flag, idx) => (
-            <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 1, gap: 1 }}>
-              {flag.severity === 'critical' ? (
-                <WarningIcon color="error" fontSize="small" sx={{ mt: 0.5 }} />
-              ) : (
-                <ReportProblemIcon sx={{ color: '#FFA726', fontSize: 20, mt: 0.5 }} />
-              )}
-              <Box>
-                <Typography variant="body1" sx={{ fontWeight: 500, color: flag.severity === 'critical' ? '#F44336' : '#FFA726' }}>{flag.name}</Typography>
-                <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 0.5 }}>{flag.warning}</Typography>
+      <Divider sx={{ my: 2 }} />
+      {/* Highlights: Negatives & Positives */}
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Highlights</Typography>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ color: '#888', mb: 1 }}>Potential negatives and positives based on nutrition and flagged ingredients:</Typography>
+        <Box>
+          {NEGATIVE_FIELDS.map(field => (
+            <Box key={field.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {field.icon}
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>{field.label}</Typography>
+                  <Typography variant="caption" sx={{ color: '#888' }}>{field.desc}</Typography>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.isAdditives ? field.getValue(additivesCount) : field.getValue(nutriments)}</Typography>
+                <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: field.color, ml: 1 }} />
               </Box>
             </Box>
           ))}
         </Box>
-      )}
-      {/* Negatives */}
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Negatives</Typography>
-      <Box>
-        {NEGATIVE_FIELDS.map(field => (
-          <Box key={field.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {field.icon}
-              <Box>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>{field.label}</Typography>
-                <Typography variant="caption" sx={{ color: '#888' }}>{field.desc}</Typography>
+        <Divider sx={{ my: 2 }} />
+        <Box>
+          {POSITIVE_FIELDS.map(field => (
+            <Box key={field.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {field.icon}
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>{field.label}</Typography>
+                  <Typography variant="caption" sx={{ color: '#888' }}>{field.desc}</Typography>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.getValue(nutriments)}</Typography>
+                <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: field.color, ml: 1 }} />
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.isAdditives ? field.getValue(additivesCount) : field.getValue(nutriments)}</Typography>
-              <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: field.color, ml: 1 }} />
-            </Box>
-          </Box>
-        ))}
+          ))}
+        </Box>
       </Box>
       <Divider sx={{ my: 2 }} />
-      {/* Positives */}
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Positives</Typography>
-      <Box>
-        {POSITIVE_FIELDS.map(field => (
-          <Box key={field.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {field.icon}
-              <Box>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>{field.label}</Typography>
-                <Typography variant="caption" sx={{ color: '#888' }}>{field.desc}</Typography>
+      {/* Flagged Ingredients Section (collapsible) */}
+      {flaggedIngredients.length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Flagged Ingredients</Typography>
+          <Collapse in={showAllFlagged || flaggedIngredients.length <= 3} collapsedSize={120}>
+            {flaggedToShow.map((flag, idx) => (
+              <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 1, gap: 1 }}>
+                {flag.severity === 'critical' ? (
+                  <WarningIcon color="error" fontSize="small" sx={{ mt: 0.5 }} />
+                ) : (
+                  <ReportProblemIcon sx={{ color: '#FFA726', fontSize: 20, mt: 0.5 }} />
+                )}
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500, color: flag.severity === 'critical' ? '#F44336' : '#FFA726' }}>{flag.name}</Typography>
+                  <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 0.5 }}>{flag.warning}</Typography>
+                </Box>
               </Box>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>{field.getValue(nutriments)}</Typography>
-              <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: field.color, ml: 1 }} />
-            </Box>
-          </Box>
-        ))}
-      </Box>
+            ))}
+          </Collapse>
+          {flaggedHasMore && (
+            <Button size="small" onClick={() => setShowAllFlagged(v => !v)} sx={{ mt: 1 }} endIcon={showAllFlagged ? <ExpandLessIcon /> : <ExpandMoreIcon />}>
+              {showAllFlagged ? 'Show Less' : 'Show More'}
+            </Button>
+          )}
+        </Box>
+      )}
     </Paper>
   );
 };
