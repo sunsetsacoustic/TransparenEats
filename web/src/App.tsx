@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel, DialogActions } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -11,6 +11,7 @@ import type { Product, Dye, IngredientInfo } from './types';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import ProductUploadDialog from './components/ProductUploadDialog';
 
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
@@ -55,6 +56,11 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [productType, setProductType] = useState<'food' | 'cosmetics' | 'cleaning'>('food');
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [pendingBarcode, setPendingBarcode] = useState<string | null>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -89,11 +95,19 @@ export default function App() {
     return 'https://world.openfoodfacts.org';
   };
 
-  // Fetch product by barcode from selected API
+  // Show upload dialog when product not found
+  useEffect(() => {
+    if (error === 'Product not found.' && pendingBarcode) {
+      setShowUploadDialog(true);
+    }
+  }, [error, pendingBarcode]);
+
+  // Modified fetchProductByBarcode to set pendingBarcode
   const fetchProductByBarcode = async (barcode: string) => {
     setLoading(true);
     setError(null);
     setProduct(null);
+    setPendingBarcode(barcode);
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v2/product/${barcode}`);
       const data = await res.json();
@@ -101,6 +115,7 @@ export default function App() {
         setProduct(data.product);
         addToHistory(data.product);
         setTab(0); // Switch to Home tab after successful scan
+        setPendingBarcode(null);
       } else {
         setError('Product not found.');
       }
@@ -138,6 +153,46 @@ export default function App() {
       scannerRef.current.stopScanner();
     }
   }, [tab]);
+
+  // Upload handler for ProductUploadDialog
+  const handleProductUpload = async (form: {
+    barcode: string;
+    product_name: string;
+    ingredients_text: string;
+    image_front?: File;
+    image_ingredients?: File;
+    image_nutrition?: File;
+  }) => {
+    setUploadLoading(true);
+    setUploadError(null);
+    setUploadSuccess(false);
+    try {
+      // 1. Upload product data and images as FormData to backend
+      const formData = new FormData();
+      formData.append('barcode', form.barcode);
+      formData.append('product_name', form.product_name);
+      formData.append('ingredients_text', form.ingredients_text);
+      if (form.image_front) formData.append('image_front', form.image_front);
+      if (form.image_ingredients) formData.append('image_ingredients', form.image_ingredients);
+      if (form.image_nutrition) formData.append('image_nutrition', form.image_nutrition);
+      const productRes = await fetch('/api/v1/uploadProduct', {
+        method: 'POST',
+        body: formData,
+      });
+      const productData = await productRes.json();
+      if (!productData.success) {
+        throw new Error(productData.error || 'Failed to upload product data.');
+      }
+      setUploadSuccess(true);
+      setShowUploadDialog(false);
+      setError(null);
+      setPendingBarcode(null);
+    } catch (e: any) {
+      setUploadError(e.message || 'Failed to upload product.');
+    } finally {
+      setUploadLoading(false);
+    }
+  };
 
   // Tab content rendering
   let content = null;
@@ -294,6 +349,27 @@ export default function App() {
           justifyContent: 'center',
         }}>
           {content}
+          {/* Product Upload Dialog */}
+          <ProductUploadDialog
+            open={showUploadDialog}
+            barcode={pendingBarcode || ''}
+            onClose={() => { setShowUploadDialog(false); setError(null); setPendingBarcode(null); }}
+            onSubmit={handleProductUpload}
+            loading={uploadLoading}
+            error={uploadError}
+          />
+          {/* Upload Success Message */}
+          {uploadSuccess && (
+            <Dialog open onClose={() => setUploadSuccess(false)}>
+              <DialogTitle>Thank you!</DialogTitle>
+              <DialogContent>
+                <Typography>Product submitted successfully. It will appear in the database after review.</Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setUploadSuccess(false)}>Close</Button>
+              </DialogActions>
+            </Dialog>
+          )}
           <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
             <DialogTitle>{ingredientInfo?.name}</DialogTitle>
             <DialogContent>
