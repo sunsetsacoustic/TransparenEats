@@ -340,11 +340,11 @@ export default function App() {
         py: 6,
       }}>
         <Box sx={{
-          width: '100%',
-          maxWidth: 420,
+          width: '100vw',
+          maxWidth: { xs: '100vw', sm: 420 },
           mx: 'auto',
           p: { xs: 2, sm: 4 },
-          borderRadius: 5,
+          borderRadius: { xs: 0, sm: 5 },
           boxShadow: '0 4px 32px 0 rgba(25, 118, 210, 0.08)',
           background: '#fff',
           display: 'flex',
@@ -419,12 +419,12 @@ export default function App() {
         </Box>
         {/* Featured Categories Card */}
         <Box sx={{
-          width: '100%',
-          maxWidth: 420,
+          width: '100vw',
+          maxWidth: { xs: '100vw', sm: 420 },
           mx: 'auto',
           mt: 2,
           p: 3,
-          borderRadius: 4,
+          borderRadius: { xs: 0, sm: 4 },
           background: 'linear-gradient(90deg, #e8f5e9 0%, #fce4ec 100%)',
           boxShadow: '0 1px 8px 0 rgba(76, 175, 80, 0.06)',
           display: 'flex',
