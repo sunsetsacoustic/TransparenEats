@@ -61,6 +61,7 @@ export default function App() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [pendingBarcode, setPendingBarcode] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -166,6 +167,7 @@ export default function App() {
     setUploadLoading(true);
     setUploadError(null);
     setUploadSuccess(false);
+    setUploadStatus('Uploading product data...');
     try {
       // 1. Upload product data and images as FormData to backend
       const formData = new FormData();
@@ -179,6 +181,7 @@ export default function App() {
         method: 'POST',
         body: formData,
       });
+      setUploadStatus('Processing images...');
       const productData = await productRes.json();
       if (!productData.success) {
         throw new Error(productData.error || 'Failed to upload product data.');
@@ -187,8 +190,10 @@ export default function App() {
       setShowUploadDialog(false);
       setError(null);
       setPendingBarcode(null);
+      setUploadStatus(null);
     } catch (e: any) {
       setUploadError(e.message || 'Failed to upload product.');
+      setUploadStatus(null);
     } finally {
       setUploadLoading(false);
     }
@@ -231,6 +236,10 @@ export default function App() {
         >
           Scan Barcode
         </Button>
+        {/* Error message if product not found and upload dialog is not open */}
+        {error && !showUploadDialog && (
+          <Typography color="error" sx={{ mt: 2, mb: 1, textAlign: 'center' }}>{error}</Typography>
+        )}
         {/* Featured categories placeholder */}
         <Box sx={{ width: '100%', maxWidth: 400, mt: 2, mb: 2 }}>
           <Box sx={{
@@ -357,6 +366,7 @@ export default function App() {
             onSubmit={handleProductUpload}
             loading={uploadLoading}
             error={uploadError}
+            statusMessage={uploadStatus}
           />
           {/* Upload Success Message */}
           {uploadSuccess && (
