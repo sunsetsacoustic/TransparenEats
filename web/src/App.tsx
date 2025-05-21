@@ -6,7 +6,6 @@ import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
 import HistoryList from './components/HistoryList';
 import SearchBar from './components/SearchBar';
-import SearchResultsList from './components/SearchResultsList';
 import BarcodeScannerComponent, { type BarcodeScannerComponentHandle } from './components/BarcodeScannerComponent';
 import type { Product, Dye, IngredientInfo } from './types';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
@@ -57,7 +56,6 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   // Products tab state
@@ -71,7 +69,6 @@ export default function App() {
   const [categoryProducts, setCategoryProducts] = useState<any[]>([]);
   const [categoryProductsLoading, setCategoryProductsLoading] = useState(false);
   const [categoryProductsError, setCategoryProductsError] = useState<string | null>(null);
-  const [selectedTrendingProduct, setSelectedTrendingProduct] = useState<any | null>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -102,7 +99,6 @@ export default function App() {
   const fetchProductByBarcode = async (barcode: string) => {
     setTab(0); // Immediately switch to Home tab to unmount scanner and release camera
     setLoading(true);
-    setError(null);
     setProduct(null);
     try {
       // 1. Try Nutritionix
@@ -180,10 +176,7 @@ export default function App() {
         setLoading(false);
         return;
       }
-      setError('Product not found.');
     } catch (e) {
-      setError('Error fetching product.');
-    } finally {
       setLoading(false);
     }
   };
@@ -191,7 +184,6 @@ export default function App() {
   const searchProducts = async () => {
     if (!search) return;
     setLoading(true);
-    setError(null);
     setSearchResults([]);
     try {
       // 1. Try Nutritionix
@@ -253,10 +245,7 @@ export default function App() {
         setLoading(false);
         return;
       }
-      setError('No results found.');
     } catch (e) {
-      setError('Error searching products.');
-    } finally {
       setLoading(false);
     }
   };
@@ -295,7 +284,7 @@ export default function App() {
         setCategories(data.tags.slice(0, 12)); // Limit to 12 for UI
         setCategoriesLoading(false);
       })
-      .catch(e => {
+      .catch(() => {
         setCategoriesError('Failed to load categories');
         setCategoriesLoading(false);
       });
@@ -312,7 +301,7 @@ export default function App() {
         setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
         setTrendingLoading(false);
       })
-      .catch(e => {
+      .catch(() => {
         setTrendingError('Failed to load trending foods');
         setTrendingLoading(false);
       });
@@ -329,7 +318,7 @@ export default function App() {
         setCategoryProducts(data.products.slice(0, 12));
         setCategoryProductsLoading(false);
       })
-      .catch(e => {
+      .catch(() => {
         setCategoryProductsError('Failed to load products for category');
         setCategoryProductsLoading(false);
       });
