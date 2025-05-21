@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, RefObject } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
@@ -6,7 +6,7 @@ import BottomNav from './components/BottomNav';
 import HistoryList from './components/HistoryList';
 import SearchBar from './components/SearchBar';
 import SearchResultsList from './components/SearchResultsList';
-import BarcodeScannerComponent from './components/BarcodeScannerComponent';
+import BarcodeScannerComponent, { type BarcodeScannerComponentHandle } from './components/BarcodeScannerComponent';
 import type { Product, Dye, IngredientInfo } from './types';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import Button from '@mui/material/Button';
@@ -53,7 +53,7 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scannerRef = useRef<any>(null);
+  const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
