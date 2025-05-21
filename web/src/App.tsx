@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, Chip, Card, CardContent, CardMedia } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -59,6 +60,18 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  // Products tab state
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const [trending, setTrending] = useState<any[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(false);
+  const [trendingError, setTrendingError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [categoryProducts, setCategoryProducts] = useState<any[]>([]);
+  const [categoryProductsLoading, setCategoryProductsLoading] = useState(false);
+  const [categoryProductsError, setCategoryProductsError] = useState<string | null>(null);
+  const [selectedTrendingProduct, setSelectedTrendingProduct] = useState<any | null>(null);
 
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
@@ -101,7 +114,7 @@ export default function App() {
           code: barcode,
           product_name: hit.item_name,
           brands: hit.brand_name,
-          ingredients_text: hit.nf_ingredient_statement,
+          ingredients_text: hit.fields.nf_ingredient_statement,
           nutriments: {
             'energy-kcal_100g': hit.fields.nf_calories,
           },
@@ -271,6 +284,57 @@ export default function App() {
     // eslint-disable-next-line
   }, [debouncedSearch]);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    if (tab !== 3) return;
+    setCategoriesLoading(true);
+    setCategoriesError(null);
+    fetch('https://world.openfoodfacts.org/categories.json')
+      .then(res => res.json())
+      .then(data => {
+        setCategories(data.tags.slice(0, 12)); // Limit to 12 for UI
+        setCategoriesLoading(false);
+      })
+      .catch(e => {
+        setCategoriesError('Failed to load categories');
+        setCategoriesLoading(false);
+      });
+  }, [tab]);
+
+  // Fetch trending products on mount
+  useEffect(() => {
+    if (tab !== 3) return;
+    setTrendingLoading(true);
+    setTrendingError(null);
+    fetch('https://world.openfoodfacts.org/popular.json')
+      .then(res => res.json())
+      .then(data => {
+        setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
+        setTrendingLoading(false);
+      })
+      .catch(e => {
+        setTrendingError('Failed to load trending foods');
+        setTrendingLoading(false);
+      });
+  }, [tab]);
+
+  // Fetch products for selected category
+  useEffect(() => {
+    if (!selectedCategory) return;
+    setCategoryProductsLoading(true);
+    setCategoryProductsError(null);
+    fetch(`https://world.openfoodfacts.org/category/${encodeURIComponent(selectedCategory)}.json`)
+      .then(res => res.json())
+      .then(data => {
+        setCategoryProducts(data.products.slice(0, 12));
+        setCategoryProductsLoading(false);
+      })
+      .catch(e => {
+        setCategoryProductsError('Failed to load products for category');
+        setCategoryProductsLoading(false);
+      });
+  }, [selectedCategory]);
+
   // Tab content rendering
   let content = null;
   if (tab === 0) {
@@ -401,29 +465,61 @@ export default function App() {
       <HistoryList history={history} onSelect={(prod) => setSelectedHistoryProduct(prod)} />
     );
   } else if (tab === 3) {
-    // Search
+    // Products
     content = (
-      <Box>
-        <SearchBar
-          value={search}
-          onChange={val => {
-            if (typeof val === 'string') setSearch(val);
-            else if (val && 'target' in val) setSearch(val.target.value);
-          }}
-          onSearch={searchProducts}
-          loading={loading}
-          options={searchResults}
-          onSelect={prod => {
-            setProduct(prod);
-            setSelectedHistoryProduct(prod);
-            addToHistory(prod);
-            setTab(0);
-            setSearch('');
-          }}
-        />
-        {loading && <CircularProgress sx={{ display: 'block', mx: 'auto', my: 2 }} />}
-        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-        <SearchResultsList results={searchResults} onSelect={(prod) => { setProduct(prod); setSelectedHistoryProduct(prod); addToHistory(prod); setTab(0); }} />
+      <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto', mt: 4, p: 3, borderRadius: 4, background: '#fff', boxShadow: '0 2px 16px 0 rgba(25, 118, 210, 0.08)' }}>
+        <Typography variant="h5" sx={{ fontWeight: 900, mb: 2, color: 'primary.main' }}>Browse Products</Typography>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Categories</Typography>
+        {categoriesLoading ? <CircularProgress /> : categoriesError ? <Typography color="error">{categoriesError}</Typography> : (
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
+            {categories.map(cat => (
+              <Chip
+                key={cat.id}
+                label={cat.name}
+                clickable
+                color={selectedCategory === cat.id ? 'primary' : 'default'}
+                onClick={() => setSelectedCategory(cat.id)}
+                sx={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}
+              />
+            ))}
+          </Box>
+        )}
+        {selectedCategory && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Products in "{categories.find(c => c.id === selectedCategory)?.name || selectedCategory}"</Typography>
+            {categoryProductsLoading ? <CircularProgress /> : categoryProductsError ? <Typography color="error">{categoryProductsError}</Typography> : (
+              <Grid container spacing={2}>
+                {categoryProducts.map(prod => (
+                  <Grid item xs={12} sm={6} md={4} key={prod.code}>
+                    <Card sx={{ cursor: 'pointer', height: '100%' }} onClick={() => setProduct(prod)}>
+                      {prod.image_front_url && <CardMedia component="img" height="120" image={prod.image_front_url} alt={prod.product_name} />}
+                      <CardContent>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{prod.product_name}</Typography>
+                        <Typography variant="body2" color="text.secondary">{prod.brands}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </Box>
+        )}
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, mt: 4 }}>Trending Foods</Typography>
+        {trendingLoading ? <CircularProgress /> : trendingError ? <Typography color="error">{trendingError}</Typography> : (
+          <Grid container spacing={2}>
+            {trending.map(prod => (
+              <Grid item xs={12} sm={6} md={3} key={prod.code}>
+                <Card sx={{ cursor: 'pointer', height: '100%' }} onClick={() => setProduct(prod)}>
+                  {prod.image_front_url && <CardMedia component="img" height="120" image={prod.image_front_url} alt={prod.product_name} />}
+                  <CardContent>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{prod.product_name}</Typography>
+                    <Typography variant="body2" color="text.secondary">{prod.brands}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
     );
   }
@@ -468,15 +564,12 @@ export default function App() {
         }}>
           <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
             <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
-            <Typography variant="h6" sx={{ fontWeight: 900, fontSize: 24, letterSpacing: 1, color: 'primary.main', textAlign: 'center', flex: 1, fontFamily: 'Montserrat, Arial, sans-serif', textShadow: '0 2px 8px #e3f2fd' }}>
-              Ingredient Aware
-            </Typography>
           </Toolbar>
         </AppBar>
         {/* Main Content */}
         <Box sx={{
-          pt: { xs: 10, sm: 12 },
-          pb: 10,
+          pt: { xs: 0, sm: 0 },
+          pb: 0,
           px: { xs: 2, sm: 0 },
           width: '100vw',
           maxWidth: '100vw',
