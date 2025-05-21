@@ -13,6 +13,8 @@ import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import ProductUploadDialog from './components/ProductUploadDialog';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 function findDyes(ingredientText: string | null | undefined): Dye[] {
   if (!ingredientText) return [];
   const lower = ingredientText.toLowerCase();
@@ -105,13 +107,14 @@ export default function App() {
 
   // Modified fetchProductByBarcode to try Nutritionix first, then Open Facts
   const fetchProductByBarcode = async (barcode: string) => {
+    setTab(0); // Immediately switch to Home tab to unmount scanner and release camera
     setLoading(true);
     setError(null);
     setProduct(null);
     setPendingBarcode(barcode);
     try {
       // 1. Try Nutritionix
-      const nutriRes = await fetch(`/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
+      const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
       const nutriData = await nutriRes.json();
       if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
         // Map Nutritionix data to Product shape
@@ -127,7 +130,6 @@ export default function App() {
         };
         setProduct(nutriProduct);
         addToHistory(nutriProduct);
-        setTab(0);
         setPendingBarcode(null);
         setLoading(false);
         return;
@@ -138,7 +140,6 @@ export default function App() {
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
-        setTab(0);
         setPendingBarcode(null);
       } else {
         setError('Product not found.');
@@ -158,7 +159,7 @@ export default function App() {
     setSearchResults([]);
     try {
       // 1. Try Nutritionix
-      const nutriRes = await fetch(`/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
+      const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
       const nutriData = await nutriRes.json();
       if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
         // Map Nutritionix data to Product shape array
@@ -219,7 +220,7 @@ export default function App() {
       if (form.image_front) formData.append('image_front', form.image_front);
       if (form.image_ingredients) formData.append('image_ingredients', form.image_ingredients);
       if (form.image_nutrition) formData.append('image_nutrition', form.image_nutrition);
-      const productRes = await fetch('/api/v1/uploadProduct', {
+      const productRes = await fetch(`${BACKEND_URL}/api/v1/uploadProduct`, {
         method: 'POST',
         body: formData,
       });
