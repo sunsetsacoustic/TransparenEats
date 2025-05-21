@@ -278,7 +278,7 @@ export default function App() {
     if (tab !== 3) return;
     setCategoriesLoading(true);
     setCategoriesError(null);
-    fetch('https://world.openfoodfacts.org/categories.json')
+    fetch('/api/off/categories')
       .then(res => res.json())
       .then(data => {
         setCategories(data.tags.slice(0, 12)); // Limit to 12 for UI
@@ -295,7 +295,7 @@ export default function App() {
     if (tab !== 3) return;
     setTrendingLoading(true);
     setTrendingError(null);
-    fetch('https://world.openfoodfacts.org/popular.json')
+    fetch('/api/off/popular')
       .then(res => res.json())
       .then(data => {
         setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
