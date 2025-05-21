@@ -103,19 +103,42 @@ export default function App() {
     }
   }, [error, pendingBarcode]);
 
-  // Modified fetchProductByBarcode to set pendingBarcode
+  // Modified fetchProductByBarcode to try Nutritionix first, then Open Facts
   const fetchProductByBarcode = async (barcode: string) => {
     setLoading(true);
     setError(null);
     setProduct(null);
     setPendingBarcode(barcode);
     try {
+      // 1. Try Nutritionix
+      const nutriRes = await fetch(`/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
+      const nutriData = await nutriRes.json();
+      if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
+        // Map Nutritionix data to Product shape
+        const hit = nutriData.hits[0].fields;
+        const nutriProduct: Product = {
+          code: barcode,
+          product_name: hit.item_name,
+          brands: hit.brand_name,
+          ingredients_text: hit.nf_ingredient_statement,
+          nutriments: {
+            'energy-kcal_100g': hit.nf_calories,
+          },
+        };
+        setProduct(nutriProduct);
+        addToHistory(nutriProduct);
+        setTab(0);
+        setPendingBarcode(null);
+        setLoading(false);
+        return;
+      }
+      // 2. Fallback to Open Facts
       const res = await fetch(`${getApiBaseUrl()}/api/v2/product/${barcode}`);
       const data = await res.json();
       if (data && data.product) {
         setProduct(data.product);
         addToHistory(data.product);
-        setTab(0); // Switch to Home tab after successful scan
+        setTab(0);
         setPendingBarcode(null);
       } else {
         setError('Product not found.');
@@ -127,13 +150,32 @@ export default function App() {
     }
   };
 
-  // Search products by name from selected API
+  // Modified searchProducts to try Nutritionix first, then Open Facts
   const searchProducts = async () => {
     if (!search) return;
     setLoading(true);
     setError(null);
     setSearchResults([]);
     try {
+      // 1. Try Nutritionix
+      const nutriRes = await fetch(`/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
+      const nutriData = await nutriRes.json();
+      if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
+        // Map Nutritionix data to Product shape array
+        const nutriProducts: Product[] = nutriData.hits.map((hit: any) => ({
+          code: hit.fields.item_id || hit.fields.nix_item_id || '',
+          product_name: hit.fields.item_name,
+          brands: hit.fields.brand_name,
+          ingredients_text: hit.fields.nf_ingredient_statement,
+          nutriments: {
+            'energy-kcal_100g': hit.fields.nf_calories,
+          },
+        }));
+        setSearchResults(nutriProducts);
+        setLoading(false);
+        return;
+      }
+      // 2. Fallback to Open Facts
       const res = await fetch(`${getApiBaseUrl()}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
       const data = await res.json();
       if (data && data.products) {
