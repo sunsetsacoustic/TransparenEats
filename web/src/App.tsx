@@ -312,7 +312,7 @@ export default function App() {
     if (!selectedCategory) return;
     setCategoryProductsLoading(true);
     setCategoryProductsError(null);
-    fetch(`https://world.openfoodfacts.org/category/${encodeURIComponent(selectedCategory)}.json`)
+    fetch(`${BACKEND_URL}/api/v1/off/category/${selectedCategory}`)
       .then(res => res.json())
       .then(data => {
         setCategoryProducts(data.products.slice(0, 12));

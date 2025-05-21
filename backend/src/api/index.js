@@ -8,6 +8,8 @@ const emojis = require('./emojis');
 const router = express.Router();
 const upload = multer();
 
+console.log('API router loaded');
+
 router.get('/', (req, res) => {
   res.json({
     message: 'API - 👋🌎🌍🌏',
@@ -104,6 +106,7 @@ router.get('/usda/search', async (req, res) => {
 
 // Proxy for Open Food Facts categories
 router.get('/off/categories', async (req, res) => {
+  console.log('GET /off/categories called');
   try {
     const response = await fetch('https://world.openfoodfacts.org/categories.json');
     const data = await response.json();
@@ -115,12 +118,25 @@ router.get('/off/categories', async (req, res) => {
 
 // Proxy for Open Food Facts popular products
 router.get('/off/popular', async (req, res) => {
+  console.log('GET /off/popular called');
   try {
     const response = await fetch('https://world.openfoodfacts.org/popular.json');
     const data = await response.json();
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch popular products from Open Food Facts.' });
+  }
+});
+
+// Proxy for Open Food Facts category products
+router.get('/off/category/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const response = await fetch(`https://world.openfoodfacts.org/category/${encodeURIComponent(slug)}.json`);
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch products for category from Open Food Facts.' });
   }
 });
 
