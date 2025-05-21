@@ -278,7 +278,7 @@ export default function App() {
     if (tab !== 3) return;
     setCategoriesLoading(true);
     setCategoriesError(null);
-    fetch('/api/off/categories')
+    fetch(`${BACKEND_URL}/api/off/categories`)
       .then(res => res.json())
       .then(data => {
         setCategories(data.tags.slice(0, 12)); // Limit to 12 for UI
@@ -295,7 +295,7 @@ export default function App() {
     if (tab !== 3) return;
     setTrendingLoading(true);
     setTrendingError(null);
-    fetch('/api/off/popular')
+    fetch(`${BACKEND_URL}/api/off/popular`)
       .then(res => res.json())
       .then(data => {
         setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
