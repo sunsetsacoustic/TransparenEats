@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar } from '@mui/material';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
 import BottomNav from './components/BottomNav';
@@ -401,7 +401,6 @@ export default function App() {
                 product={selectedHistoryProduct}
                 flaggedIngredients={findFlaggedIngredients(selectedHistoryProduct.ingredients_text)}
                 dyes={findDyes(selectedHistoryProduct.ingredients_text)}
-                handleIngredientClick={() => {}}
               />
             ) : null}
           </Dialog>

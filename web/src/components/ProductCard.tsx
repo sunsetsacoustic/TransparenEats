@@ -14,7 +14,6 @@ import type { Product, Dye } from '../types';
  * @property product - The product object to display.
  * @property flaggedIngredients - Array of flagged ingredient objects.
  * @property dyes - Array of dye objects found in the product.
- * @property handleIngredientClick - Callback for when an ingredient chip is clicked.
  */
 interface FlaggedIngredient {
   name: string;
@@ -27,7 +26,6 @@ interface ProductCardProps {
   product: Product;
   flaggedIngredients: FlaggedIngredient[];
   dyes: Dye[];
-  handleIngredientClick: (ing: string) => void;
 }
 
 const NEGATIVE_FIELDS: {
@@ -112,7 +110,7 @@ const getScoreLabel = (score: number) => {
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes, handleIngredientClick }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes }) => {
   if (!product) return null;
   const score = getScore(flaggedIngredients, dyes);
   const { label: scoreLabel, color: scoreColor } = getScoreLabel(score);
