@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Paper, Box, Typography, Divider, Avatar, Chip, Collapse, Button, Tooltip } from '@mui/material';
+import { Paper, Box, Typography, Divider, Avatar, Chip, Collapse, Button, Popover } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -126,6 +126,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const { label: scoreLabel, color: scoreColor } = getScoreLabel(score);
   const nutriments = product.nutriments || {};
   const additivesCount = flaggedIngredients.length;
+  const [scorePopover, setScorePopover] = useState<{ anchorEl: HTMLElement | null, type: string | null }>({ anchorEl: null, type: null });
 
   // Helper: get value or fallback
   const get = (obj: any, ...fields: string[]) => fields.reduce((v, f) => v && v[f], obj);
@@ -159,6 +160,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const ingredientLines = (product.ingredients_text || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
   const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
   const flaggedHasMore = flaggedIngredients.length > 3;
+
+  const handleScoreChipClick = (event: React.MouseEvent<HTMLElement>, type: string) => {
+    if (scorePopover.anchorEl && scorePopover.type === type) {
+      setScorePopover({ anchorEl: null, type: null });
+    } else {
+      setScorePopover({ anchorEl: event.currentTarget, type });
+    }
+  };
+  const handleScorePopoverClose = () => setScorePopover({ anchorEl: null, type: null });
 
   return (
     <Paper sx={{ p: 2, mt: 3, borderRadius: 4, maxWidth: 420, mx: 'auto', boxShadow: 3, background: '#fff', color: '#222', maxHeight: '80vh', overflowY: 'auto' }}>
@@ -211,22 +221,73 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         {publicationDate && <Typography variant="body2">Publication Date: {publicationDate}</Typography>}
       </Box>
       <Divider sx={{ my: 2 }} />
-      {/* Scores with tooltips */}
+      {/* Scores with popovers */}
       <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         {nutriScore && (
-          <Tooltip title={SCORE_DEFINITIONS['Nutri-Score']} arrow>
-            <Chip label={`Nutri-Score: ${nutriScore}`} sx={{ mb: 1, cursor: 'pointer' }} />
-          </Tooltip>
+          <>
+            <Chip
+              label={`Nutri-Score: ${nutriScore}`}
+              sx={{ mb: 1, cursor: 'pointer' }}
+              onClick={e => handleScoreChipClick(e, 'Nutri-Score')}
+              color={scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) ? 'primary' : 'default'}
+            />
+            <Popover
+              open={scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={handleScorePopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Nutri-Score</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['Nutri-Score']}</Typography>
+              </Box>
+            </Popover>
+          </>
         )}
         {ecoScore && (
-          <Tooltip title={SCORE_DEFINITIONS['Eco-Score']} arrow>
-            <Chip label={`Eco-Score: ${ecoScore}`} sx={{ mb: 1, cursor: 'pointer' }} />
-          </Tooltip>
+          <>
+            <Chip
+              label={`Eco-Score: ${ecoScore}`}
+              sx={{ mb: 1, cursor: 'pointer' }}
+              onClick={e => handleScoreChipClick(e, 'Eco-Score')}
+              color={scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) ? 'primary' : 'default'}
+            />
+            <Popover
+              open={scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={handleScorePopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Eco-Score</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['Eco-Score']}</Typography>
+              </Box>
+            </Popover>
+          </>
         )}
         {novaGroup && (
-          <Tooltip title={SCORE_DEFINITIONS['NOVA Group']} arrow>
-            <Chip label={`NOVA Group: ${novaGroup}`} sx={{ mb: 1, cursor: 'pointer' }} />
-          </Tooltip>
+          <>
+            <Chip
+              label={`NOVA Group: ${novaGroup}`}
+              sx={{ mb: 1, cursor: 'pointer' }}
+              onClick={e => handleScoreChipClick(e, 'NOVA Group')}
+              color={scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) ? 'primary' : 'default'}
+            />
+            <Popover
+              open={scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={handleScorePopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>NOVA Group</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['NOVA Group']}</Typography>
+              </Box>
+            </Popover>
+          </>
         )}
       </Box>
       <Divider sx={{ my: 2 }} />
