@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Paper, Box, Typography, Divider, Avatar, Chip, Collapse, Button, Popover } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Paper, Box, Typography, Divider, Avatar, Chip, Collapse, Button, Popover, CircularProgress } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -127,6 +127,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const nutriments = product.nutriments || {};
   const additivesCount = flaggedIngredients.length;
   const [scorePopover, setScorePopover] = useState<{ anchorEl: HTMLElement | null, type: string | null }>({ anchorEl: null, type: null });
+  const [additiveInfo, setAdditiveInfo] = useState<Record<string, { name: string; code: string; description?: string }>>({});
+  const [additivePopover, setAdditivePopover] = useState<{ anchorEl: HTMLElement | null, code: string | null }>({ anchorEl: null, code: null });
+  const [additiveLoading, setAdditiveLoading] = useState(false);
 
   // Helper: get value or fallback
   const get = (obj: any, ...fields: string[]) => fields.reduce((v, f) => v && v[f], obj);
@@ -160,6 +163,50 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const ingredientLines = (product.ingredients_text || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
   const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
   const flaggedHasMore = flaggedIngredients.length > 3;
+
+  // Parse additive codes from product
+  const additiveCodes = (product.additives_tags || product.additives || '')
+    .toString()
+    .split(',')
+    .map((tag: string) => tag.trim().replace(/^en:/, ''))
+    .filter(Boolean);
+
+  // Fetch additive names from Open Food Facts
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchAdditives() {
+      setAdditiveLoading(true);
+      const info: Record<string, { name: string; code: string; description?: string }> = {};
+      await Promise.all(additiveCodes.map(async (code) => {
+        try {
+          const res = await fetch(`https://world.openfoodfacts.org/additive/${code}.json`);
+          const data = await res.json();
+          if (data && data.name && data.name.en) {
+            info[code] = {
+              name: data.name.en,
+              code,
+              description: data.wiki_data && data.wiki_data.description && data.wiki_data.description.en
+                ? data.wiki_data.description.en
+                : data.description && data.description.en
+                  ? data.description.en
+                  : undefined,
+            };
+          } else {
+            info[code] = { name: code.toUpperCase(), code };
+          }
+        } catch {
+          info[code] = { name: code.toUpperCase(), code };
+        }
+      }));
+      if (!cancelled) {
+        setAdditiveInfo(info);
+        setAdditiveLoading(false);
+      }
+    }
+    if (additiveCodes.length > 0) fetchAdditives();
+    else setAdditiveInfo({});
+    return () => { cancelled = true; };
+  }, [product.additives_tags, product.additives]);
 
   const handleScoreChipClick = (event: React.MouseEvent<HTMLElement>, type: string) => {
     if (scorePopover.anchorEl && scorePopover.type === type) {
@@ -214,7 +261,36 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           {categories && <Chip label={`Categories: ${categories}`} size="small" />}
           {labels && <Chip label={`Labels: ${labels}`} size="small" />}
           {allergens && <Chip label={`Allergens: ${allergens}`} size="small" color="warning" />}
-          {additives && <Chip label={`Additives: ${additives}`} size="small" color="error" />}
+          {/* Additives as chips with popover */}
+          {additiveLoading && additiveCodes.length > 0 && <CircularProgress size={18} sx={{ ml: 1 }} />}
+          {additiveCodes.map(code => (
+            <Chip
+              key={code}
+              label={additiveInfo[code] ? `${additiveInfo[code].name} (${code.toUpperCase()})` : code.toUpperCase()}
+              size="small"
+              color="error"
+              sx={{ cursor: 'pointer' }}
+              onClick={e => setAdditivePopover({ anchorEl: e.currentTarget, code })}
+            />
+          ))}
+          <Popover
+            open={!!additivePopover.anchorEl && !!additivePopover.code}
+            anchorEl={additivePopover.anchorEl}
+            onClose={() => setAdditivePopover({ anchorEl: null, code: null })}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          >
+            <Box sx={{ p: 2, maxWidth: 280 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                {additivePopover.code && additiveInfo[additivePopover.code]?.name} ({additivePopover.code?.toUpperCase()})
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {additivePopover.code && additiveInfo[additivePopover.code]?.description
+                  ? additiveInfo[additivePopover.code]?.description
+                  : 'No description available.'}
+              </Typography>
+            </Box>
+          </Popover>
         </Box>
         {servingSize && <Typography variant="body2">Serving Size: {servingSize}</Typography>}
         {dataType && <Typography variant="body2">Data Type: {dataType}</Typography>}
