@@ -139,7 +139,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const categories = product.categories || product.categories_tags || product.category || '';
   const labels = product.labels || product.labels_tags || '';
   const allergens = product.allergens || product.allergens_tags || '';
-  const additives = product.additives_tags || product.additives || '';
   const nutriScore = product.nutriscore_grade || product.nutriscore_score;
   const ecoScore = product.ecoscore_grade || product.ecoscore_score;
   const novaGroup = product.nova_group;
