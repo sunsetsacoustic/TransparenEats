@@ -68,4 +68,21 @@ router.post('/uploadProduct', upload.fields([
   }
 });
 
+// Nutritionix search endpoint
+router.get('/nutritionix/search', async (req, res) => {
+  const { query } = req.query;
+  const appId = process.env.NUTRITIONIX_APP_ID;
+  const apiKey = process.env.NUTRITIONIX_API_KEY;
+  if (!query) return res.status(400).json({ error: 'Missing query parameter.' });
+  try {
+    const response = await fetch(
+      `https://api.nutritionix.com/v1_1/search/${encodeURIComponent(query)}?results=0:1&fields=item_name,brand_name,nf_calories,nf_ingredient_statement&appId=${appId}&appKey=${apiKey}`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch from Nutritionix.' });
+  }
+});
+
 module.exports = router;

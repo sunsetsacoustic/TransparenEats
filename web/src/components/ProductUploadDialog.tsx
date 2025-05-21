@@ -15,9 +15,10 @@ interface ProductUploadDialogProps {
   }) => Promise<void>;
   loading?: boolean;
   error?: string | null;
+  statusMessage?: string | null;
 }
 
-const ProductUploadDialog: React.FC<ProductUploadDialogProps> = ({ open, barcode, onClose, onSubmit, loading, error }) => {
+const ProductUploadDialog: React.FC<ProductUploadDialogProps> = ({ open, barcode, onClose, onSubmit, loading, error, statusMessage }) => {
   const [productName, setProductName] = useState('');
   const [ingredientsText, setIngredientsText] = useState('');
   const [imageFront, setImageFront] = useState<File | undefined>();
@@ -91,7 +92,7 @@ const ProductUploadDialog: React.FC<ProductUploadDialogProps> = ({ open, barcode
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>Cancel</Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading || !productName || !ingredientsText}>
-          {loading ? <CircularProgress size={20} /> : 'Submit'}
+          {loading ? <><CircularProgress size={20} />{statusMessage && <span style={{ marginLeft: 12 }}>{statusMessage}</span>}</> : 'Submit'}
         </Button>
       </DialogActions>
     </Dialog>
