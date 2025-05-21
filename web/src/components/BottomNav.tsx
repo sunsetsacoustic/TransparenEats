@@ -4,7 +4,6 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import HomeIcon from '@mui/icons-material/Home';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import HistoryIcon from '@mui/icons-material/History';
-import SearchIcon from '@mui/icons-material/Search';
 
 interface BottomNavProps {
   value: number;
@@ -35,7 +34,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ value, onChange }) => (
     <BottomNavigationAction label="Home" icon={<HomeIcon />} sx={{ color: value === 0 ? 'primary.main' : '#888' }} />
     <BottomNavigationAction label="Scan" icon={<CameraAltIcon />} sx={{ color: value === 1 ? 'primary.main' : '#888' }} />
     <BottomNavigationAction label="History" icon={<HistoryIcon />} sx={{ color: value === 2 ? 'primary.main' : '#888' }} />
-    <BottomNavigationAction label="Search" icon={<SearchIcon />} sx={{ color: value === 3 ? 'primary.main' : '#888' }} />
   </BottomNavigation>
 );
 
