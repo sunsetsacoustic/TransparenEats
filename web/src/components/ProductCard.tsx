@@ -290,6 +290,49 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   },
 };
 
+const ADDITIVE_NAMES: Record<string, string> = {
+  'E171': 'Titanium Dioxide',
+  'E202': 'Potassium Sorbate',
+  'E282': 'Calcium Propionate',
+  'E322': 'Lecithin',
+  'E322I': 'Lecithin',
+  'E450': 'Diphosphates',
+  'E450I': 'Disodium Diphosphate',
+  'E471': 'Mono/Diglycerides',
+  'E472E': 'Mono/Diglyceride Esters',
+  'E500': 'Sodium Carbonates',
+  'E500II': 'Sodium Bicarbonate',
+  'E930': 'Calcium Peroxide',
+  'E220': 'Sulfur Dioxide',
+  'E221': 'Sodium Sulfite',
+  'E222': 'Sodium Bisulfite',
+  'E223': 'Sodium Metabisulfite',
+  'E224': 'Potassium Metabisulfite',
+  'E225': 'Potassium Sulfite',
+  'E226': 'Calcium Sulfite',
+  'E227': 'Calcium Hydrogen Sulfite',
+  'E228': 'Potassium Hydrogen Sulfite',
+  'E621': 'Monosodium Glutamate',
+  'E100': 'Curcumin',
+  'E129': 'Allura Red AC',
+  'E102': 'Tartrazine',
+  'E110': 'Sunset Yellow',
+  'E133': 'Brilliant Blue FCF',
+  'E150': 'Caramel',
+  'E160B': 'Annatto',
+  'E320': 'BHA',
+  'E321': 'BHT',
+  'E407': 'Carrageenan',
+  'E412': 'Guar Gum',
+  'E415': 'Xanthan Gum',
+  'E433': 'Polysorbate 80',
+  'E440': 'Pectin',
+  'E950': 'Acesulfame K',
+  'E951': 'Aspartame',
+  'E954': 'Saccharin',
+  'E955': 'Sucralose',
+};
+
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
@@ -423,7 +466,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     
     window.dispatchEvent(new CustomEvent('show-ingredient-info', {
       detail: {
-        name: additiveInfo[code]?.name || code.toUpperCase(),
+        name: additiveInfo[code]?.name || ADDITIVE_NAMES[upperCode] || code.toUpperCase(),
         info: description,
         isFlagged: true,
         isDye: false,
@@ -432,6 +475,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         severity
       }
     }));
+  };
+
+  // Get additive name for display
+  const getAdditiveName = (code: string): string => {
+    const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (additiveInfo[code]?.name) {
+      return additiveInfo[code].name;
+    } else if (ADDITIVE_NAMES[upperCode]) {
+      return `${ADDITIVE_NAMES[upperCode]} (${upperCode})`;
+    } else {
+      return code.toUpperCase();
+    }
   };
 
   return (
@@ -642,7 +697,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
             {additiveCodes.map(code => (
               <Chip
                 key={code}
-                label={additiveInfo[code] ? `${additiveInfo[code].name} (${code.toUpperCase()})` : code.toUpperCase()}
+                label={getAdditiveName(code)}
                 size="small"
                 color="error"
                 sx={{ 
