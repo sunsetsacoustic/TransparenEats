@@ -333,6 +333,521 @@ const ADDITIVE_NAMES: Record<string, string> = {
   'E955': 'Sucralose',
 };
 
+// Define nutrient fields outside components for reuse
+const NUTRIENT_FIELDS = [
+  { key: 'energy-kcal_100g', label: 'Calories', unit: 'kcal' },
+  { key: 'proteins_100g', label: 'Protein', unit: 'g' },
+  { key: 'fat_100g', label: 'Fat', unit: 'g' },
+  { key: 'carbohydrates_100g', label: 'Carbs', unit: 'g' },
+  { key: 'fiber_100g', label: 'Fiber', unit: 'g' },
+  { key: 'sugars_100g', label: 'Sugars', unit: 'g' },
+  { key: 'sodium_100g', label: 'Sodium', unit: 'mg' },
+];
+
+// Extract NutritionalInfo component
+interface NutritionalInfoProps {
+  nutriments: Record<string, any>;
+}
+
+const NutritionalInfo: React.FC<NutritionalInfoProps> = ({ nutriments }) => {
+  return (
+    <Box sx={{ 
+      mb: 3, 
+      p: 3, 
+      borderRadius: '16px', 
+      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      border: '1px solid rgba(186, 230, 253, 0.4)'
+    }}>
+      <Typography variant="h6" sx={{ 
+        fontWeight: 700, 
+        mb: 2,
+        fontSize: '1.1rem',
+        position: 'relative',
+        display: 'inline-block',
+        '&:after': {
+          content: '""',
+          position: 'absolute',
+          bottom: -6,
+          left: 0,
+          width: 40,
+          height: 3,
+          borderRadius: 2,
+          background: '#0ea5e9',
+        }
+      }}>Nutritional Info (per 100 g)</Typography>
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        {NUTRIENT_FIELDS.map(field => (
+          nutriments[field.key] !== undefined && (
+            <Grid item xs={6} key={field.key}>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 500 }}>
+                  {field.label}
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                  {nutriments[field.key]} {field.unit}
+                </Typography>
+              </Box>
+            </Grid>
+          )
+        ))}
+      </Grid>
+    </Box>
+  );
+};
+
+// Extract ProductHeader component
+interface ProductHeaderProps {
+  product: Product;
+  score: number;
+  scoreLabel: string;
+}
+
+const ProductHeader: React.FC<ProductHeaderProps> = ({ product, score, scoreLabel }) => {
+  const barcode = product.code || product.gtinUpc || product.fdcId;
+  const image = product.image_front_url || product.image_url || product.photo || '';
+
+  return (
+    <Box sx={{ 
+      background: score < 40 
+        ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' 
+        : score < 70
+        ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        : 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+      color: 'white',
+      p: 3,
+      borderRadius: '24px 24px 0 0',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* Background pattern */}
+      <Box sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.1,
+        background: `
+          radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%)
+        `,
+        zIndex: 0,
+      }} />
+      
+      {/* Barcode */}
+      {barcode && <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1, display: 'block', zIndex: 1, position: 'relative' }}>Barcode: {barcode}</Typography>}
+      
+      {/* Product name & brand */}
+      <Box sx={{ position: 'relative', zIndex: 1, mb: 2 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>{product.product_name || 'No name'}</Typography>
+        {product.brands && <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>{product.brands}</Typography>}
+      </Box>
+
+      {/* Score in circle and Image side by side */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'relative', 
+        zIndex: 1,
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ 
+            background: 'rgba(255,255,255,1)', 
+            color: score < 40 ? '#ef4444' : score < 70 ? '#f59e0b' : '#4ade80', 
+            borderRadius: '50%', 
+            width: 56, 
+            height: 56, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            fontWeight: 800, 
+            fontSize: 24,
+            border: '2px solid rgba(255,255,255,0.4)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>{score}</Box>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>{scoreLabel}</Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>{score}/100 Health Score</Typography>
+          </Box>
+        </Box>
+        
+        {/* Image on the right */}
+        {image && (
+          <Box sx={{ position: 'relative' }}>
+            <Avatar 
+              src={image} 
+              alt={product.product_name} 
+              variant="rounded" 
+              sx={{ 
+                width: 100, 
+                height: 100, 
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                border: '4px solid white',
+                borderRadius: 4
+              }} 
+            />
+          </Box>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+// Extract AdditiveChips component
+interface AdditiveChipsProps {
+  additiveCodes: string[];
+  additiveInfo: Record<string, { name: string; code: string; description?: string }>;
+  additiveLoading: boolean;
+  onAdditiveClick: (code: string) => void;
+}
+
+const AdditiveChips: React.FC<AdditiveChipsProps> = ({ 
+  additiveCodes, 
+  additiveInfo, 
+  additiveLoading, 
+  onAdditiveClick 
+}) => {
+  // Get additive name for display
+  const getAdditiveName = (code: string): string => {
+    const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (additiveInfo[code]?.name) {
+      return `${additiveInfo[code].name} (${upperCode})`;
+    } else if (ADDITIVE_NAMES[upperCode]) {
+      return `${ADDITIVE_NAMES[upperCode]} (${upperCode})`;
+    } else {
+      return code.toUpperCase();
+    }
+  };
+
+  return (
+    <>
+      {additiveLoading && additiveCodes.length > 0 && <CircularProgress size={18} sx={{ ml: 1 }} />}
+      {additiveCodes.map(code => (
+        <Chip
+          key={code}
+          label={getAdditiveName(code)}
+          size="small"
+          color="error"
+          sx={{ 
+            cursor: 'pointer',
+            bgcolor: '#FF5252',
+            color: 'white',
+            borderRadius: '20px',
+          }}
+          onClick={() => onAdditiveClick(code)}
+        />
+      ))}
+    </>
+  );
+};
+
+// Extract IngredientsList component
+interface IngredientsListProps {
+  ingredientLines: string[];
+  showAllIngredients: boolean;
+  onToggleShowAll: () => void;
+}
+
+const IngredientsList: React.FC<IngredientsListProps> = ({ 
+  ingredientLines, 
+  showAllIngredients, 
+  onToggleShowAll 
+}) => {
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="h6" sx={{ 
+        fontWeight: 700, 
+        mb: 2,
+        fontSize: '1.1rem',
+        position: 'relative',
+        display: 'inline-block',
+        '&:after': {
+          content: '""',
+          position: 'absolute',
+          bottom: -6,
+          left: 0,
+          width: 40,
+          height: 3,
+          borderRadius: 2,
+          background: '#4ade80',
+        }
+      }}>Ingredients</Typography>
+      <Collapse in={showAllIngredients || ingredientLines.length <= 3} collapsedSize={72}>
+        <Typography variant="body2" sx={{ 
+          color: '#374151', 
+          whiteSpace: 'pre-line',
+          background: 'rgba(243, 244, 246, 0.7)',
+          borderRadius: 2,
+          p: 2,
+          fontSize: '0.9rem',
+          lineHeight: 1.6,
+        }}>
+          {showAllIngredients ? ingredientLines.join(', ') : ingredientLines.slice(0, 3).join(', ') + (ingredientLines.length > 3 ? ', ...' : '')}
+        </Typography>
+      </Collapse>
+      {ingredientLines.length > 3 && (
+        <Button 
+          size="small" 
+          onClick={onToggleShowAll} 
+          sx={{ 
+            mt: 1,
+            color: '#4ade80',
+            '&:hover': {
+              background: 'rgba(74, 222, 128, 0.1)',
+            },
+          }} 
+          endIcon={showAllIngredients ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        >
+          {showAllIngredients ? 'SHOW LESS' : 'SHOW MORE'}
+        </Button>
+      )}
+    </Box>
+  );
+};
+
+// Extract FlaggedIngredients component
+interface FlaggedIngredientsProps {
+  flaggedIngredients: FlaggedIngredient[];
+  showAllFlagged: boolean;
+  onToggleShowAll: () => void;
+}
+
+const FlaggedIngredients: React.FC<FlaggedIngredientsProps> = ({ 
+  flaggedIngredients, 
+  showAllFlagged, 
+  onToggleShowAll 
+}) => {
+  const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
+  const flaggedHasMore = flaggedIngredients.length > 3;
+
+  return (
+    <Box sx={{ 
+      mb: 3,
+      p: 3,
+      borderRadius: '16px',
+      background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+      border: '1px solid rgba(254, 202, 202, 0.4)'
+    }}>
+      <Typography variant="h6" sx={{ 
+        fontWeight: 700, 
+        mb: 2,
+        fontSize: '1.1rem',
+        position: 'relative',
+        display: 'inline-block',
+        color: '#b91c1c',
+        '&:after': {
+          content: '""',
+          position: 'absolute',
+          bottom: -6,
+          left: 0,
+          width: 40,
+          height: 3,
+          borderRadius: 2,
+          background: '#ef4444',
+        }
+      }}>Flagged Ingredients</Typography>
+      <Collapse in={showAllFlagged || flaggedIngredients.length <= 3} collapsedSize={120}>
+        {flaggedToShow.map((flag, idx) => (
+          <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, gap: 1 }}>
+            {flag.severity === 'critical' ? (
+              <WarningIcon sx={{ color: '#dc2626', fontSize: 20, mt: 0.5 }} />
+            ) : (
+              <ReportProblemIcon sx={{ color: '#ea580c', fontSize: 20, mt: 0.5 }} />
+            )}
+            <Box>
+              <Typography variant="subtitle2" sx={{ 
+                fontWeight: 600, 
+                color: flag.severity === 'critical' ? '#dc2626' : '#ea580c' 
+              }}>
+                {flag.name}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#4b5563', display: 'block', mb: 0.5 }}>
+                {flag.warning}
+              </Typography>
+            </Box>
+          </Box>
+        ))}
+      </Collapse>
+      {flaggedHasMore && (
+        <Button 
+          size="small" 
+          onClick={onToggleShowAll} 
+          sx={{ 
+            mt: 1,
+            color: '#ef4444',
+            '&:hover': {
+              background: 'rgba(239, 68, 68, 0.1)',
+            },
+          }} 
+          endIcon={showAllFlagged ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        >
+          {showAllFlagged ? 'SHOW LESS' : 'SHOW MORE'}
+        </Button>
+      )}
+    </Box>
+  );
+};
+
+// Update the FoodScores component props interface to fix type issues
+interface FoodScoresProps {
+  nutriScore?: string | number;
+  ecoScore?: string | number;
+  novaGroup?: string | number;
+  onScoreClick: (event: React.MouseEvent<HTMLElement>, type: string) => void;
+  scorePopover: { anchorEl: HTMLElement | null, type: string | null };
+  onPopoverClose: () => void;
+}
+
+const FoodScores: React.FC<FoodScoresProps> = ({ 
+  nutriScore, 
+  ecoScore, 
+  novaGroup, 
+  onScoreClick, 
+  scorePopover, 
+  onPopoverClose 
+}) => {
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="h6" sx={{ 
+        fontWeight: 700, 
+        mb: 2,
+        fontSize: '1.1rem',
+        position: 'relative',
+        display: 'inline-block',
+        '&:after': {
+          content: '""',
+          position: 'absolute',
+          bottom: -6,
+          left: 0,
+          width: 40,
+          height: 3,
+          borderRadius: 2,
+          background: '#f59e0b',
+        }
+      }}>Food Scores</Typography>
+      
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+        {nutriScore && (
+          <>
+            <Chip
+              label={`Nutri-Score: ${nutriScore}`}
+              sx={{ 
+                mb: 1, 
+                cursor: 'pointer',
+                '&.MuiChip-root': {
+                  background: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) 
+                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
+                    : 'rgba(243, 244, 246, 0.7)',
+                  color: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
+                  fontWeight: 500,
+                }
+              }}
+              onClick={e => onScoreClick(e, 'Nutri-Score')}
+            />
+            <Popover
+              open={scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={onPopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  borderRadius: 2,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                }
+              }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Nutri-Score</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['Nutri-Score']}</Typography>
+              </Box>
+            </Popover>
+          </>
+        )}
+        {ecoScore && (
+          <>
+            <Chip
+              label={`Eco-Score: ${ecoScore}`}
+              sx={{ 
+                mb: 1, 
+                cursor: 'pointer',
+                '&.MuiChip-root': {
+                  background: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) 
+                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
+                    : 'rgba(243, 244, 246, 0.7)',
+                  color: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
+                  fontWeight: 500,
+                }
+              }}
+              onClick={e => onScoreClick(e, 'Eco-Score')}
+            />
+            <Popover
+              open={scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={onPopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  borderRadius: 2,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                }
+              }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Eco-Score</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['Eco-Score']}</Typography>
+              </Box>
+            </Popover>
+          </>
+        )}
+        {novaGroup && (
+          <>
+            <Chip
+              label={`NOVA Group: ${novaGroup}`}
+              sx={{ 
+                mb: 1, 
+                cursor: 'pointer',
+                '&.MuiChip-root': {
+                  background: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) 
+                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
+                    : 'rgba(243, 244, 246, 0.7)',
+                  color: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
+                  fontWeight: 500,
+                }
+              }}
+              onClick={e => onScoreClick(e, 'NOVA Group')}
+            />
+            <Popover
+              open={scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl)}
+              anchorEl={scorePopover.anchorEl}
+              onClose={onPopoverClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  borderRadius: 2,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                }
+              }}
+            >
+              <Box sx={{ p: 2, maxWidth: 240 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>NOVA Group</Typography>
+                <Typography variant="body2">{SCORE_DEFINITIONS['NOVA Group']}</Typography>
+              </Box>
+            </Popover>
+          </>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
@@ -358,19 +873,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const nutriScore = product.nutriscore_grade || product.nutriscore_score;
   const ecoScore = product.ecoscore_grade || product.ecoscore_score;
   const novaGroup = product.nova_group;
-  const barcode = product.code || product.gtinUpc || product.fdcId;
-  const image = product.image_front_url || product.image_url || product.photo || '';
-
-  // Collect all nutrients present
-  const nutrientFields = [
-    { key: 'energy-kcal_100g', label: 'Calories', unit: 'kcal' },
-    { key: 'proteins_100g', label: 'Protein', unit: 'g' },
-    { key: 'fat_100g', label: 'Fat', unit: 'g' },
-    { key: 'carbohydrates_100g', label: 'Carbs', unit: 'g' },
-    { key: 'fiber_100g', label: 'Fiber', unit: 'g' },
-    { key: 'sugars_100g', label: 'Sugars', unit: 'g' },
-    { key: 'sodium_100g', label: 'Sodium', unit: 'mg' },
-  ];
 
   // Collapsible logic for ingredients
   const ingredientLines = (product.ingredients_text || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
@@ -424,15 +926,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     return () => { cancelled = true; };
   }, [product.additives_tags, product.additives]);
 
-  const handleScoreChipClick = (event: React.MouseEvent<HTMLElement>, type: string) => {
-    if (scorePopover.anchorEl && scorePopover.type === type) {
-      setScorePopover({ anchorEl: null, type: null });
-    } else {
-      setScorePopover({ anchorEl: event.currentTarget, type });
-    }
-  };
-  const handleScorePopoverClose = () => setScorePopover({ anchorEl: null, type: null });
-
   // Get allergen/additive descriptions for popups
   const getAllergenInfo = (allergenCode: string) => {
     const name = allergenCode.replace(/^en:/, '').replace(/-/g, ' ');
@@ -477,17 +970,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     }));
   };
 
-  // Get additive name for display
-  const getAdditiveName = (code: string): string => {
-    const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (additiveInfo[code]?.name) {
-      return `${additiveInfo[code].name} (${upperCode})`;
-    } else if (ADDITIVE_NAMES[upperCode]) {
-      return `${ADDITIVE_NAMES[upperCode]} (${upperCode})`;
+  // Event handlers
+  const handleScoreChipClick = (event: React.MouseEvent<HTMLElement>, type: string) => {
+    if (scorePopover.anchorEl && scorePopover.type === type) {
+      setScorePopover({ anchorEl: null, type: null });
     } else {
-      return code.toUpperCase();
+      setScorePopover({ anchorEl: event.currentTarget, type });
     }
   };
+  const handleScorePopoverClose = () => setScorePopover({ anchorEl: null, type: null });
+  const toggleIngredients = () => setShowAllIngredients(prev => !prev);
+  const toggleFlagged = () => setShowAllFlagged(prev => !prev);
 
   return (
     <Paper sx={{ 
@@ -502,146 +995,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
       overflowY: 'auto',
       position: 'relative'
     }}>
-      {/* Top section with gradient background */}
-      <Box sx={{ 
-        background: score < 40 
-          ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' 
-          : score < 70
-          ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-          : 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
-        color: 'white',
-        p: 3,
-        borderRadius: '24px 24px 0 0',
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
-        {/* Background pattern */}
-        <Box sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.1,
-          background: `
-            radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%)
-          `,
-          zIndex: 0,
-        }} />
-        
-        {/* Barcode */}
-        {barcode && <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1, display: 'block', zIndex: 1, position: 'relative' }}>Barcode: {barcode}</Typography>}
-        
-        {/* Product name & brand */}
-        <Box sx={{ position: 'relative', zIndex: 1, mb: 2 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>{product.product_name || 'No name'}</Typography>
-          {product.brands && <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>{product.brands}</Typography>}
-        </Box>
-
-        {/* Score in circle and Image side by side */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'relative', 
-          zIndex: 1,
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ 
-              background: 'rgba(255,255,255,1)', 
-              color: score < 40 ? '#ef4444' : score < 70 ? '#f59e0b' : '#4ade80', 
-              borderRadius: '50%', 
-              width: 56, 
-              height: 56, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              fontWeight: 800, 
-              fontSize: 24,
-              border: '2px solid rgba(255,255,255,0.4)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-            }}>{score}</Box>
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>{scoreLabel}</Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>{score}/100 Health Score</Typography>
-            </Box>
-          </Box>
-          
-          {/* Image on the right */}
-          {image && (
-            <Box sx={{ position: 'relative' }}>
-              <Avatar 
-                src={image} 
-                alt={product.product_name} 
-                variant="rounded" 
-                sx={{ 
-                  width: 100, 
-                  height: 100, 
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                  border: '4px solid white',
-                  borderRadius: 4
-                }} 
-              />
-            </Box>
-          )}
-        </Box>
-      </Box>
+      {/* Use the extracted ProductHeader component */}
+      <ProductHeader 
+        product={product} 
+        score={score} 
+        scoreLabel={scoreLabel} 
+      />
       
       {/* Content section */}
       <Box sx={{ p: 3 }}>
         {/* Ingredients (collapsible) */}
         {ingredientLines.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ 
-              fontWeight: 700, 
-              mb: 2,
-              fontSize: '1.1rem',
-              position: 'relative',
-              display: 'inline-block',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -6,
-                left: 0,
-                width: 40,
-                height: 3,
-                borderRadius: 2,
-                background: '#4ade80',
-              }
-            }}>Ingredients</Typography>
-            <Collapse in={showAllIngredients || ingredientLines.length <= 3} collapsedSize={72}>
-              <Typography variant="body2" sx={{ 
-                color: '#374151', 
-                whiteSpace: 'pre-line',
-                background: 'rgba(243, 244, 246, 0.7)',
-                borderRadius: 2,
-                p: 2,
-                fontSize: '0.9rem',
-                lineHeight: 1.6,
-              }}>
-                {showAllIngredients ? ingredientLines.join(', ') : ingredientLines.slice(0, 3).join(', ') + (ingredientLines.length > 3 ? ', ...' : '')}
-              </Typography>
-            </Collapse>
-            {ingredientLines.length > 3 && (
-              <Button 
-                size="small" 
-                onClick={() => setShowAllIngredients(v => !v)} 
-                sx={{ 
-                  mt: 1,
-                  color: '#4ade80',
-                  '&:hover': {
-                    background: 'rgba(74, 222, 128, 0.1)',
-                  },
-                }} 
-                endIcon={showAllIngredients ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              >
-                {showAllIngredients ? 'SHOW LESS' : 'SHOW MORE'}
-              </Button>
-            )}
-          </Box>
+          <IngredientsList 
+            ingredientLines={ingredientLines}
+            showAllIngredients={showAllIngredients}
+            onToggleShowAll={toggleIngredients}
+          />
         )}
         
         {/* Details Section (chips) */}
@@ -692,23 +1061,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               />
             ))}
             
-            {/* Additives as chips with custom event dispatch */}
-            {additiveLoading && additiveCodes.length > 0 && <CircularProgress size={18} sx={{ ml: 1 }} />}
-            {additiveCodes.map(code => (
-              <Chip
-                key={code}
-                label={getAdditiveName(code)}
-                size="small"
-                color="error"
-                sx={{ 
-                  cursor: 'pointer',
-                  bgcolor: '#FF5252',
-                  color: 'white',
-                  borderRadius: '20px',
-                }}
-                onClick={() => handleAdditiveClick(code)}
-              />
-            ))}
+            {/* Use the AdditiveChips component */}
+            <AdditiveChips 
+              additiveCodes={additiveCodes}
+              additiveInfo={additiveInfo}
+              additiveLoading={additiveLoading}
+              onAdditiveClick={handleAdditiveClick}
+            />
           </Box>
           
           {servingSize && (
@@ -733,251 +1092,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         </Box>
         
         {/* Food Scores with popovers */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ 
-            fontWeight: 700, 
-            mb: 2,
-            fontSize: '1.1rem',
-            position: 'relative',
-            display: 'inline-block',
-            '&:after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -6,
-              left: 0,
-              width: 40,
-              height: 3,
-              borderRadius: 2,
-              background: '#f59e0b',
-            }
-          }}>Food Scores</Typography>
-          
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {nutriScore && (
-              <>
-                <Chip
-                  label={`Nutri-Score: ${nutriScore}`}
-                  sx={{ 
-                    mb: 1, 
-                    cursor: 'pointer',
-                    '&.MuiChip-root': {
-                      background: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) 
-                        ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                        : 'rgba(243, 244, 246, 0.7)',
-                      color: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                      fontWeight: 500,
-                    }
-                  }}
-                  onClick={e => handleScoreChipClick(e, 'Nutri-Score')}
-                />
-                <Popover
-                  open={scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl)}
-                  anchorEl={scorePopover.anchorEl}
-                  onClose={handleScorePopoverClose}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <Box sx={{ p: 2, maxWidth: 240 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Nutri-Score</Typography>
-                    <Typography variant="body2">{SCORE_DEFINITIONS['Nutri-Score']}</Typography>
-                  </Box>
-                </Popover>
-              </>
-            )}
-            {ecoScore && (
-              <>
-                <Chip
-                  label={`Eco-Score: ${ecoScore}`}
-                  sx={{ 
-                    mb: 1, 
-                    cursor: 'pointer',
-                    '&.MuiChip-root': {
-                      background: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) 
-                        ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                        : 'rgba(243, 244, 246, 0.7)',
-                      color: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                      fontWeight: 500,
-                    }
-                  }}
-                  onClick={e => handleScoreChipClick(e, 'Eco-Score')}
-                />
-                <Popover
-                  open={scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl)}
-                  anchorEl={scorePopover.anchorEl}
-                  onClose={handleScorePopoverClose}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <Box sx={{ p: 2, maxWidth: 240 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Eco-Score</Typography>
-                    <Typography variant="body2">{SCORE_DEFINITIONS['Eco-Score']}</Typography>
-                  </Box>
-                </Popover>
-              </>
-            )}
-            {novaGroup && (
-              <>
-                <Chip
-                  label={`NOVA Group: ${novaGroup}`}
-                  sx={{ 
-                    mb: 1, 
-                    cursor: 'pointer',
-                    '&.MuiChip-root': {
-                      background: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) 
-                        ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                        : 'rgba(243, 244, 246, 0.7)',
-                      color: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                      fontWeight: 500,
-                    }
-                  }}
-                  onClick={e => handleScoreChipClick(e, 'NOVA Group')}
-                />
-                <Popover
-                  open={scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl)}
-                  anchorEl={scorePopover.anchorEl}
-                  onClose={handleScorePopoverClose}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  PaperProps={{
-                    sx: {
-                      borderRadius: 2,
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
-                  <Box sx={{ p: 2, maxWidth: 240 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>NOVA Group</Typography>
-                    <Typography variant="body2">{SCORE_DEFINITIONS['NOVA Group']}</Typography>
-                  </Box>
-                </Popover>
-              </>
-            )}
-          </Box>
-        </Box>
+        <FoodScores
+          nutriScore={nutriScore}
+          ecoScore={ecoScore}
+          novaGroup={novaGroup}
+          onScoreClick={handleScoreChipClick}
+          scorePopover={scorePopover}
+          onPopoverClose={handleScorePopoverClose}
+        />
         
         {/* Nutritional Info in a card */}
-        <Box sx={{ 
-          mb: 3, 
-          p: 3, 
-          borderRadius: '16px', 
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: '1px solid rgba(186, 230, 253, 0.4)'
-        }}>
-          <Typography variant="h6" sx={{ 
-            fontWeight: 700, 
-            mb: 2,
-            fontSize: '1.1rem',
-            position: 'relative',
-            display: 'inline-block',
-            '&:after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -6,
-              left: 0,
-              width: 40,
-              height: 3,
-              borderRadius: 2,
-              background: '#0ea5e9',
-            }
-          }}>Nutritional Info (per 100 g)</Typography>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {nutrientFields.map(field => (
-              nutriments[field.key] !== undefined && (
-                <Grid item xs={6} key={field.key}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 500 }}>
-                      {field.label}
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                      {nutriments[field.key]} {field.unit}
-                    </Typography>
-                  </Box>
-                </Grid>
-              )
-            ))}
-          </Grid>
-        </Box>
+        <NutritionalInfo nutriments={nutriments} />
         
-        {/* Flagged Ingredients Section (collapsible) in a warning card */}
+        {/* Flagged Ingredients Section */}
         {flaggedIngredients.length > 0 && (
-          <Box sx={{ 
-            mb: 3,
-            p: 3,
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            border: '1px solid rgba(254, 202, 202, 0.4)'
-          }}>
-            <Typography variant="h6" sx={{ 
-              fontWeight: 700, 
-              mb: 2,
-              fontSize: '1.1rem',
-              position: 'relative',
-              display: 'inline-block',
-              color: '#b91c1c',
-              '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -6,
-                left: 0,
-                width: 40,
-                height: 3,
-                borderRadius: 2,
-                background: '#ef4444',
-              }
-            }}>Flagged Ingredients</Typography>
-            <Collapse in={showAllFlagged || flaggedIngredients.length <= 3} collapsedSize={120}>
-              {flaggedToShow.map((flag, idx) => (
-                <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, gap: 1 }}>
-                  {flag.severity === 'critical' ? (
-                    <WarningIcon sx={{ color: '#dc2626', fontSize: 20, mt: 0.5 }} />
-                  ) : (
-                    <ReportProblemIcon sx={{ color: '#ea580c', fontSize: 20, mt: 0.5 }} />
-                  )}
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ 
-                      fontWeight: 600, 
-                      color: flag.severity === 'critical' ? '#dc2626' : '#ea580c' 
-                    }}>
-                      {flag.name}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#4b5563', display: 'block', mb: 0.5 }}>
-                      {flag.warning}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Collapse>
-            {flaggedHasMore && (
-              <Button 
-                size="small" 
-                onClick={() => setShowAllFlagged(v => !v)} 
-                sx={{ 
-                  mt: 1,
-                  color: '#ef4444',
-                  '&:hover': {
-                    background: 'rgba(239, 68, 68, 0.1)',
-                  },
-                }} 
-                endIcon={showAllFlagged ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              >
-                {showAllFlagged ? 'SHOW LESS' : 'SHOW MORE'}
-              </Button>
-            )}
-          </Box>
+          <FlaggedIngredients
+            flaggedIngredients={flaggedIngredients}
+            showAllFlagged={showAllFlagged}
+            onToggleShowAll={toggleFlagged}
+          />
         )}
       </Box>
     </Paper>
