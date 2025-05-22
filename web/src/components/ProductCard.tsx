@@ -194,6 +194,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
         borderRadius: '24px 24px 0 0',
         position: 'relative',
         overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
       }}>
         {/* Background pattern */}
         <Box sx={{
@@ -219,62 +221,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           {product.brands && <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>{product.brands}</Typography>}
         </Box>
 
-        {/* Score in circle */}
+        {/* Score in circle and Image side by side */}
         <Box sx={{ 
           display: 'flex', 
-          alignItems: 'center', 
-          gap: 2, 
+          justifyContent: 'space-between',
+          alignItems: 'center',
           position: 'relative', 
-          zIndex: 1 
+          zIndex: 1,
         }}>
-          <Box sx={{ 
-            background: 'rgba(255,255,255,0.2)', 
-            color: '#fff', 
-            borderRadius: '50%', 
-            width: 56, 
-            height: 56, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontWeight: 800, 
-            fontSize: 24,
-            border: '2px solid rgba(255,255,255,0.4)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }}>{score}</Box>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>{scoreLabel}</Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>{score}/100 Health Score</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              background: 'rgba(255,255,255,1)', 
+              color: score < 40 ? '#ef4444' : score < 70 ? '#f59e0b' : '#4ade80', 
+              borderRadius: '50%', 
+              width: 56, 
+              height: 56, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontWeight: 800, 
+              fontSize: 24,
+              border: '2px solid rgba(255,255,255,0.4)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>{score}</Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>{scoreLabel}</Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)' }}>{score}/100 Health Score</Typography>
+            </Box>
           </Box>
+          
+          {/* Image on the right */}
+          {image && (
+            <Box sx={{ position: 'relative' }}>
+              <Avatar 
+                src={image} 
+                alt={product.product_name} 
+                variant="rounded" 
+                sx={{ 
+                  width: 100, 
+                  height: 100, 
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                  border: '4px solid white',
+                  borderRadius: 4
+                }} 
+              />
+            </Box>
+          )}
         </Box>
       </Box>
       
-      {/* Image (if available) */}
-      {image && (
-        <Box sx={{ 
-          mt: -4, 
-          mb: 2, 
-          display: 'flex', 
-          justifyContent: 'center',
-          position: 'relative',
-          zIndex: 2
-        }}>
-          <Avatar 
-            src={image} 
-            alt={product.product_name} 
-            variant="rounded" 
-            sx={{ 
-              width: 100, 
-              height: 100, 
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-              border: '4px solid white',
-              borderRadius: 4
-            }} 
-          />
-        </Box>
-      )}
-      
       {/* Content section */}
-      <Box sx={{ p: 3, pt: image ? 1 : 3 }}>
+      <Box sx={{ p: 3 }}>
         {/* Ingredients (collapsible) */}
         {ingredientLines.length > 0 && (
           <Box sx={{ mb: 3 }}>
@@ -321,7 +318,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
                 }} 
                 endIcon={showAllIngredients ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               >
-                {showAllIngredients ? 'Show Less' : 'Show More'}
+                {showAllIngredients ? 'SHOW LESS' : 'SHOW MORE'}
               </Button>
             )}
           </Box>
@@ -346,6 +343,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               background: '#60a5fa',
             }
           }}>Details</Typography>
+          
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
             {categories && <Chip label={`Categories: ${categories}`} size="small" sx={{ background: 'rgba(243, 244, 246, 0.7)' }} />}
             {labels && <Chip label={`Labels: ${labels}`} size="small" sx={{ background: 'rgba(243, 244, 246, 0.7)' }} />}
@@ -382,7 +380,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
                 label={additiveInfo[code] ? `${additiveInfo[code].name} (${code.toUpperCase()})` : code.toUpperCase()}
                 size="small"
                 color="error"
-                sx={{ cursor: 'pointer' }}
+                sx={{ 
+                  cursor: 'pointer',
+                  bgcolor: '#FF5252',
+                  color: 'white',
+                  borderRadius: '20px',
+                }}
                 onClick={() => {
                   window.dispatchEvent(new CustomEvent('show-ingredient-info', {
                     detail: {
@@ -398,6 +401,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               />
             ))}
           </Box>
+          
           {servingSize && (
             <Typography variant="body2" sx={{ 
               color: '#4b5563', 
@@ -419,7 +423,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
           )}
         </Box>
         
-        {/* Scores with popovers */}
+        {/* Food Scores with popovers */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ 
             fontWeight: 700, 
@@ -438,6 +442,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               background: '#f59e0b',
             }
           }}>Food Scores</Typography>
+          
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {nutriScore && (
               <>
@@ -578,7 +583,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               borderRadius: 2,
               background: '#0ea5e9',
             }
-          }}>Nutritional Info (per 100g)</Typography>
+          }}>Nutritional Info (per 100 g)</Typography>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {nutrientFields.map(field => (
               nutriments[field.key] !== undefined && (
@@ -660,7 +665,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
                 }} 
                 endIcon={showAllFlagged ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               >
-                {showAllFlagged ? 'Show Less' : 'Show More'}
+                {showAllFlagged ? 'SHOW LESS' : 'SHOW MORE'}
               </Button>
             )}
           </Box>
