@@ -57,6 +57,239 @@ const SCORE_DEFINITIONS: Record<string, string> = {
   'NOVA Group': 'A classification of food processing, from 1 (unprocessed) to 4 (ultra-processed).',
 };
 
+// Add allergen and additive descriptions mapping
+const ALLERGEN_DESCRIPTIONS: Record<string, { description: string; severity: 'critical' | 'caution' }> = {
+  // Critical Allergens
+  'milk': { 
+    description: 'Critical allergen: Can trigger severe allergic reactions (e.g., hives, swelling, breathing issues) or digestive distress (e.g., bloating, diarrhea) for those with lactose intolerance.',
+    severity: 'critical'
+  },
+  'eggs': { 
+    description: 'Critical allergen: May cause allergic reactions from mild (e.g., hives, stomach upset) to severe (e.g., breathing difficulty, anaphylaxis).',
+    severity: 'critical'
+  },
+  'peanuts': { 
+    description: 'Critical allergen: High risk for severe, life-threatening allergic reactions, including anaphylaxis. Strict avoidance is crucial.',
+    severity: 'critical'
+  },
+  'tree-nuts': { 
+    description: 'Critical allergen group: Can cause severe allergic reactions (e.g., swelling, breathing issues, anaphylaxis). Avoid if allergic to any tree nut.',
+    severity: 'critical'
+  },
+  'soy': { 
+    description: 'Critical allergen: May cause allergic reactions, ranging from mild skin/digestive issues to more severe systemic reactions.',
+    severity: 'critical'
+  },
+  'wheat': { 
+    description: 'Critical allergen: Contains gluten; triggers severe autoimmune reaction in Celiac disease, or digestive/other symptoms in non-celiac gluten sensitivity.',
+    severity: 'critical'
+  },
+  'fish': { 
+    description: 'Critical allergen: Can cause allergic reactions, from hives and swelling to severe anaphylaxis.',
+    severity: 'critical'
+  },
+  'shellfish': { 
+    description: 'Critical allergen: Common cause of severe, sometimes life-threatening allergic reactions (e.g., rapid swelling, breathing issues).',
+    severity: 'critical'
+  },
+  'sesame': { 
+    description: 'Critical allergen: A growing common allergen that can cause mild to severe allergic reactions, including anaphylaxis.',
+    severity: 'critical'
+  },
+  'mustard': { 
+    description: 'Critical allergen: Can cause allergic reactions, usually mild skin or digestive symptoms, but severe reactions are possible in highly sensitive individuals.',
+    severity: 'critical'
+  },
+  'celery': { 
+    description: 'Critical allergen: May cause allergic reactions, sometimes including oral allergy syndrome, skin rashes, or digestive issues.',
+    severity: 'critical'
+  },
+  'lupin': { 
+    description: 'Critical allergen: As a legume, it can cause allergic reactions, especially in those with peanut or soy allergies.',
+    severity: 'critical'
+  },
+};
+
+const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'critical' | 'caution' }> = {
+  // Preservatives
+  'E202': { 
+    description: 'Caution: Generally safe, but rarely reported to cause mild skin irritation, digestive upset, or allergic-like reactions in sensitive individuals.',
+    severity: 'caution'
+  },
+  'E211': { 
+    description: 'Caution: In rare cases, may trigger hyperactive behavior, especially when combined with artificial colors. Can form harmful benzene in presence of Vitamin C.',
+    severity: 'caution'
+  },
+  'E282': { 
+    description: 'Caution: Considered safe for most, but some anecdotal reports link it to mild digestive discomfort, headaches, or behavioral changes in children.',
+    severity: 'caution'
+  },
+  'E320': { 
+    description: 'Caution: Antioxidant preservative. Some debate exists regarding its long-term health effects; often avoided by those seeking \'clean label\' products.',
+    severity: 'caution'
+  },
+  'E321': { 
+    description: 'Caution: Antioxidant preservative with similar debated health concerns to BHA; often avoided by consumers prioritizing natural ingredients.',
+    severity: 'caution'
+  },
+  
+  // Colorings
+  'E150': { 
+    description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
+    severity: 'caution'
+  },
+  'E160B': { 
+    description: 'Caution: Natural coloring; while safe for most, some individuals have reported allergic-like sensitivities such as hives or swelling.',
+    severity: 'caution'
+  },
+  'E100': { 
+    description: 'Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions.',
+    severity: 'caution'
+  },
+  'E171': { 
+    description: 'Caution: Used for whiteness. Safety is debated, particularly for nanoparticles; has been categorized as \'possibly carcinogenic to humans\' if inhaled. Many consumers avoid it as a precaution.',
+    severity: 'caution'
+  },
+  'E129': { 
+    description: 'Caution: Artificial red color strongly linked to hyperactivity and behavioral issues in sensitive children. Widely avoided by concerned parents and those avoiding artificial additives.',
+    severity: 'caution'
+  },
+  'E102': { 
+    description: 'Caution: Artificial yellow color often linked to hyperactivity and behavioral issues in sensitive children. Some individuals may experience mild allergic reactions like itching.',
+    severity: 'caution'
+  },
+  'E110': { 
+    description: 'Caution: Artificial orange-yellow color commonly linked to hyperactivity and behavioral issues in sensitive children.',
+    severity: 'caution'
+  },
+  'E133': { 
+    description: 'Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported.',
+    severity: 'caution'
+  },
+  
+  // Emulsifiers/Stabilizers/Thickeners
+  'E322': { 
+    description: 'Caution: An emulsifier, commonly sourced from soy (be aware if you have a soy allergy) or sunflower. Generally safe, but very rarely reported to cause mild digestive issues.',
+    severity: 'caution'
+  },
+  'E322I': { 
+    description: 'Caution: An emulsifier, commonly sourced from soy (be aware if you have a soy allergy) or sunflower. Generally safe, but very rarely reported to cause mild digestive issues.',
+    severity: 'caution'
+  },
+  'E471': { 
+    description: 'Caution: Emulsifiers that can be derived from animal fats (a concern for vegans/vegetarians). Some recent studies debate their potential impact on gut microbiome and inflammation.',
+    severity: 'caution'
+  },
+  'E415': { 
+    description: 'Caution: Thickener and stabilizer. Generally safe, but can cause bloating, gas, or mild digestive upset in sensitive individuals, especially in large amounts.',
+    severity: 'caution'
+  },
+  'E412': { 
+    description: 'Caution: Thickener and stabilizer. A natural fiber, it can cause digestive upset like gas or bloating, particularly at high consumption levels.',
+    severity: 'caution'
+  },
+  'E407': { 
+    description: 'Caution: Derived from seaweed; controversial additive. Some animal studies suggest it may contribute to inflammation and digestive issues; avoided by many for these concerns.',
+    severity: 'caution'
+  },
+  'E440': { 
+    description: 'Caution: A natural gelling agent from fruits. Generally very safe, but can cause mild digestive discomfort (e.g., bloating, gas) if consumed in very high amounts due to its fiber content.',
+    severity: 'caution'
+  },
+  'E433': { 
+    description: 'Caution: Emulsifier. Some animal and in-vitro studies suggest a potential link to gut microbiome disruption and inflammation, though human effects are still being debated.',
+    severity: 'caution'
+  },
+  
+  // Sweeteners
+  'E951': { 
+    description: 'Caution: Artificial sweetener. Controversial for some consumers; individuals with Phenylketonuria (PKU) must strictly avoid due to its phenylalanine content. Some sensitive individuals report headaches or other symptoms.',
+    severity: 'caution'
+  },
+  'E955': { 
+    description: 'Caution: Artificial sweetener. While generally regarded as safe, some studies suggest potential negative effects on gut bacteria and blood sugar regulation in certain individuals.',
+    severity: 'caution'
+  },
+  'E954': { 
+    description: 'Caution: Artificial sweetener. One of the oldest synthetic sweeteners. Historically had cancer concerns (since debunked for humans), but still viewed with caution by some consumers.',
+    severity: 'caution'
+  },
+  'E950': { 
+    description: 'Caution: Artificial sweetener. Some animal studies raise questions about its metabolic effects, but it is generally regarded as safe for human consumption at approved levels.',
+    severity: 'caution'
+  },
+  
+  // Flavor Enhancers
+  'E621': { 
+    description: 'Caution: Flavor enhancer; can trigger a set of symptoms (e.g., headache, flushing, sweating, chest pain) in sensitive individuals, often referred to as \'MSG symptom complex\'.',
+    severity: 'caution'
+  },
+  
+  // Sulfites
+  'E220': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E221': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E222': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E223': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E224': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E225': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E226': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E227': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  'E228': { 
+    description: 'Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions.',
+    severity: 'critical'
+  },
+  
+  // Other common additives
+  'E450': { 
+    description: 'Caution: Phosphate additive used as an emulsifier, stabilizer and acidity regulator. May contribute to imbalance in calcium-phosphorus metabolism with long-term consumption.',
+    severity: 'caution'
+  },
+  'E450I': { 
+    description: 'Caution: Phosphate additive used as an emulsifier, stabilizer and acidity regulator. May contribute to imbalance in calcium-phosphorus metabolism with long-term consumption.',
+    severity: 'caution'
+  },
+  'E472E': { 
+    description: 'Caution: Emulsifier made from glycerol and natural fatty acids. Generally recognized as safe but may cause digestive discomfort in sensitive individuals.',
+    severity: 'caution'
+  },
+  'E500': { 
+    description: 'Caution: Sodium carbonates used as acidity regulators and raising agents. Generally safe, but high consumption may contribute to sodium intake concerns.',
+    severity: 'caution'
+  },
+  'E500II': { 
+    description: 'Caution: Sodium carbonates used as acidity regulators and raising agents. Generally safe, but high consumption may contribute to sodium intake concerns.',
+    severity: 'caution'
+  },
+  'E930': { 
+    description: 'Caution: Calcium peroxide, used as a flour treatment agent. Generally recognized as safe in food production.',
+    severity: 'caution'
+  },
+};
+
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
@@ -160,13 +393,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   // Get allergen/additive descriptions for popups
   const getAllergenInfo = (allergenCode: string) => {
     const name = allergenCode.replace(/^en:/, '').replace(/-/g, ' ');
+    const normalizedName = name.toLowerCase();
+    
+    // Check if this allergen is in our database
+    const allergenInfo = Object.entries(ALLERGEN_DESCRIPTIONS).find(([key]) => 
+      normalizedName.includes(key) || key.includes(normalizedName)
+    );
+    
     return {
       name: name.charAt(0).toUpperCase() + name.slice(1),
       code: allergenCode,
-      info: 'Common allergen that can cause serious, life-threatening allergic reactions, or medically recognized severe intolerances in some individuals.',
+      info: allergenInfo 
+        ? allergenInfo[1].description 
+        : 'Common allergen that can cause serious, life-threatening allergic reactions, or medically recognized severe intolerances in some individuals.',
       type: 'allergen',
-      isFlagged: true
+      isFlagged: true,
+      severity: allergenInfo ? allergenInfo[1].severity : 'critical'
     };
+  };
+
+  // Update the additive chip click handler to use our description database
+  const handleAdditiveClick = (code: string) => {
+    const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const description = ADDITIVE_DESCRIPTIONS[upperCode] 
+      ? ADDITIVE_DESCRIPTIONS[upperCode].description 
+      : additiveInfo[code]?.description || 'Food additive that may affect taste, appearance, or shelf life of the product.';
+    
+    const severity = ADDITIVE_DESCRIPTIONS[upperCode] ? ADDITIVE_DESCRIPTIONS[upperCode].severity : 'caution';
+    
+    window.dispatchEvent(new CustomEvent('show-ingredient-info', {
+      detail: {
+        name: additiveInfo[code]?.name || code.toUpperCase(),
+        info: description,
+        isFlagged: true,
+        isDye: false,
+        type: 'additive',
+        code: code.toUpperCase(),
+        severity
+      }
+    }));
   };
 
   return (
@@ -386,18 +651,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
                   color: 'white',
                   borderRadius: '20px',
                 }}
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('show-ingredient-info', {
-                    detail: {
-                      name: additiveInfo[code]?.name || code.toUpperCase(),
-                      info: additiveInfo[code]?.description || 'Food additive that may affect taste, appearance, or shelf life of the product.',
-                      isFlagged: true,
-                      isDye: false,
-                      type: 'additive',
-                      code: code.toUpperCase()
-                    }
-                  }));
-                }}
+                onClick={() => handleAdditiveClick(code)}
               />
             ))}
           </Box>
