@@ -26,10 +26,22 @@ interface ProductCardProps {
 }
 
 const getScore = (flaggedIngredients: FlaggedIngredient[], dyes: Dye[]) => {
-  // Example: 100 - 10*flagged - 5*dyes, clamp 0-100
-  let score = 100 - 10 * flaggedIngredients.length - 5 * dyes.length;
+  // Count critical and caution flagged ingredients separately
+  const criticalCount = flaggedIngredients.filter(i => i.severity === 'critical').length;
+  const cautionCount = flaggedIngredients.filter(i => i.severity === 'caution').length;
+  
+  // Heavier penalties for critical ingredients, moderate for caution, light for dyes
+  let score = 100 - (criticalCount * 20) - (cautionCount * 10) - (dyes.length * 7);
+  
+  // Additional penalty if both dyes and critical ingredients are present
+  if (criticalCount > 0 && dyes.length > 0) {
+    score -= 10;
+  }
+  
+  // Clamp score between 0-100
   if (score < 0) score = 0;
   if (score > 100) score = 100;
+  
   return score;
 };
 
@@ -172,7 +184,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     }}>
       {/* Top section with gradient background */}
       <Box sx={{ 
-        background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+        background: score < 40 
+          ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' 
+          : score < 70
+          ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+          : 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
         color: 'white',
         p: 3,
         borderRadius: '24px 24px 0 0',
