@@ -108,3 +108,9 @@ html, body, #root {
   left: 0;
   top: 0;
 }
+
+/* Content area should be scrollable */
+.scrollable-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}

@@ -331,7 +331,7 @@ export default function App() {
     content = product ? null : (
       <Box sx={{
         width: '100%',
-        minHeight: '100vh',
+        minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -339,8 +339,11 @@ export default function App() {
         background: 'linear-gradient(135deg, #f0f4f8 0%, #d0e8fd 100%)',
         py: 2,
         position: 'relative',
-        overflow: 'hidden',
-      }}>
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
+      className="scrollable-content"
+      >
         {/* Background patterns */}
         <Box sx={{
           position: 'absolute',
@@ -651,7 +654,7 @@ export default function App() {
     content = (
       <Box sx={{
         width: '100%',
-        height: 'calc(100vh - 56px - 56px)',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -659,8 +662,11 @@ export default function App() {
         position: 'relative',
         py: 3,
         px: 2,
-        overflow: 'hidden',
-      }}>
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
+      className="scrollable-content"
+      >
         {/* Background pattern */}
         <Box sx={{
           position: 'absolute',
@@ -709,7 +715,10 @@ export default function App() {
           borderRadius: 4,
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
           p: 2,
-        }}>
+          WebkitOverflowScrolling: 'touch',
+        }}
+        className="scrollable-content"
+        >
           <HistoryList 
             history={history} 
             onSelect={(prod) => setSelectedHistoryProduct(prod)} 
@@ -741,7 +750,7 @@ export default function App() {
     content = (
       <Box sx={{
         width: '100%',
-        height: 'calc(100vh - 56px - 56px)',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -749,8 +758,11 @@ export default function App() {
         position: 'relative',
         py: 3,
         px: 2,
-        overflow: 'hidden',
-      }}>
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
+      className="scrollable-content"
+      >
         {/* Background pattern */}
         <Box sx={{
           position: 'absolute',
@@ -773,7 +785,10 @@ export default function App() {
           zIndex: 1,
           flex: 1,
           overflowY: 'auto',
-        }}>
+          WebkitOverflowScrolling: 'touch',
+        }}
+        className="scrollable-content"
+        >
           <Typography variant="h4" sx={{ 
             fontWeight: 800, 
             color: '#1e3a8a',
@@ -1032,8 +1047,8 @@ export default function App() {
         position: 'absolute',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         background: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect width=\'40\' height=\'40\' fill=\'%23e3f2fd\'/%3E%3Ccircle cx=\'20\' cy=\'20\' r=\'2\' fill=\'%23bbdefb\'/%3E%3C/svg%3E")',
         opacity: 0.15,
         zIndex: 0,
@@ -1099,9 +1114,12 @@ export default function App() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           overflowY: 'auto',
-        }}>
+          WebkitOverflowScrolling: 'touch',
+        }}
+        className="scrollable-content"
+        >
           {content}
           <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
             <DialogTitle>{ingredientInfo?.name}</DialogTitle>
