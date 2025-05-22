@@ -3,7 +3,9 @@ const fetch = require('node-fetch');
 const FormData = require('form-data');
 const multer = require('multer');
 
-const emojis = require('./emojis');
+const offRouter = require('./off');
+const nutritionixRouter = require('./nutritionix');
+const usdaRouter = require('./usda');
 
 const router = express.Router();
 const upload = multer();
@@ -15,8 +17,6 @@ router.get('/', (req, res) => {
     message: 'API - 👋🌎🌍🌏',
   });
 });
-
-router.use('/emojis', emojis);
 
 // Upload product and images to Open Food Facts
 router.post('/uploadProduct', upload.fields([
@@ -70,90 +70,9 @@ router.post('/uploadProduct', upload.fields([
   }
 });
 
-// Nutritionix search endpoint
-router.get('/nutritionix/search', async (req, res) => {
-  const { query } = req.query;
-  const appId = process.env.NUTRITIONIX_APP_ID;
-  const apiKey = process.env.NUTRITIONIX_API_KEY;
-  if (!query) return res.status(400).json({ error: 'Missing query parameter.' });
-  if (!appId || !apiKey) return res.status(500).json({ error: 'Nutritionix API credentials not set.' });
-  try {
-    const response = await fetch(
-      `https://api.nutritionix.com/v1_1/search/${encodeURIComponent(query)}?results=0:1&fields=item_name,brand_name,nf_calories,nf_ingredient_statement&appId=${appId}&appKey=${apiKey}`
-    );
-    if (!response.ok) {
-      const text = await response.text();
-      console.error('Nutritionix API error:', text);
-      return res.status(500).json({ error: 'Nutritionix API error', details: text });
-    }
-    const data = await response.json();
-    res.json(data);
-  } catch (e) {
-    console.error('Failed to fetch from Nutritionix:', e);
-    res.status(500).json({ error: 'Failed to fetch from Nutritionix.', details: e.message });
-  }
-});
-
-// USDA search endpoint
-router.get('/usda/search', async (req, res) => {
-  const { query } = req.query;
-  const apiKey = process.env.USDA_API_KEY;
-  if (!query) return res.status(400).json({ error: 'Missing query parameter.' });
-  try {
-    // Search for food by barcode or name
-    const response = await fetch(
-      `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&api_key=${apiKey}`
-    );
-    const data = await response.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch from USDA.' });
-  }
-});
-
-// Proxy for Open Food Facts categories
-router.get('/off/categories', async (req, res) => {
-  console.log('GET /off/categories called');
-  try {
-    const response = await fetch('https://world.openfoodfacts.org/categories.json');
-    const data = await response.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch categories from Open Food Facts.' });
-  }
-});
-
-// Proxy for Open Food Facts popular products
-router.get('/off/popular', async (req, res) => {
-  try {
-    const response = await fetch('https://world.openfoodfacts.org/popular.json');
-    if (!response.ok) {
-      const text = await response.text();
-      console.error('Open Food Facts API error:', text);
-      return res.status(500).json({ error: 'Open Food Facts API error', details: text });
-    }
-    const data = await response.json();
-    if (!data.products) {
-      console.error('No popular products found in Open Food Facts response:', data);
-      return res.status(500).json({ error: 'No popular products found.' });
-    }
-    res.json(data);
-  } catch (e) {
-    console.error('Failed to fetch popular products from Open Food Facts:', e);
-    res.status(500).json({ error: 'Failed to fetch popular products from Open Food Facts.', details: e.message });
-  }
-});
-
-// Proxy for Open Food Facts category products
-router.get('/off/category/:slug', async (req, res) => {
-  try {
-    const { slug } = req.params;
-    const response = await fetch(`https://world.openfoodfacts.org/category/${encodeURIComponent(slug)}.json`);
-    const data = await response.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch products for category from Open Food Facts.' });
-  }
-});
+// Mount logical routers
+router.use('/off', offRouter);
+router.use('/nutritionix', nutritionixRouter);
+router.use('/usda', usdaRouter);
 
 module.exports = router;

@@ -4,7 +4,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 const apiRouter = require('./src/api');
 
 var app = express();
@@ -16,7 +15,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/api', apiRouter);
+
+// Print all registered routes for debugging
+function printRoutes(stack, prefix = '') {
+  stack.forEach(function(layer) {
+    if (layer.route && layer.route.path) {
+      console.log(prefix + layer.route.path);
+    } else if (layer.name === 'router' && layer.handle.stack) {
+      printRoutes(layer.handle.stack, prefix + (layer.regexp && layer.regexp.source !== '^\\/?$' ? layer.regexp.source : ''));
+    }
+  });
+}
+printRoutes(app._router.stack);
 
 module.exports = app;

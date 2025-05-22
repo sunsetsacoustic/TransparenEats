@@ -64,8 +64,10 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
     }, []);
 
     useEffect(() => {
-      // Always try to start scanner on mount
-      startScanner();
+      // Only start scanner on mount if autoStart is true
+      if (autoStart) {
+        startScanner();
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

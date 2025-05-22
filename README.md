@@ -43,3 +43,28 @@ See `MVP_CHECKLIST.md` for a detailed breakdown of MVP requirements and progress
 
 ## License
 MIT 
+
+## Refactoring & Cleanup Checklist
+
+### Backend
+- [ ] Remove unused routes, files, and dependencies.
+- [ ] Organize routes into logical modules (e.g., `/off`, `/nutritionix`, `/usda`).
+- [ ] Add consistent error handling and logging for all endpoints.
+- [ ] Validate and sanitize all incoming parameters.
+- [ ] Add comments and JSDoc to all exported functions and routes.
+- [ ] Ensure all environment variables are checked and have fallbacks or clear errors.
+- [ ] Add tests for all API endpoints (unit and integration).
+
+### Frontend
+- [ ] Remove unused components and code.
+- [ ] Ensure all API calls go through the backend (no direct CORS requests).
+- [ ] Add user-friendly error messages for all failed API calls.
+- [ ] Refactor state management for clarity and efficiency.
+- [ ] Add comments and prop types (or TypeScript interfaces) for all components.
+- [ ] Improve UI/UX for loading and error states.
+- [ ] Add tests for key components and flows.
+
+### DevOps
+- [ ] Ensure all environment variables are set in Render/Vercel.
+- [ ] Set up automatic deployment on push to `main`.
+- [ ] Add health checks and monitoring for backend endpoints. 

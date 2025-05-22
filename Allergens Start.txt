@@ -1,53 +1,53 @@
 A. Critical Alerts (Red Warning)
-These ingredients are commonly associated with severe allergic reactions or major intolerances/sensitivities that necessitate strict avoidance.
-Milk (Lactose, Casein, Whey): Common dairy allergen; can cause digestive issues or severe allergic reactions.
-Eggs: Common allergen; found in many baked goods, sauces.
-Peanuts: Legume allergen; can cause severe, life-threatening reactions.
-Tree Nuts (Almonds, Walnuts, Cashews, Pecans, Hazelnuts, Pistachios): Group of allergens; can cause severe, life-threatening reactions.
-Soy (Soybean, Soy Lecithin): Common legume allergen; found in many processed foods.
-Wheat (Gluten): Cereal grain allergen; contains gluten which affects those with Celiac disease or sensitivities.
-Fish (any fin fish): Seafood allergen; can cause allergic reactions.
-Shellfish (Crab, Shrimp, Lobster, Mussels, Oysters, Clams): Crustacean and mollusk allergen; can cause severe allergic reactions.
-Sesame: Seed allergen; can cause allergic reactions.
-Mustard: Spice allergen; can cause allergic reactions in sensitive individuals.
-Celery: Vegetable allergen; used in soups, broths, and seasonings.
-Sulfite/Sulfites (E220-E228): Preservatives; can cause respiratory issues or allergic reactions in sensitive individuals (especially asthmatics).
-Lupin: Legume related to peanuts; can cause allergic reactions.
+These are allergens or substances that can cause serious, life-threatening allergic reactions, or medically recognized severe intolerances.
+Milk (Lactose, Casein, Whey): "Critical allergen: Can trigger severe allergic reactions (e.g., hives, swelling, breathing issues) or digestive distress (e.g., bloating, diarrhea) for those with lactose intolerance."
+Eggs: "Critical allergen: May cause allergic reactions from mild (e.g., hives, stomach upset) to severe (e.g., breathing difficulty, anaphylaxis)."
+Peanuts: "Critical allergen: High risk for severe, life-threatening allergic reactions, including anaphylaxis. Strict avoidance is crucial."
+Tree Nuts (Almonds, Walnuts, Cashews, Pecans, Hazelnuts, Pistachios): "Critical allergen group: Can cause severe allergic reactions (e.g., swelling, breathing issues, anaphylaxis). Avoid if allergic to any tree nut."
+Soy (Soybean, Soy Lecithin): "Critical allergen: May cause allergic reactions, ranging from mild skin/digestive issues to more severe systemic reactions."
+Wheat (Gluten): "Critical allergen: Contains gluten; triggers severe autoimmune reaction in Celiac disease, or digestive/other symptoms in non-celiac gluten sensitivity."
+Fish (any fin fish): "Critical allergen: Can cause allergic reactions, from hives and swelling to severe anaphylaxis."
+Shellfish (Crab, Shrimp, Lobster, Mussels, Oysters, Clams): "Critical allergen: Common cause of severe, sometimes life-threatening allergic reactions (e.g., rapid swelling, breathing issues)."
+Sesame: "Critical allergen: A growing common allergen that can cause mild to severe allergic reactions, including anaphylaxis."
+Mustard: "Critical allergen: Can cause allergic reactions, usually mild skin or digestive symptoms, but severe reactions are possible in highly sensitive individuals."
+Celery: "Critical allergen: May cause allergic reactions, sometimes including oral allergy syndrome, skin rashes, or digestive issues."
+Sulfite/Sulfites (E220-E228): "Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions."
+Lupin: "Critical allergen: As a legume, it can cause allergic reactions, especially in those with peanut or soy allergies."
 B. Caution Alerts (Yellow/Orange Warning)
-These additives are commonly included in processed foods and while generally not allergens causing acute reactions, they are often a concern for individuals with sensitivities, certain health conditions, or those following a "clean eating" philosophy due to perceived health risks or processing.
+These ingredients are often associated with concerns about general health, potential mild sensitivities, dietary restrictions, or are frequently avoided as a personal choice.
 Preservatives:
-Potassium Sorbate (E202): Mold and yeast inhibitor; extends shelf life.
-Sodium Benzoate (E211): Antifungal preservative; common in acidic foods and drinks; can form benzene in presence of Vitamin C.
-Calcium Propionate (E282): Mold inhibitor; often used in baked goods.
-BHA (E320): Antioxidant preservative; prevents fats from going rancid; some health concerns.
-BHT (E321): Antioxidant preservative; prevents fats from going rancid; some health concerns.
-Nitrates/Nitrites (E249-E252): Preservatives; used to cure meats and prevent bacterial growth; potential formation of nitrosamines.
+Potassium Sorbate (E202): "Caution: Generally safe, but rarely reported to cause mild skin irritation, digestive upset, or allergic-like reactions in sensitive individuals."
+Sodium Benzoate (E211): "Caution: In rare cases, may trigger hyperactive behavior, especially when combined with artificial colors. Can form harmful benzene in presence of Vitamin C."
+Calcium Propionate (E282): "Caution: Considered safe for most, but some anecdotal reports link it to mild digestive discomfort, headaches, or behavioral changes in children."
+BHA (E320): "Caution: Antioxidant preservative. Some debate exists regarding its long-term health effects; often avoided by those seeking 'clean label' products."
+BHT (E321): "Caution: Antioxidant preservative with similar debated health concerns to BHA; often avoided by consumers prioritizing natural ingredients."
+Nitrates/Nitrites (E249-E252): "Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake."
 Colorings:
-Caramel Color (E150a-d): Food coloring; used to impart brown shades; some types (like E150c/d) linked to 4-MeI concern.
-Annatto (E160b): Natural yellow-orange food coloring; some individuals can be sensitive.
-Turmeric (E100): Natural yellow spice extract and coloring; generally safe, but listed as an additive.
-Titanium Dioxide (E171): White food coloring; provides brightness and opacity; microparticle concerns debated.
-Red 40 (E129): Artificial red food coloring; commonly linked to hyperactivity in children.
-Yellow 5 (E102): Artificial yellow food coloring; commonly linked to hyperactivity in children.
-Yellow 6 (E110): Artificial orange-yellow food coloring; commonly linked to hyperactivity in children.
-Blue 1 (E133): Artificial blue food coloring.
+Caramel Color (E150a-d): "Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies."
+Annatto (E160b): "Caution: Natural coloring; while safe for most, some individuals have reported allergic-like sensitivities such as hives or swelling."
+Turmeric (E100): "Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions."
+Titanium Dioxide (E171): "Caution: Used for whiteness. Safety is debated, particularly for nanoparticles; has been categorized as 'possibly carcinogenic to humans' if inhaled. Many consumers avoid it as a precaution."
+Red 40 (E129): "Caution: Artificial red color strongly linked to hyperactivity and behavioral issues in sensitive children. Widely avoided by concerned parents and those avoiding artificial additives."
+Yellow 5 (E102): "Caution: Artificial yellow color often linked to hyperactivity and behavioral issues in sensitive children. Some individuals may experience mild allergic reactions like itching."
+Yellow 6 (E110): "Caution: Artificial orange-yellow color commonly linked to hyperactivity and behavioral issues in sensitive children."
+Blue 1 (E133): "Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported."
 Emulsifiers/Stabilizers/Thickeners:
-Lecithin (E322): Emulsifier; helps oil and water mix; sometimes sourced from soy or sunflower.
-Mono- and Diglycerides (E471): Emulsifiers; improves texture and prevents separation; often derived from animal fats (concern for vegans/vegetarians).
-Xanthan Gum (E415): Thickener and stabilizer; can cause digestive upset in sensitive individuals.
-Guar Gum (E412): Thickener and stabilizer; natural fiber, can cause digestive upset.
-Carrageenan (E407): Thickener and gelling agent; derived from seaweed; controversial for potential inflammation/GI issues.
-Pectin (E440): Natural gelling agent; common in jams and jellies.
-Polysorbate 80 (E433): Emulsifier and solubilizer; some studies suggest impact on gut microbiome.
+Lecithin (E322): "Caution: An emulsifier, commonly sourced from soy (be aware if you have a soy allergy) or sunflower. Generally safe, but very rarely reported to cause mild digestive issues."
+Mono- and Diglycerides (E471): "Caution: Emulsifiers that can be derived from animal fats (a concern for vegans/vegetarians). Some recent studies debate their potential impact on gut microbiome and inflammation."
+Xanthan Gum (E415): "Caution: Thickener and stabilizer. Generally safe, but can cause bloating, gas, or mild digestive upset in sensitive individuals, especially in large amounts."
+Guar Gum (E412): "Caution: Thickener and stabilizer. A natural fiber, it can cause digestive upset like gas or bloating, particularly at high consumption levels."
+Carrageenan (E407): "Caution: Derived from seaweed; controversial additive. Some animal studies suggest it may contribute to inflammation and digestive issues; avoided by many for these concerns."
+Pectin (E440): "Caution: A natural gelling agent from fruits. Generally very safe, but can cause mild digestive discomfort (e.g., bloating, gas) if consumed in very high amounts due to its fiber content."
+Polysorbate 80 (E433): "Caution: Emulsifier. Some animal and in-vitro studies suggest a potential link to gut microbiome disruption and inflammation, though human effects are still being debated."
 Sweeteners (Artificial/High-Intensity):
-Aspartame (E951): Artificial sweetener; metabolic concerns for some; contains phenylalanine.
-Sucralose (E955): Artificial sweetener; some studies suggest gut health impacts.
-Saccharin (E954): Artificial sweetener; one of the oldest synthetic sweeteners.
-Acesulfame Potassium (E950): Artificial sweetener; often combined with other sweeteners.
+Aspartame (E951): "Caution: Artificial sweetener. Controversial for some consumers; individuals with Phenylketonuria (PKU) must strictly avoid due to its phenylalanine content. Some sensitive individuals report headaches or other symptoms."
+Sucralose (E955): "Caution: Artificial sweetener. While generally regarded as safe, some studies suggest potential negative effects on gut bacteria and blood sugar regulation in certain individuals."
+Saccharin (E954): "Caution: Artificial sweetener. One of the oldest synthetic sweeteners. Historically had cancer concerns (since debunked for humans), but still viewed with caution by some consumers."
+Acesulfame Potassium (E950): "Caution: Artificial sweetener. Some animal studies raise questions about its metabolic effects, but it is generally regarded as safe for human consumption at approved levels."
 Flavor Enhancers:
-Monosodium Glutamate (MSG, E621): Flavor enhancer; provides umami taste; known sensitivities ("MSG symptom complex").
-Disodium Guanylate (E626-E629): Flavor enhancer; often used with MSG.
-Disodium Inosinate (E630-E633): Flavor enhancer; often used with MSG.
+Monosodium Glutamate (MSG, E621): "Caution: Flavor enhancer; can trigger a set of symptoms (e.g., headache, flushing, sweating, chest pain) in sensitive individuals, often referred to as 'MSG symptom complex'."
+Disodium Guanylate (E626-E629): "Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract."
+Disodium Inosinate (E630-E633): "Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract."
 Anti-caking Agents:
-Silicon Dioxide (E551): Anti-caking agent; prevents clumping of powdered ingredients; concerns about nanoparticles.
-Calcium Carbonate (E170): Anti-caking agent; also a food whitener and firming agent.
+Silicon Dioxide (E551): "Caution: Anti-caking agent. Concerns about potential effects mainly apply to nanoparticle forms; generally considered inert in the digestive system, but some choose to avoid for caution."
+Calcium Carbonate (E170): "Caution: A common mineral used as an anti-caking agent or whitener. Generally safe, but very high doses can cause mild digestive upset like constipation."
