@@ -90,11 +90,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const flaggedHasMore = flaggedIngredients.length > 3;
 
   // Parse additive codes from product
-  const additiveCodes = (product.additives_tags || product.additives || '')
-    .toString()
-    .split(',')
-    .map((tag: string) => tag.trim().replace(/^en:/, ''))
-    .filter(Boolean);
+  const additiveCodes = (() => {
+    const additiveData = product.additives_tags || product.additives || '';
+    if (Array.isArray(additiveData)) {
+      return additiveData.join(',').split(',').map(tag => tag.trim().replace(/^en:/, '')).filter(Boolean);
+    } else {
+      return String(additiveData).split(',').map(tag => tag.trim().replace(/^en:/, '')).filter(Boolean);
+    }
+  })();
 
   // Fetch additive names from Open Food Facts
   useEffect(() => {
@@ -332,7 +335,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
             {labels && <Chip label={`Labels: ${labels}`} size="small" sx={{ background: 'rgba(243, 244, 246, 0.7)' }} />}
             
             {/* Allergens with proper click handling */}
-            {allergens && allergens.split(',').map(allergen => (
+            {allergens && typeof allergens === 'string' && allergens.split(',').filter(Boolean).map(allergen => (
               <Chip
                 key={allergen}
                 label={`${allergen.replace(/^en:/, '').replace(/-/g, ' ')}`}

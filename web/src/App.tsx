@@ -102,81 +102,115 @@ export default function App() {
     setProduct(null);
     try {
       // 1. Try Nutritionix
-      const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
-      const nutriData = await nutriRes.json();
-      if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
-        const hit = nutriData.hits[0].fields;
-        const nutriProduct: Product = {
-          code: barcode,
-          product_name: hit.item_name,
-          brands: hit.brand_name,
-          ingredients_text: hit.fields.nf_ingredient_statement,
-          nutriments: {
-            'energy-kcal_100g': hit.fields.nf_calories,
-          },
-        };
-        setProduct(nutriProduct);
-        setSelectedHistoryProduct(nutriProduct);
-        addToHistory(nutriProduct);
-        setTab(0);
-        setSearch('');
-        setLoading(false);
-        return;
+      try {
+        const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
+        if (nutriRes.ok) {
+          const nutriData = await nutriRes.json();
+          if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
+            const hit = nutriData.hits[0].fields;
+            const nutriProduct: Product = {
+              code: barcode,
+              product_name: hit.item_name,
+              brands: hit.brand_name,
+              ingredients_text: hit.nf_ingredient_statement,
+              nutriments: {
+                'energy-kcal_100g': hit.nf_calories,
+              },
+            };
+            setProduct(nutriProduct);
+            setSelectedHistoryProduct(nutriProduct);
+            addToHistory(nutriProduct);
+            setTab(0);
+            setSearch('');
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Nutritionix barcode search failed:', e);
+        // Continue to next API
       }
+      
       // 2. Try USDA
-      const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(barcode)}`);
-      const usdaData = await usdaRes.json();
-      if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
-        const food = usdaData.foods[0];
-        const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
-        const usdaProduct: Product = {
-          code: food.gtinUpc || food.fdcId?.toString() || barcode,
-          product_name: food.description,
-          brands: food.brandOwner,
-          ingredients_text: food.ingredients,
-          nutriments: {
-            'energy-kcal_100g': getNutrient('Energy'),
-            'proteins_100g': getNutrient('Protein'),
-            'fat_100g': getNutrient('Total lipid (fat)'),
-            'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
-            'fiber_100g': getNutrient('Fiber, total dietary'),
-            'sugars_100g': getNutrient('Sugars, total including NLEA'),
-            'sodium_100g': getNutrient('Sodium, Na'),
-          },
-        };
-        setProduct(usdaProduct);
-        setSelectedHistoryProduct(usdaProduct);
-        addToHistory(usdaProduct);
-        setTab(0);
-        setSearch('');
-        setLoading(false);
-        return;
+      try {
+        const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(barcode)}`);
+        if (usdaRes.ok) {
+          const usdaData = await usdaRes.json();
+          if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
+            const food = usdaData.foods[0];
+            const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
+            const usdaProduct: Product = {
+              code: food.gtinUpc || food.fdcId?.toString() || barcode,
+              product_name: food.description,
+              brands: food.brandOwner,
+              ingredients_text: food.ingredients,
+              nutriments: {
+                'energy-kcal_100g': getNutrient('Energy'),
+                'proteins_100g': getNutrient('Protein'),
+                'fat_100g': getNutrient('Total lipid (fat)'),
+                'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
+                'fiber_100g': getNutrient('Fiber, total dietary'),
+                'sugars_100g': getNutrient('Sugars, total including NLEA'),
+                'sodium_100g': getNutrient('Sodium, Na'),
+              },
+            };
+            setProduct(usdaProduct);
+            setSelectedHistoryProduct(usdaProduct);
+            addToHistory(usdaProduct);
+            setTab(0);
+            setSearch('');
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('USDA barcode search failed:', e);
+        // Continue to next API
       }
+      
       // 3. Try Open Food Facts
-      const res = await fetch(`${OPEN_FOOD_FACTS_URL}/api/v2/product/${barcode}`);
-      const data = await res.json();
-      if (data && data.product) {
-        setProduct(data.product);
-        setSelectedHistoryProduct(data.product);
-        addToHistory(data.product);
-        setTab(0);
-        setSearch('');
-        setLoading(false);
-        return;
+      try {
+        const res = await fetch(`${OPEN_FOOD_FACTS_URL}/api/v2/product/${barcode}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.product) {
+            setProduct(data.product);
+            setSelectedHistoryProduct(data.product);
+            addToHistory(data.product);
+            setTab(0);
+            setSearch('');
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Open Food Facts barcode search failed:', e);
+        // Continue to next API
       }
+      
       // 4. Final fallback: Open Beauty Facts
-      const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/api/v2/product/${barcode}`);
-      const beautyData = await beautyRes.json();
-      if (beautyData && beautyData.product) {
-        setProduct(beautyData.product);
-        setSelectedHistoryProduct(beautyData.product);
-        addToHistory(beautyData.product);
-        setTab(0);
-        setSearch('');
-        setLoading(false);
-        return;
+      try {
+        const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/api/v2/product/${barcode}`);
+        if (beautyRes.ok) {
+          const beautyData = await beautyRes.json();
+          if (beautyData && beautyData.product) {
+            setProduct(beautyData.product);
+            setSelectedHistoryProduct(beautyData.product);
+            addToHistory(beautyData.product);
+            setTab(0);
+            setSearch('');
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Open Beauty Facts barcode search failed:', e);
       }
+      
+      // If we got here, no product was found
+      setLoading(false);
     } catch (e) {
+      console.error('Product barcode search failed:', e);
       setLoading(false);
     }
   };
@@ -187,65 +221,99 @@ export default function App() {
     setSearchResults([]);
     try {
       // 1. Try Nutritionix
-      const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
-      const nutriData = await nutriRes.json();
-      if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
-        const nutriProducts: Product[] = nutriData.hits.map((hit: any) => ({
-          code: hit.fields.item_id || hit.fields.nix_item_id || '',
-          product_name: hit.fields.item_name,
-          brands: hit.fields.brand_name,
-          ingredients_text: hit.fields.nf_ingredient_statement,
-          nutriments: {
-            'energy-kcal_100g': hit.fields.nf_calories,
-          },
-        }));
-        setSearchResults(nutriProducts);
-        setLoading(false);
-        return;
+      try {
+        const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(search)}`);
+        if (nutriRes.ok) {
+          const nutriData = await nutriRes.json();
+          if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
+            const nutriProducts: Product[] = nutriData.hits.map((hit: any) => ({
+              code: hit.fields.item_id || hit.fields.nix_item_id || '',
+              product_name: hit.fields.item_name,
+              brands: hit.fields.brand_name,
+              ingredients_text: hit.fields.nf_ingredient_statement,
+              nutriments: {
+                'energy-kcal_100g': hit.fields.nf_calories,
+              },
+            }));
+            setSearchResults(nutriProducts);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Nutritionix search failed:', e);
+        // Continue to next API
       }
+      
       // 2. Try USDA
-      const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(search)}`);
-      const usdaData = await usdaRes.json();
-      if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
-        const usdaProducts: Product[] = usdaData.foods.map((food: any) => {
-          const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
-          return {
-            code: food.gtinUpc || food.fdcId?.toString() || '',
-            product_name: food.description,
-            brands: food.brandOwner,
-            ingredients_text: food.ingredients,
-            nutriments: {
-              'energy-kcal_100g': getNutrient('Energy'),
-              'proteins_100g': getNutrient('Protein'),
-              'fat_100g': getNutrient('Total lipid (fat)'),
-              'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
-              'fiber_100g': getNutrient('Fiber, total dietary'),
-              'sugars_100g': getNutrient('Sugars, total including NLEA'),
-              'sodium_100g': getNutrient('Sodium, Na'),
-            },
-          };
-        });
-        setSearchResults(usdaProducts);
-        setLoading(false);
-        return;
+      try {
+        const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(search)}`);
+        if (usdaRes.ok) {
+          const usdaData = await usdaRes.json();
+          if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
+            const usdaProducts: Product[] = usdaData.foods.map((food: any) => {
+              const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
+              return {
+                code: food.gtinUpc || food.fdcId?.toString() || '',
+                product_name: food.description,
+                brands: food.brandOwner,
+                ingredients_text: food.ingredients,
+                nutriments: {
+                  'energy-kcal_100g': getNutrient('Energy'),
+                  'proteins_100g': getNutrient('Protein'),
+                  'fat_100g': getNutrient('Total lipid (fat)'),
+                  'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
+                  'fiber_100g': getNutrient('Fiber, total dietary'),
+                  'sugars_100g': getNutrient('Sugars, total including NLEA'),
+                  'sodium_100g': getNutrient('Sodium, Na'),
+                },
+              };
+            });
+            setSearchResults(usdaProducts);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('USDA search failed:', e);
+        // Continue to next API
       }
+      
       // 3. Try Open Food Facts
-      const res = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
-      const data = await res.json();
-      if (data && data.products) {
-        setSearchResults(data.products);
-        setLoading(false);
-        return;
+      try {
+        const res = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.products) {
+            setSearchResults(data.products);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Open Food Facts search failed:', e);
+        // Continue to next API
       }
+      
       // 4. Final fallback: Open Beauty Facts
-      const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
-      const beautyData = await beautyRes.json();
-      if (beautyData && beautyData.products) {
-        setSearchResults(beautyData.products);
-        setLoading(false);
-        return;
+      try {
+        const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+        if (beautyRes.ok) {
+          const beautyData = await beautyRes.json();
+          if (beautyData && beautyData.products) {
+            setSearchResults(beautyData.products);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('Open Beauty Facts search failed:', e);
       }
+      
+      // If all APIs fail, return empty results
+      setLoading(false);
     } catch (e) {
+      console.error('Product search failed:', e);
       setLoading(false);
     }
   };
