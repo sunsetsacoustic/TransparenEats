@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Box, Typography, Avatar, Chip, Collapse, Button, Popover, CircularProgress, Grid } from '@mui/material';
+import { Paper, Box, Typography, Chip, Collapse, Button, CircularProgress, Grid, Avatar } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -51,65 +51,7 @@ const getScoreLabel = (score: number) => {
   return { label: 'Good', color: '#4CAF50' };
 };
 
-const SCORE_DEFINITIONS: Record<string, string> = {
-  'Nutri-Score': 'A nutrition label that grades food from A (best) to E (worst) based on its nutritional quality.',
-  'Eco-Score': 'An environmental impact score from A (low impact) to E (high impact).',
-  'NOVA Group': 'A classification of food processing, from 1 (unprocessed) to 4 (ultra-processed).',
-};
-
 // Add allergen and additive descriptions mapping
-const ALLERGEN_DESCRIPTIONS: Record<string, { description: string; severity: 'critical' | 'caution' }> = {
-  // Critical Allergens
-  'milk': { 
-    description: 'Critical allergen: Can trigger severe allergic reactions (e.g., hives, swelling, breathing issues) or digestive distress (e.g., bloating, diarrhea) for those with lactose intolerance.',
-    severity: 'critical'
-  },
-  'eggs': { 
-    description: 'Critical allergen: May cause allergic reactions from mild (e.g., hives, stomach upset) to severe (e.g., breathing difficulty, anaphylaxis).',
-    severity: 'critical'
-  },
-  'peanuts': { 
-    description: 'Critical allergen: High risk for severe, life-threatening allergic reactions, including anaphylaxis. Strict avoidance is crucial.',
-    severity: 'critical'
-  },
-  'tree-nuts': { 
-    description: 'Critical allergen group: Can cause severe allergic reactions (e.g., swelling, breathing issues, anaphylaxis). Avoid if allergic to any tree nut.',
-    severity: 'critical'
-  },
-  'soy': { 
-    description: 'Critical allergen: May cause allergic reactions, ranging from mild skin/digestive issues to more severe systemic reactions.',
-    severity: 'critical'
-  },
-  'wheat': { 
-    description: 'Critical allergen: Contains gluten; triggers severe autoimmune reaction in Celiac disease, or digestive/other symptoms in non-celiac gluten sensitivity.',
-    severity: 'critical'
-  },
-  'fish': { 
-    description: 'Critical allergen: Can cause allergic reactions, from hives and swelling to severe anaphylaxis.',
-    severity: 'critical'
-  },
-  'shellfish': { 
-    description: 'Critical allergen: Common cause of severe, sometimes life-threatening allergic reactions (e.g., rapid swelling, breathing issues).',
-    severity: 'critical'
-  },
-  'sesame': { 
-    description: 'Critical allergen: A growing common allergen that can cause mild to severe allergic reactions, including anaphylaxis.',
-    severity: 'critical'
-  },
-  'mustard': { 
-    description: 'Critical allergen: Can cause allergic reactions, usually mild skin or digestive symptoms, but severe reactions are possible in highly sensitive individuals.',
-    severity: 'critical'
-  },
-  'celery': { 
-    description: 'Critical allergen: May cause allergic reactions, sometimes including oral allergy syndrome, skin rashes, or digestive issues.',
-    severity: 'critical'
-  },
-  'lupin': { 
-    description: 'Critical allergen: As a legume, it can cause allergic reactions, especially in those with peanut or soy allergies.',
-    severity: 'critical'
-  },
-};
-
 const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'critical' | 'caution' }> = {
   // Preservatives
   'E202': { 
@@ -344,409 +286,6 @@ const NUTRIENT_FIELDS = [
   { key: 'sodium_100g', label: 'Sodium', unit: 'mg' },
 ];
 
-// Extract NutritionalInfo component
-interface NutritionalInfoProps {
-  nutriments: Record<string, any>;
-}
-
-const NutritionalInfo: React.FC<NutritionalInfoProps> = ({ nutriments }) => {
-  return (
-    <Box sx={{ 
-      mb: 3, 
-      p: 3, 
-      borderRadius: '16px', 
-      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-      border: '1px solid rgba(186, 230, 253, 0.4)'
-    }}>
-      <Typography variant="h6" sx={{ 
-        fontWeight: 700, 
-        mb: 2,
-        fontSize: '1.1rem',
-        position: 'relative',
-        display: 'inline-block',
-        '&:after': {
-          content: '""',
-          position: 'absolute',
-          bottom: -6,
-          left: 0,
-          width: 40,
-          height: 3,
-          borderRadius: 2,
-          background: '#0ea5e9',
-        }
-      }}>Nutritional Info (per 100 g)</Typography>
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        {NUTRIENT_FIELDS.map(field => (
-          nutriments[field.key] !== undefined && (
-            <Grid item xs={6} key={field.key}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 500 }}>
-                  {field.label}
-                </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                  {nutriments[field.key]} {field.unit}
-                </Typography>
-              </Box>
-            </Grid>
-          )
-        ))}
-      </Grid>
-    </Box>
-  );
-};
-
-// Extract AdditiveChips component
-interface AdditiveChipsProps {
-  additiveCodes: string[];
-  additiveInfo: Record<string, { name: string; code: string; description?: string }>;
-  additiveLoading: boolean;
-  onAdditiveClick: (code: string) => void;
-}
-
-const AdditiveChips: React.FC<AdditiveChipsProps> = ({ 
-  additiveCodes, 
-  additiveInfo, 
-  additiveLoading, 
-  onAdditiveClick 
-}) => {
-  // Get additive name for display
-  const getAdditiveName = (code: string): string => {
-    const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (additiveInfo[code]?.name) {
-      return `${additiveInfo[code].name} (${upperCode})`;
-    } else if (ADDITIVE_NAMES[upperCode]) {
-      return `${ADDITIVE_NAMES[upperCode]} (${upperCode})`;
-    } else {
-      return code.toUpperCase();
-    }
-  };
-
-  return (
-    <>
-      {additiveLoading && additiveCodes.length > 0 && <CircularProgress size={18} sx={{ ml: 1 }} />}
-      {additiveCodes.map(code => (
-        <Chip
-          key={code}
-          label={getAdditiveName(code)}
-          size="small"
-          color="error"
-          sx={{ 
-            cursor: 'pointer',
-            bgcolor: '#FF5252',
-            color: 'white',
-            borderRadius: '20px',
-          }}
-          onClick={() => onAdditiveClick(code)}
-        />
-      ))}
-    </>
-  );
-};
-
-// Extract IngredientsList component
-interface IngredientsListProps {
-  ingredientLines: string[];
-  showAllIngredients: boolean;
-  onToggleShowAll: () => void;
-}
-
-const IngredientsList: React.FC<IngredientsListProps> = ({ 
-  ingredientLines, 
-  showAllIngredients, 
-  onToggleShowAll 
-}) => {
-  return (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="h6" sx={{ 
-        fontWeight: 700, 
-        mb: 2,
-        fontSize: '1.1rem',
-        position: 'relative',
-        display: 'inline-block',
-        '&:after': {
-          content: '""',
-          position: 'absolute',
-          bottom: -6,
-          left: 0,
-          width: 40,
-          height: 3,
-          borderRadius: 2,
-          background: '#4ade80',
-        }
-      }}>Ingredients</Typography>
-      <Collapse in={showAllIngredients || ingredientLines.length <= 3} collapsedSize={72}>
-        <Typography variant="body2" sx={{ 
-          color: '#374151', 
-          whiteSpace: 'pre-line',
-          background: 'rgba(243, 244, 246, 0.7)',
-          borderRadius: 2,
-          p: 2,
-          fontSize: '0.9rem',
-          lineHeight: 1.6,
-        }}>
-          {showAllIngredients ? ingredientLines.join(', ') : ingredientLines.slice(0, 3).join(', ') + (ingredientLines.length > 3 ? ', ...' : '')}
-        </Typography>
-      </Collapse>
-      {ingredientLines.length > 3 && (
-        <Button 
-          size="small" 
-          onClick={onToggleShowAll} 
-          sx={{ 
-            mt: 1,
-            color: '#4ade80',
-            '&:hover': {
-              background: 'rgba(74, 222, 128, 0.1)',
-            },
-          }} 
-          endIcon={showAllIngredients ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        >
-          {showAllIngredients ? 'SHOW LESS' : 'SHOW MORE'}
-        </Button>
-      )}
-    </Box>
-  );
-};
-
-// Extract FlaggedIngredients component
-interface FlaggedIngredientsProps {
-  flaggedIngredients: FlaggedIngredient[];
-  showAllFlagged: boolean;
-  onToggleShowAll: () => void;
-}
-
-const FlaggedIngredients: React.FC<FlaggedIngredientsProps> = ({ 
-  flaggedIngredients, 
-  showAllFlagged, 
-  onToggleShowAll 
-}) => {
-  const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
-  const flaggedHasMore = flaggedIngredients.length > 3;
-
-  return (
-    <Box sx={{ 
-      mb: 3,
-      p: 3,
-      borderRadius: '16px',
-      background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-      border: '1px solid rgba(254, 202, 202, 0.4)'
-    }}>
-      <Typography variant="h6" sx={{ 
-        fontWeight: 700, 
-        mb: 2,
-        fontSize: '1.1rem',
-        position: 'relative',
-        display: 'inline-block',
-        color: '#b91c1c',
-        '&:after': {
-          content: '""',
-          position: 'absolute',
-          bottom: -6,
-          left: 0,
-          width: 40,
-          height: 3,
-          borderRadius: 2,
-          background: '#ef4444',
-        }
-      }}>Flagged Ingredients</Typography>
-      <Collapse in={showAllFlagged || flaggedIngredients.length <= 3} collapsedSize={120}>
-        {flaggedToShow.map((flag, idx) => (
-          <Box key={flag.name + idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2, gap: 1 }}>
-            {flag.severity === 'critical' ? (
-              <WarningIcon sx={{ color: '#dc2626', fontSize: 20, mt: 0.5 }} />
-            ) : (
-              <ReportProblemIcon sx={{ color: '#ea580c', fontSize: 20, mt: 0.5 }} />
-            )}
-            <Box>
-              <Typography variant="subtitle2" sx={{ 
-                fontWeight: 600, 
-                color: flag.severity === 'critical' ? '#dc2626' : '#ea580c' 
-              }}>
-                {flag.name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#4b5563', display: 'block', mb: 0.5 }}>
-                {flag.warning}
-              </Typography>
-            </Box>
-          </Box>
-        ))}
-      </Collapse>
-      {flaggedHasMore && (
-        <Button 
-          size="small" 
-          onClick={onToggleShowAll} 
-          sx={{ 
-            mt: 1,
-            color: '#ef4444',
-            '&:hover': {
-              background: 'rgba(239, 68, 68, 0.1)',
-            },
-          }} 
-          endIcon={showAllFlagged ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        >
-          {showAllFlagged ? 'SHOW LESS' : 'SHOW MORE'}
-        </Button>
-      )}
-    </Box>
-  );
-};
-
-// Update the FoodScores component props interface to fix type issues
-interface FoodScoresProps {
-  nutriScore?: string | number;
-  ecoScore?: string | number;
-  novaGroup?: string | number;
-  onScoreClick: (event: React.MouseEvent<HTMLElement>, type: string) => void;
-  scorePopover: { anchorEl: HTMLElement | null, type: string | null };
-  onPopoverClose: () => void;
-}
-
-const FoodScores: React.FC<FoodScoresProps> = ({ 
-  nutriScore, 
-  ecoScore, 
-  novaGroup, 
-  onScoreClick, 
-  scorePopover, 
-  onPopoverClose 
-}) => {
-  return (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="h6" sx={{ 
-        fontWeight: 700, 
-        mb: 2,
-        fontSize: '1.1rem',
-        position: 'relative',
-        display: 'inline-block',
-        '&:after': {
-          content: '""',
-          position: 'absolute',
-          bottom: -6,
-          left: 0,
-          width: 40,
-          height: 3,
-          borderRadius: 2,
-          background: '#f59e0b',
-        }
-      }}>Food Scores</Typography>
-      
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-        {nutriScore && (
-          <>
-            <Chip
-              label={`Nutri-Score: ${nutriScore}`}
-              sx={{ 
-                mb: 1, 
-                cursor: 'pointer',
-                '&.MuiChip-root': {
-                  background: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) 
-                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                    : 'rgba(243, 244, 246, 0.7)',
-                  color: scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                  fontWeight: 500,
-                }
-              }}
-              onClick={e => onScoreClick(e, 'Nutri-Score')}
-            />
-            <Popover
-              open={scorePopover.type === 'Nutri-Score' && Boolean(scorePopover.anchorEl)}
-              anchorEl={scorePopover.anchorEl}
-              onClose={onPopoverClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{
-                sx: {
-                  borderRadius: 2,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                }
-              }}
-            >
-              <Box sx={{ p: 2, maxWidth: 240 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Nutri-Score</Typography>
-                <Typography variant="body2">{SCORE_DEFINITIONS['Nutri-Score']}</Typography>
-              </Box>
-            </Popover>
-          </>
-        )}
-        {ecoScore && (
-          <>
-            <Chip
-              label={`Eco-Score: ${ecoScore}`}
-              sx={{ 
-                mb: 1, 
-                cursor: 'pointer',
-                '&.MuiChip-root': {
-                  background: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) 
-                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                    : 'rgba(243, 244, 246, 0.7)',
-                  color: scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                  fontWeight: 500,
-                }
-              }}
-              onClick={e => onScoreClick(e, 'Eco-Score')}
-            />
-            <Popover
-              open={scorePopover.type === 'Eco-Score' && Boolean(scorePopover.anchorEl)}
-              anchorEl={scorePopover.anchorEl}
-              onClose={onPopoverClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{
-                sx: {
-                  borderRadius: 2,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                }
-              }}
-            >
-              <Box sx={{ p: 2, maxWidth: 240 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Eco-Score</Typography>
-                <Typography variant="body2">{SCORE_DEFINITIONS['Eco-Score']}</Typography>
-              </Box>
-            </Popover>
-          </>
-        )}
-        {novaGroup && (
-          <>
-            <Chip
-              label={`NOVA Group: ${novaGroup}`}
-              sx={{ 
-                mb: 1, 
-                cursor: 'pointer',
-                '&.MuiChip-root': {
-                  background: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) 
-                    ? 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)' 
-                    : 'rgba(243, 244, 246, 0.7)',
-                  color: scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl) ? 'white' : 'inherit',
-                  fontWeight: 500,
-                }
-              }}
-              onClick={e => onScoreClick(e, 'NOVA Group')}
-            />
-            <Popover
-              open={scorePopover.type === 'NOVA Group' && Boolean(scorePopover.anchorEl)}
-              anchorEl={scorePopover.anchorEl}
-              onClose={onPopoverClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{
-                sx: {
-                  borderRadius: 2,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                }
-              }}
-            >
-              <Box sx={{ p: 2, maxWidth: 240 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>NOVA Group</Typography>
-                <Typography variant="body2">{SCORE_DEFINITIONS['NOVA Group']}</Typography>
-              </Box>
-            </Popover>
-          </>
-        )}
-      </Box>
-    </Box>
-  );
-};
-
 // Extract ProductHeader component
 interface ProductHeaderProps {
   product: Product;
@@ -850,7 +389,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const [showAllIngredients, setShowAllIngredients] = useState(false);
   const [showAllFlagged, setShowAllFlagged] = useState(false);
   const score = getScore(flaggedIngredients, dyes);
-  const { label: scoreLabel, color: scoreColor } = getScoreLabel(score);
+  const { label: scoreLabel } = getScoreLabel(score);
   const nutriments = product.nutriments || {};
   const [scorePopover, setScorePopover] = useState<{ anchorEl: HTMLElement | null, type: string | null }>({ anchorEl: null, type: null });
   const [additiveInfo, setAdditiveInfo] = useState<Record<string, { name: string; code: string; description?: string }>>({});
@@ -864,9 +403,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const servingSize = product.serving_size || product.quantity || get(product, 'servingSize') || get(product, 'servingSizeUnit') || '';
   const categories = product.categories || product.categories_tags || product.category || '';
   const labels = product.labels || product.labels_tags || '';
-  const allergens = product.allergens || product.allergens_tags || '';
   const nutriScore = product.nutriscore_grade || product.nutriscore_score;
-  const ecoScore = product.ecoscore_grade || product.ecoscore_score;
   const novaGroup = product.nova_group;
 
   // Collapsible logic for ingredients
@@ -919,28 +456,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     return () => { cancelled = true; };
   }, [product.additives_tags, product.additives]);
 
-  // Get allergen/additive descriptions for popups
-  const getAllergenInfo = (allergenCode: string) => {
-    const name = allergenCode.replace(/^en:/, '').replace(/-/g, ' ');
-    const normalizedName = name.toLowerCase();
-    
-    // Check if this allergen is in our database
-    const allergenInfo = Object.entries(ALLERGEN_DESCRIPTIONS).find(([key]) => 
-      normalizedName.includes(key) || key.includes(normalizedName)
-    );
-    
-    return {
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      code: allergenCode,
-      info: allergenInfo 
-        ? allergenInfo[1].description 
-        : 'Common allergen that can cause serious, life-threatening allergic reactions, or medically recognized severe intolerances in some individuals.',
-      type: 'allergen',
-      isFlagged: true,
-      severity: allergenInfo ? allergenInfo[1].severity : 'critical'
-    };
-  };
-
   // Update the additive chip click handler to use our description database
   const handleAdditiveClick = (code: string) => {
     const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -971,7 +486,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
       setScorePopover({ anchorEl: event.currentTarget, type });
     }
   };
-  const handleScorePopoverClose = () => setScorePopover({ anchorEl: null, type: null });
+  
+  // Update popovers in the UI
+  React.useEffect(() => {
+    const popovers = document.querySelectorAll('.MuiPopover-root');
+    popovers.forEach(popover => {
+      const element = popover as HTMLElement;
+      if (element && element.style) {
+        if (!scorePopover.anchorEl) {
+          element.style.display = 'none';
+        }
+      }
+    });
+  }, [scorePopover]);
+  
   const toggleIngredients = () => setShowAllIngredients(prev => !prev);
   const toggleFlagged = () => setShowAllFlagged(prev => !prev);
 
