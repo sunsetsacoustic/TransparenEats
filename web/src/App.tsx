@@ -251,8 +251,15 @@ export default function App() {
 
   // Stop scanner when leaving Scan tab
   useEffect(() => {
-    if (tab !== 1 && scannerRef.current && typeof scannerRef.current.stopScanner === 'function') {
-      scannerRef.current.stopScanner();
+    if (tab !== 1 && scannerRef.current) {
+      // Ensure we call stopScanner when leaving the Scan tab
+      try {
+        if (typeof scannerRef.current.stopScanner === 'function') {
+          scannerRef.current.stopScanner();
+        }
+      } catch (e) {
+        console.error("Error stopping scanner:", e);
+      }
     }
   }, [tab]);
 
@@ -624,18 +631,49 @@ export default function App() {
       <Box sx={{
         width: '100%',
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f0f4f8 0%, #d0e8fd 100%)',
+        padding: 2,
         position: 'relative',
-        bgcolor: '#000',
-        overflow: 'hidden',
-      }}>
-        {/* Full-screen scanner component */}
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }}
+      className="scrollable-content"
+      >
+        {/* Background pattern */}
         <Box sx={{
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          opacity: 0.4,
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
+          `,
+        }} />
+        
+        <Typography variant="h4" sx={{ 
+          fontWeight: 800, 
+          color: '#1e3a8a',
+          mb: 4,
           zIndex: 1,
+        }}>
+          Scan Barcode
+        </Typography>
+        
+        {/* Scanner component */}
+        <Box sx={{ 
+          width: '100%', 
+          maxWidth: '450px',
+          zIndex: 1,
+          mb: 3,
         }}>
           <BarcodeScannerComponent 
             ref={scannerRef} 
@@ -644,37 +682,15 @@ export default function App() {
           />
         </Box>
         
-        {/* Scanning overlay with improved UI */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          padding: '16px 24px 24px',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%)',
-          color: 'white',
+        <Typography variant="body1" sx={{ 
+          color: '#475569',
           textAlign: 'center',
-          zIndex: 10,
-          pointerEvents: 'none',
+          maxWidth: 300,
+          mb: 2,
+          zIndex: 1,
         }}>
-          <Typography variant="h6" sx={{ 
-            fontWeight: 700, 
-            mb: 1,
-            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-            fontSize: '1.1rem',
-          }}>
-            Scanning for Barcode
-          </Typography>
-          <Typography variant="body2" sx={{ 
-            opacity: 0.9,
-            maxWidth: 280,
-            mx: 'auto',
-            fontSize: '0.9rem',
-            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-          }}>
-            Center the barcode within the frame
-          </Typography>
-        </Box>
+          Position the product barcode within the scanner frame
+        </Typography>
       </Box>
     );
   } else if (tab === 2) {

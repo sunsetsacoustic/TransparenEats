@@ -8,6 +8,7 @@ export interface BarcodeScannerComponentProps {
 
 export interface BarcodeScannerComponentHandle {
   stopScanner: () => void;
+  startScanner: () => void;
 }
 
 const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, BarcodeScannerComponentProps>(
@@ -24,12 +25,13 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
 
     useImperativeHandle(ref, () => ({
       stopScanner,
+      startScanner,
     }));
 
     // Scan line animation
     useEffect(() => {
       if (scanning) {
-        scanLineInterval.current = setInterval(() => {
+        scanLineInterval.current = window.setInterval(() => {
           setScanLinePos((pos) => {
             if (pos >= 95) {
               setScanLineDir(-1);
@@ -44,22 +46,23 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
       } else {
         setScanLinePos(0);
         setScanLineDir(1);
-        if (scanLineInterval.current) clearInterval(scanLineInterval.current);
+        if (scanLineInterval.current) {
+          window.clearInterval(scanLineInterval.current);
+          scanLineInterval.current = null;
+        }
       }
       return () => {
-        if (scanLineInterval.current) clearInterval(scanLineInterval.current);
+        if (scanLineInterval.current) {
+          window.clearInterval(scanLineInterval.current);
+          scanLineInterval.current = null;
+        }
       };
     }, [scanning, scanLineDir]);
 
     useEffect(() => {
       // Cleanup on unmount
       return () => {
-        if (html5QrCodeRef.current) {
-          html5QrCodeRef.current.stop().catch(() => {});
-          html5QrCodeRef.current.clear().catch(() => {});
-          html5QrCodeRef.current = null;
-        }
-        if (scanLineInterval.current) clearInterval(scanLineInterval.current);
+        stopScanner();
       };
     }, []);
 
@@ -72,6 +75,9 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
     }, []);
 
     const startScanner = async () => {
+      // Stop any existing scanner first
+      await stopScanner();
+      
       setError(null);
       setDebug('');
       setScanSuccess(false);
@@ -80,8 +86,8 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
       try {
         const config = {
           fps: 10,
-          qrbox: { width: 300, height: 220 },
-          aspectRatio: window.innerWidth / window.innerHeight,
+          qrbox: { width: 250, height: 180 },
+          aspectRatio: 1.33,
           formatsToSupport: [
             'QR_CODE',
             'EAN_13',
@@ -95,7 +101,12 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
             'CODE_93',
           ],
         };
-        html5QrCodeRef.current = new Html5Qrcode((videoRef.current as HTMLDivElement).id);
+        
+        if (!videoRef.current) {
+          throw new Error("Video container not available");
+        }
+        
+        html5QrCodeRef.current = new Html5Qrcode(videoRef.current.id);
         await html5QrCodeRef.current.start(
           { facingMode: 'environment' },
           config,
@@ -119,12 +130,22 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
     const stopScanner = async () => {
       setScanning(false);
       setDebug('');
+      
       if (html5QrCodeRef.current) {
         try {
-          await html5QrCodeRef.current.stop();
+          if (html5QrCodeRef.current.isScanning) {
+            await html5QrCodeRef.current.stop();
+          }
           await html5QrCodeRef.current.clear();
-        } catch (e) {}
+        } catch (e) {
+          console.log("Error stopping scanner:", e);
+        }
         html5QrCodeRef.current = null;
+      }
+      
+      if (scanLineInterval.current) {
+        window.clearInterval(scanLineInterval.current);
+        scanLineInterval.current = null;
       }
     };
 
@@ -133,18 +154,20 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        width: '100%', 
-        height: '100%',
+        width: '100%',
+        maxWidth: 400,
+        height: 400,
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        margin: '0 auto',
+        borderRadius: 16,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        background: '#f1f5f9',
       }}>
         <div
           id="barcode-video"
           ref={videoRef}
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
             width: '100%',
             height: '100%',
             overflow: 'hidden',
@@ -152,7 +175,8 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1
+            zIndex: 1,
+            borderRadius: 16,
           }}
         />
         
@@ -163,8 +187,8 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: '80%',
-          maxWidth: 300,
-          height: 220,
+          maxWidth: 250,
+          height: 180,
           borderRadius: 16,
           border: '2px solid rgba(255,255,255,0.6)',
           boxShadow: '0 0 0 1000px rgba(0, 0, 0, 0.5)',
@@ -179,9 +203,9 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
               left: '50%',
               transform: 'translateX(-50%)',
               width: '75%',
-              maxWidth: 280,
+              maxWidth: 230,
               height: 2,
-              top: `calc(50% - 110px + ${scanLinePos * 2.2}px)`,
+              top: `calc(50% - 90px + ${scanLinePos * 1.8}px)`,
               background: 'linear-gradient(90deg, rgba(0,234,255,0) 0%, #00eaff 50%, rgba(0,234,255,0) 100%)',
               opacity: 0.7,
               borderRadius: 2,
@@ -194,17 +218,17 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
         
         {/* Corners for scan area */}
         {scanning && [
-          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-145px, -105px) rotate(0deg)' },
-          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(145px, -105px) rotate(90deg)' },
-          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(145px, 105px) rotate(180deg)' },
-          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-145px, 105px) rotate(270deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-120px, -85px) rotate(0deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(120px, -85px) rotate(90deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(120px, 85px) rotate(180deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-120px, 85px) rotate(270deg)' },
         ].map((style, i) => (
           <div
             key={i}
             style={{
               position: 'absolute',
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
               border: '3px solid #00eaff',
               borderRight: 'none',
               borderBottom: 'none',
@@ -226,8 +250,8 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
               left: '50%',
               transform: 'translate(-50%, -50%)',
               width: '80%',
-              maxWidth: 300,
-              height: 220,
+              maxWidth: 250,
+              height: 180,
               background: 'rgba(0,255,128,0.18)',
               border: '2px solid #00ff99',
               borderRadius: 16,
@@ -243,7 +267,7 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
         {error && (
           <div style={{ 
             position: 'absolute', 
-            bottom: 70, 
+            bottom: 20, 
             left: 0, 
             width: '100%',
             background: 'rgba(255,0,0,0.7)',
