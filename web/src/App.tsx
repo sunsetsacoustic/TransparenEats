@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, AppBar, Toolbar, Chip, Card, CardContent, CardMedia } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, Chip, Card, CardContent, CardMedia } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
@@ -8,7 +8,6 @@ import HistoryList from './components/HistoryList';
 import SearchBar from './components/SearchBar';
 import BarcodeScannerComponent, { type BarcodeScannerComponentHandle } from './components/BarcodeScannerComponent';
 import type { Product, Dye, IngredientInfo } from './types';
-import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
