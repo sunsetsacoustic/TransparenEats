@@ -34,7 +34,7 @@ TransparenEats is a web application that helps users identify what's really in t
 
 ## Screenshots
 
-*[Insert screenshots of key screens here]*
+https://imgur.com/a/3iFRww4
 
 ## Tech Stack
 
