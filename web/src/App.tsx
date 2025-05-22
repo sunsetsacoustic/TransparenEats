@@ -116,6 +116,9 @@ export default function App() {
               nutriments: {
                 'energy-kcal_100g': hit.nf_calories,
               },
+              // Nutritionix is primarily US-based
+              countries: 'United States',
+              countries_tags: ['en:united-states'],
             };
             setProduct(nutriProduct);
             setSelectedHistoryProduct(nutriProduct);
@@ -153,6 +156,9 @@ export default function App() {
                 'sugars_100g': getNutrient('Sugars, total including NLEA'),
                 'sodium_100g': getNutrient('Sodium, Na'),
               },
+              // USDA is US-specific
+              countries: 'United States',
+              countries_tags: ['en:united-states'],
             };
             setProduct(usdaProduct);
             setSelectedHistoryProduct(usdaProduct);
@@ -168,12 +174,40 @@ export default function App() {
         // Continue to next API
       }
       
-      // 3. Try Open Food Facts
+      // 3. Try Open Food Facts - look for US product first
       try {
         const res = await fetch(`${OPEN_FOOD_FACTS_URL}/api/v2/product/${barcode}`);
         if (res.ok) {
           const data = await res.json();
           if (data && data.product) {
+            // Check if this is a US product
+            const isUSProduct = data.product.countries_tags && 
+              Array.isArray(data.product.countries_tags) &&
+              data.product.countries_tags.some((c: string) => c.includes('united-states'));
+            
+            // If not a US product, try to find a US version
+            if (!isUSProduct) {
+              try {
+                const usSearchRes = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(barcode)}&search_simple=1&action=process&json=1&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
+                if (usSearchRes.ok) {
+                  const usSearchData = await usSearchRes.json();
+                  if (usSearchData && usSearchData.products && usSearchData.products.length > 0) {
+                    // Use the US version instead
+                    setProduct(usSearchData.products[0]);
+                    setSelectedHistoryProduct(usSearchData.products[0]);
+                    addToHistory(usSearchData.products[0]);
+                    setTab(0);
+                    setSearch('');
+                    setLoading(false);
+                    return;
+                  }
+                }
+              } catch (usSearchErr) {
+                console.log('US product search failed:', usSearchErr);
+              }
+            }
+            
+            // If we're here, either it's a US product or we couldn't find a US version
             setProduct(data.product);
             setSelectedHistoryProduct(data.product);
             addToHistory(data.product);
@@ -188,12 +222,39 @@ export default function App() {
         // Continue to next API
       }
       
-      // 4. Final fallback: Open Beauty Facts
+      // 4. Final fallback: Open Beauty Facts - prefer US products
       try {
         const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/api/v2/product/${barcode}`);
         if (beautyRes.ok) {
           const beautyData = await beautyRes.json();
           if (beautyData && beautyData.product) {
+            // Check if this is a US product
+            const isUSProduct = beautyData.product.countries_tags && 
+              Array.isArray(beautyData.product.countries_tags) &&
+              beautyData.product.countries_tags.some((c: string) => c.includes('united-states'));
+            
+            // If not a US product, try to find a US version
+            if (!isUSProduct) {
+              try {
+                const usSearchRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(barcode)}&search_simple=1&action=process&json=1&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
+                if (usSearchRes.ok) {
+                  const usSearchData = await usSearchRes.json();
+                  if (usSearchData && usSearchData.products && usSearchData.products.length > 0) {
+                    // Use the US version instead
+                    setProduct(usSearchData.products[0]);
+                    setSelectedHistoryProduct(usSearchData.products[0]);
+                    addToHistory(usSearchData.products[0]);
+                    setTab(0);
+                    setSearch('');
+                    setLoading(false);
+                    return;
+                  }
+                }
+              } catch (usSearchErr) {
+                console.log('US product search failed:', usSearchErr);
+              }
+            }
+            
             setProduct(beautyData.product);
             setSelectedHistoryProduct(beautyData.product);
             addToHistory(beautyData.product);
@@ -234,6 +295,9 @@ export default function App() {
               nutriments: {
                 'energy-kcal_100g': hit.fields.nf_calories,
               },
+              // Nutritionix is primarily US-based
+              countries: 'United States',
+              countries_tags: ['en:united-states'],
             }));
             setSearchResults(nutriProducts);
             setLoading(false);
@@ -267,6 +331,9 @@ export default function App() {
                   'sugars_100g': getNutrient('Sugars, total including NLEA'),
                   'sodium_100g': getNutrient('Sodium, Na'),
                 },
+                // USDA is US-specific
+                countries: 'United States',
+                countries_tags: ['en:united-states'],
               };
             });
             setSearchResults(usdaProducts);
@@ -279,13 +346,18 @@ export default function App() {
         // Continue to next API
       }
       
-      // 3. Try Open Food Facts
+      // 3. Try Open Food Facts (with US filter)
       try {
-        const res = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+        const res = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=20&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
         if (res.ok) {
           const data = await res.json();
           if (data && data.products) {
-            setSearchResults(data.products);
+            // Filter to ensure only US products
+            const usProducts = data.products.filter((p: any) => {
+              const countries = (p.countries_tags || []);
+              return countries.some((c: string) => c.includes('united-states'));
+            });
+            setSearchResults(usProducts);
             setLoading(false);
             return;
           }
@@ -295,13 +367,18 @@ export default function App() {
         // Continue to next API
       }
       
-      // 4. Final fallback: Open Beauty Facts
+      // 4. Final fallback: Open Beauty Facts (with US filter)
       try {
-        const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=10`);
+        const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(search)}&search_simple=1&action=process&json=1&page_size=20&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
         if (beautyRes.ok) {
           const beautyData = await beautyRes.json();
           if (beautyData && beautyData.products) {
-            setSearchResults(beautyData.products);
+            // Filter to ensure only US products
+            const usProducts = beautyData.products.filter((p: any) => {
+              const countries = (p.countries_tags || []);
+              return countries.some((c: string) => c.includes('united-states'));
+            });
+            setSearchResults(usProducts);
             setLoading(false);
             return;
           }
@@ -370,10 +447,15 @@ export default function App() {
     if (tab !== 3) return;
     setTrendingLoading(true);
     setTrendingError(null);
-    fetch(`${BACKEND_URL}/api/v1/off/popular`)
+    fetch(`${BACKEND_URL}/api/v1/off/popular?country=united-states`)
       .then(res => res.json())
       .then(data => {
-        setTrending(data.products.slice(0, 8)); // Limit to 8 for UI
+        // Filter to ensure only US products
+        const usProducts = data.products.filter((p: any) => {
+          const countries = (p.countries_tags || []);
+          return countries.some((c: string) => c.includes('united-states'));
+        });
+        setTrending(usProducts.slice(0, 8)); // Limit to 8 for UI
         setTrendingLoading(false);
       })
       .catch(() => {
@@ -387,10 +469,15 @@ export default function App() {
     if (!selectedCategory) return;
     setCategoryProductsLoading(true);
     setCategoryProductsError(null);
-    fetch(`${BACKEND_URL}/api/v1/off/category/${selectedCategory}`)
+    fetch(`${BACKEND_URL}/api/v1/off/category/${selectedCategory}?country=united-states`)
       .then(res => res.json())
       .then(data => {
-        setCategoryProducts(data.products.slice(0, 12));
+        // Filter to ensure only US products
+        const usProducts = data.products.filter((p: any) => {
+          const countries = (p.countries_tags || []);
+          return countries.some((c: string) => c.includes('united-states'));
+        });
+        setCategoryProducts(usProducts.slice(0, 12));
         setCategoryProductsLoading(false);
       })
       .catch(() => {

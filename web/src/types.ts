@@ -39,6 +39,8 @@ export interface Product {
   fdcId?: string;
   image_url?: string;
   photo?: string;
+  countries?: string;
+  countries_tags?: string[];
 }
 
 export interface Dye {
