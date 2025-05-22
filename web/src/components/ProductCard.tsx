@@ -427,7 +427,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
       const info: Record<string, { name: string; code: string; description?: string }> = {};
       await Promise.all(additiveCodes.map(async (code) => {
         try {
-          const res = await fetch(`https://world.openfoodfacts.org/additive/${code}.json`);
+          // Use our proxy API endpoint instead of direct OpenFoodFacts API
+          const res = await fetch(`/api/additiveProxy/${code}`);
           const data = await res.json();
           if (data && data.name && data.name.en) {
             info[code] = {

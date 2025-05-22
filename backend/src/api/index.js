@@ -6,6 +6,7 @@ const multer = require('multer');
 const offRouter = require('./off');
 const nutritionixRouter = require('./nutritionix');
 const usdaRouter = require('./usda');
+const additiveProxyRouter = require('./additiveProxy');
 
 const router = express.Router();
 const upload = multer();
@@ -74,5 +75,6 @@ router.post('/uploadProduct', upload.fields([
 router.use('/off', offRouter);
 router.use('/nutritionix', nutritionixRouter);
 router.use('/usda', usdaRouter);
+router.use('/additiveProxy', additiveProxyRouter);
 
 module.exports = router;
