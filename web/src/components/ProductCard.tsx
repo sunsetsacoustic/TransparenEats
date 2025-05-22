@@ -438,7 +438,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
             : 'https://transparen-eats-backend.vercel.app';
           
           // Use our proxy API endpoint instead of direct OpenFoodFacts API
-          const res = await fetch(`${backendUrl}/api/additiveProxy/${cleanCode}`);
+          const res = await fetch(`${backendUrl}/api/v1/additiveProxy/${cleanCode}`);
           const data = await res.json();
           if (data && data.name && data.name.en) {
             info[code] = {
