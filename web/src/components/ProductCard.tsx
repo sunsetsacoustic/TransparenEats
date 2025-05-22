@@ -876,8 +876,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
 
   // Collapsible logic for ingredients
   const ingredientLines = (product.ingredients_text || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
-  const flaggedToShow = showAllFlagged ? flaggedIngredients : flaggedIngredients.slice(0, 3);
-  const flaggedHasMore = flaggedIngredients.length > 3;
 
   // Parse additive codes from product
   const additiveCodes = (() => {
