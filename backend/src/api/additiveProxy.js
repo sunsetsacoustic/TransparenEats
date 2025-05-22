@@ -10,11 +10,20 @@ const router = express.Router();
 router.get('/:code', async (req, res) => {
   try {
     const { code } = req.params;
-    // Sanitize the code parameter
-    const sanitizedCode = code.replace(/[^a-zA-Z0-9]/g, '');
+    // No need for additional sanitization as it's handled in frontend
     
     // Make the request to OpenFoodFacts
-    const response = await fetch(`https://world.openfoodfacts.org/additive/${sanitizedCode}.json`);
+    console.log(`Fetching additive data for: ${code}`);
+    const response = await fetch(`https://world.openfoodfacts.org/additive/${code}.json`);
+    
+    if (!response.ok) {
+      console.error(`Error response from OpenFoodFacts: ${response.status} ${response.statusText}`);
+      return res.status(response.status).json({ 
+        message: `OpenFoodFacts API returned ${response.status}`,
+        error: response.statusText
+      });
+    }
+    
     const data = await response.json();
     
     // Send back the data
