@@ -2,11 +2,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 const apiRouter = require('./src/api');
 
 var app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
