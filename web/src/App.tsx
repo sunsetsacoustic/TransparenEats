@@ -1108,7 +1108,18 @@ export default function App() {
             </DialogContent>
           </Dialog>
           {/* Product details dialog for history */}
-          <Dialog open={!!selectedHistoryProduct} onClose={() => setSelectedHistoryProduct(null)} fullWidth maxWidth="sm">
+          <Dialog 
+            open={!!selectedHistoryProduct} 
+            onClose={() => {
+              setSelectedHistoryProduct(null);
+              // Reset product state when dialog is closed from home tab
+              if (tab === 0) {
+                setProduct(null);
+              }
+            }} 
+            fullWidth 
+            maxWidth="sm"
+          >
             {selectedHistoryProduct ? (
               <ProductCard
                 product={selectedHistoryProduct}
