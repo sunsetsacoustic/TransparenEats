@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body, html {
@@ -14,6 +15,7 @@ body, html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f8fafc;
+  touch-action: manipulation;
 }
 
 #root {
@@ -25,14 +27,41 @@ body, html {
 
 /* Fix for scrollable content */
 .scrollable-content {
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain;
+  touch-action: pan-y;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  max-height: 100%;
+  position: relative;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .scrollable-content {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important; /* Force scroll on mobile */
+    max-height: 100%;
+    scrollbar-width: none; /* Hide scrollbar on Firefox */
+  }
+  
+  .scrollable-content::-webkit-scrollbar {
+    display: none; /* Hide scrollbar on WebKit browsers (Safari, Chrome) */
+  }
 }
 
 /* Apply momentum scrolling for iOS */
 @supports (-webkit-touch-callout: none) {
   .scrollable-content {
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
+  }
+  
+  body {
+    height: -webkit-fill-available;
+  }
+  
+  html {
+    height: -webkit-fill-available;
   }
 }
 

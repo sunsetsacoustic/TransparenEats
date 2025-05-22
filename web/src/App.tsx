@@ -754,14 +754,16 @@ export default function App() {
           maxWidth: 600,
           zIndex: 1,
           flex: 1,
-          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
           background: 'rgba(255,255,255,0.7)',
           backdropFilter: 'blur(10px)',
           borderRadius: 4,
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
           p: 2,
           WebkitOverflowScrolling: 'touch',
-          maxHeight: 'calc(100% - 120px)',
+          maxHeight: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 220px)' },
+          overflow: 'auto',
         }}
         className="scrollable-content"
         >
@@ -826,26 +828,31 @@ export default function App() {
           pointerEvents: 'none',
         }} />
         
+        <Typography variant="h4" sx={{ 
+          fontWeight: 800, 
+          color: '#1e3a8a',
+          mb: 3,
+          zIndex: 1,
+          width: '100%',
+          maxWidth: 600,
+        }}>
+          Browse Products
+        </Typography>
+        
         <Box sx={{ 
           width: '100%',
           maxWidth: 600,
           zIndex: 1,
           flex: 1,
-          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
           WebkitOverflowScrolling: 'touch',
+          overflow: 'auto',
+          maxHeight: { xs: 'calc(100vh - 150px)', sm: 'calc(100vh - 170px)' },
           pb: 4,
-          maxHeight: 'calc(100% - 20px)',
         }}
         className="scrollable-content"
         >
-          <Typography variant="h4" sx={{ 
-            fontWeight: 800, 
-            color: '#1e3a8a',
-            mb: 3,
-          }}>
-            Browse Products
-          </Typography>
-          
           <Box sx={{ mb: 4 }}>
             <Typography variant="h5" sx={{ 
               fontWeight: 700, 
@@ -1082,7 +1089,7 @@ export default function App() {
       maxWidth: '100%',
       overflow: 'hidden',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
-      position: 'absolute',
+      position: 'fixed',
       left: 0,
       top: 0,
       m: 0,
