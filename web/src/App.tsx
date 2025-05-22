@@ -331,114 +331,284 @@ export default function App() {
     content = product ? null : (
       <Box sx={{
         width: '100vw',
-        minHeight: '80vh',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
-        py: 6,
+        justifyContent: 'flex-start',
+        background: 'linear-gradient(135deg, #f0f4f8 0%, #d0e8fd 100%)',
+        py: 2,
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* Background patterns */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          opacity: 0.4,
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
+          `,
+        }} />
+
+        {/* App name and tagline with bold styling */}
+        <Box sx={{
+          width: '100vw',
+          textAlign: 'center',
+          mb: 2,
+          mt: 4,
+          position: 'relative',
+          zIndex: 1,
+        }}>
+          <Typography variant="h3" sx={{ 
+            fontWeight: 900, 
+            mb: 1, 
+            color: '#1e3a8a',
+            letterSpacing: '-0.5px',
+            textShadow: '1px 1px 0px rgba(255,255,255,0.5)',
+            fontFamily: '"Montserrat", sans-serif',
+          }}>
+            Ingredient <Box component="span" sx={{ color: '#4caf50' }}>Aware</Box>
+          </Typography>
+          <Typography variant="subtitle1" sx={{ 
+            color: '#2c5282', 
+            mb: 2, 
+            fontWeight: 500,
+            fontSize: '1.1rem',
+            maxWidth: '260px',
+            mx: 'auto',
+            lineHeight: 1.4,
+          }}>
+            Scan, search, and discover what's really in your food
+          </Typography>
+        </Box>
+
+        {/* Main content card with unique shape */}
         <Box sx={{
           width: '100vw',
           maxWidth: { xs: '100vw', sm: 420 },
           mx: 'auto',
-          p: { xs: 2, sm: 4 },
-          borderRadius: { xs: 0, sm: 5 },
-          boxShadow: '0 4px 32px 0 rgba(25, 118, 210, 0.08)',
-          background: '#fff',
+          mb: 4,
+          position: 'relative',
+          zIndex: 1,
+        }}>
+          <Box sx={{
+            p: { xs: 3, sm: 4 },
+            borderRadius: { xs: '40px 40px 0 0', sm: '40px' },
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 10px 40px -10px rgba(0, 105, 165, 0.3), 0 0 80px -20px rgba(76, 175, 80, 0.2)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            overflow: 'hidden',
+            borderBottom: { xs: 'none', sm: '4px solid #4caf50' },
+          }}>
+            {/* Food icon group */}
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: 1,
+              mb: 3
+            }}>
+              <Box sx={{ 
+                width: 60, 
+                height: 60, 
+                borderRadius: '20px', 
+                background: '#ebf8ee',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                transform: 'rotate(-5deg)'
+              }}>
+                🥦
+              </Box>
+              <Box sx={{ 
+                width: 60, 
+                height: 60, 
+                borderRadius: '20px', 
+                background: '#fff0e8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                transform: 'rotate(5deg)'
+              }}>
+                🥕
+              </Box>
+              <Box sx={{ 
+                width: 60, 
+                height: 60, 
+                borderRadius: '20px', 
+                background: '#e6f7ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 32,
+                transform: 'rotate(-5deg)'
+              }}>
+                🍎
+              </Box>
+            </Box>
+
+            {/* SearchBar with enhanced styling */}
+            <SearchBar
+              value={search}
+              onChange={val => {
+                if (typeof val === 'string') setSearch(val);
+                else if (val && 'target' in val) setSearch(val.target.value);
+              }}
+              onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
+              loading={loading}
+              options={searchResults}
+              onSelect={prod => {
+                setProduct(prod);
+                setSelectedHistoryProduct(prod);
+                addToHistory(prod);
+                setTab(0);
+                setSearch('');
+              }}
+              sx={{
+                mb: 3,
+                width: '100%',
+                '& .MuiInputBase-root': {
+                  borderRadius: 99,
+                  fontSize: 16,
+                  px: 2,
+                  py: 1.5,
+                  background: '#f1f5f9',
+                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.05)',
+                  border: '1px solid #e2e8f0',
+                  fontFamily: 'inherit',
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: '#94a3b8',
+                  opacity: 1,
+                },
+              }}
+            />
+            
+            {/* Scan Button with improved design */}
+            <Button
+              variant="contained"
+              fullWidth
+              size="large"
+              startIcon={<QrCodeScannerIcon />}
+              sx={{
+                borderRadius: 99,
+                fontWeight: 700,
+                fontSize: 18,
+                py: 2,
+                px: 2,
+                background: 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)',
+                color: '#fff',
+                boxShadow: '0 4px 14px 0 rgba(34, 197, 94, 0.4)',
+                mb: 0,
+                mt: 0,
+                transition: 'all 0.2s',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)',
+                  boxShadow: '0 6px 20px 0 rgba(34, 197, 94, 0.5)',
+                  transform: 'translateY(-2px)',
+                },
+                '&:active': {
+                  transform: 'translateY(0)',
+                  boxShadow: '0 2px 10px 0 rgba(34, 197, 94, 0.4)',
+                },
+              }}
+              onClick={() => setTab(1)}
+            >
+              Scan Product Barcode
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Feature cards */}
+        <Box sx={{
+          width: '100vw',
+          maxWidth: { xs: '100vw', sm: 420 },
+          mx: 'auto',
+          px: { xs: 3, sm: 0 },
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          mb: 4,
+          gap: 3,
+          zIndex: 1,
+          position: 'relative',
         }}>
-          {/* Organic Illustration */}
-          <Box sx={{ mb: 2 }}>
-            <span style={{ fontSize: 56, display: 'block' }}>🥦🥕🍃</span>
-          </Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: 'primary.main', fontFamily: 'Montserrat, Arial, sans-serif' }}>
-            Ingredient Aware
-          </Typography>
-          <Typography variant="subtitle1" sx={{ color: '#4caf50', mb: 3, fontWeight: 500 }}>
-            Discover what's really in your food.
-          </Typography>
-          {/* SearchBar with pill shape */}
-          <SearchBar
-            value={search}
-            onChange={val => {
-              if (typeof val === 'string') setSearch(val);
-              else if (val && 'target' in val) setSearch(val.target.value);
-            }}
-            onSearch={() => { setTab(3); setTimeout(searchProducts, 0); }}
-            loading={loading}
-            options={searchResults}
-            onSelect={prod => {
-              setProduct(prod);
-              setSelectedHistoryProduct(prod);
-              addToHistory(prod);
-              setTab(0);
-              setSearch('');
-            }}
-            sx={{
-              mb: 2,
-              '& .MuiInputBase-root': {
-                borderRadius: 99,
-                fontSize: 18,
-                px: 2,
-                background: '#f8fafc',
-              },
-            }}
-          />
-          {/* Scan Button */}
-          <Button
-            variant="contained"
-            fullWidth
-            size="large"
-            startIcon={<QrCodeScannerIcon />}
-            sx={{
-              borderRadius: 99,
-              fontWeight: 700,
-              fontSize: 20,
-              py: 2,
-              px: 2,
-              background: 'linear-gradient(90deg, #a8e063 0%, #56ab2f 100%)',
+          {/* Feature 1 */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            p: 3,
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+          }}>
+            <Box sx={{ 
+              width: 50, 
+              height: 50, 
+              borderRadius: '15px', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
               color: '#fff',
-              boxShadow: '0 2px 12px 0 rgba(76, 175, 80, 0.12)',
-              mb: 2,
-              mt: 1,
-              transition: 'background 0.2s, box-shadow 0.2s',
-              '&:hover': {
-                background: 'linear-gradient(90deg, #56ab2f 0%, #a8e063 100%)',
-                boxShadow: '0 4px 24px 0 rgba(76, 175, 80, 0.18)',
-              },
-            }}
-            onClick={() => setTab(1)}
-          >
-            Scan Barcode
-          </Button>
-        </Box>
-        {/* Featured Categories Card */}
-        <Box sx={{
-          width: '100vw',
-          maxWidth: { xs: '100vw', sm: 420 },
-          mx: 'auto',
-          mt: 2,
-          p: 3,
-          borderRadius: { xs: 0, sm: 4 },
-          background: 'linear-gradient(90deg, #e8f5e9 0%, #fce4ec 100%)',
-          boxShadow: '0 1px 8px 0 rgba(76, 175, 80, 0.06)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-        }}>
-          <span style={{ fontSize: 32 }}>🌱</span>
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#388e3c' }}>
-              Featured categories coming soon!
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#888' }}>
-              Explore healthy, plant-based, and trending foods soon.
-            </Typography>
+              fontSize: 24,
+            }}>
+              🚫
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1e40af', mb: 0.5 }}>
+                Identify Food Dyes
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.4 }}>
+                Scan products to detect artificial food dyes and additives
+              </Typography>
+            </Box>
+          </Box>
+          
+          {/* Feature 2 */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            p: 3,
+            borderRadius: 4,
+            background: 'rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+          }}>
+            <Box sx={{ 
+              width: 50, 
+              height: 50, 
+              borderRadius: '15px', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              color: '#fff',
+              fontSize: 24,
+            }}>
+              ⚠️
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1e40af', mb: 0.5 }}>
+                Ingredient Warnings
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.4 }}>
+                Get alerts about potentially concerning ingredients
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -446,45 +616,388 @@ export default function App() {
   } else if (tab === 1) {
     // Scan
     content = (
-      <BarcodeScannerComponent ref={scannerRef} onDetected={fetchProductByBarcode} autoStart={true} />
+      <Box sx={{
+        width: '100vw',
+        height: 'calc(100vh - 56px - 56px)',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+      }}>
+        <BarcodeScannerComponent ref={scannerRef} onDetected={fetchProductByBarcode} autoStart={true} />
+        
+        {/* Scanning overlay with improved UI */}
+        <Box sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          padding: 3,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+          color: 'white',
+          textAlign: 'center',
+          zIndex: 10,
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+            Scanning for Barcode
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+            Center the barcode within the frame
+          </Typography>
+        </Box>
+      </Box>
     );
   } else if (tab === 2) {
     // History
     content = (
-      <HistoryList history={history} onSelect={(prod) => setSelectedHistoryProduct(prod)} />
+      <Box sx={{
+        width: '100vw',
+        height: 'calc(100vh - 56px - 56px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #f0f4f8 0%, #d0e8fd 100%)',
+        position: 'relative',
+        py: 3,
+        px: 2,
+        overflow: 'hidden',
+      }}>
+        {/* Background pattern */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          opacity: 0.4,
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
+          `,
+        }} />
+        
+        <Box sx={{ 
+          width: '100%',
+          maxWidth: 600,
+          zIndex: 1,
+          mb: 2,
+        }}>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 800, 
+            color: '#1e3a8a',
+            mb: 1,
+          }}>
+            Scan History
+          </Typography>
+          <Typography variant="body1" sx={{ 
+            color: '#475569',
+            mb: 3,
+          }}>
+            Your recently scanned or searched products
+          </Typography>
+        </Box>
+        
+        <Box sx={{ 
+          width: '100%',
+          maxWidth: 600,
+          zIndex: 1,
+          flex: 1,
+          overflowY: 'auto',
+          background: 'rgba(255,255,255,0.7)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 4,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+          p: 2,
+        }}>
+          <HistoryList 
+            history={history} 
+            onSelect={(prod) => setSelectedHistoryProduct(prod)} 
+          />
+          
+          {history.length === 0 && (
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              py: 8,
+              opacity: 0.7,
+            }}>
+              <Box sx={{ fontSize: 64, mb: 2 }}>📋</Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#64748b', mb: 1 }}>
+                No History Yet
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#94a3b8', textAlign: 'center', maxWidth: 300 }}>
+                Your scan and search history will appear here
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
     );
   } else if (tab === 3) {
     // Products
     content = (
-      <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto', mt: 4, p: 3, borderRadius: 4, background: '#fff', boxShadow: '0 2px 16px 0 rgba(25, 118, 210, 0.08)' }}>
-        <Typography variant="h5" sx={{ fontWeight: 900, mb: 2, color: 'primary.main' }}>Browse Products</Typography>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Categories</Typography>
-        {categoriesLoading ? <CircularProgress /> : categoriesError ? <Typography color="error">{categoriesError}</Typography> : (
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
-            {categories.map(cat => (
-              <Chip
-                key={cat.id}
-                label={cat.name}
-                clickable
-                color={selectedCategory === cat.id.replace(/^en:/, "") ? 'primary' : 'default'}
-                onClick={() => setSelectedCategory(cat.id.replace(/^en:/, ""))}
-                sx={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}
-              />
-            ))}
+      <Box sx={{
+        width: '100vw',
+        height: 'calc(100vh - 56px - 56px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #f0f4f8 0%, #d0e8fd 100%)',
+        position: 'relative',
+        py: 3,
+        px: 2,
+        overflow: 'hidden',
+      }}>
+        {/* Background pattern */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          opacity: 0.4,
+          background: `
+            radial-gradient(circle at 20% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
+          `,
+        }} />
+        
+        <Box sx={{ 
+          width: '100%',
+          maxWidth: 600,
+          zIndex: 1,
+          flex: 1,
+          overflowY: 'auto',
+        }}>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 800, 
+            color: '#1e3a8a',
+            mb: 3,
+          }}>
+            Browse Products
+          </Typography>
+          
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h5" sx={{ 
+              fontWeight: 700, 
+              color: '#334155',
+              fontSize: '1.25rem',
+              position: 'relative',
+              display: 'inline-block',
+              mb: 2,
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: 40,
+                height: 3,
+                borderRadius: 2,
+                background: '#4ade80',
+              }
+            }}>
+              Categories
+            </Typography>
+            
+            {categoriesLoading ? (
+              <Box sx={{ py: 3, display: 'flex', justifyContent: 'center' }}>
+                <CircularProgress size={30} sx={{ color: '#60a5fa' }} />
+              </Box>
+            ) : categoriesError ? (
+              <Typography color="error" sx={{ py: 2 }}>{categoriesError}</Typography>
+            ) : (
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 1.5, 
+                flexWrap: 'wrap', 
+                mb: 3,
+                mt: 2,
+              }}>
+                {categories.map(cat => (
+                  <Chip
+                    key={cat.id}
+                    label={cat.name}
+                    clickable
+                    color={selectedCategory === cat.id.replace(/^en:/, "") ? 'primary' : 'default'}
+                    onClick={() => setSelectedCategory(cat.id.replace(/^en:/, ""))}
+                    sx={{ 
+                      minWidth: 100, 
+                      fontWeight: 600, 
+                      fontSize: 14,
+                      borderRadius: '10px',
+                      px: 1,
+                      '&.MuiChip-colorPrimary': {
+                        background: 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)',
+                        boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+                      },
+                      '&.MuiChip-colorDefault': {
+                        background: 'rgba(255,255,255,0.9)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
           </Box>
-        )}
-        {selectedCategory && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Products in "{categories.find(c => c.id.replace(/^en:/, "") === selectedCategory)?.name || selectedCategory}"</Typography>
-            {categoryProductsLoading ? <CircularProgress /> : categoryProductsError ? <Typography color="error">{categoryProductsError}</Typography> : (
-              <Grid container spacing={2}>
-                {categoryProducts.map(prod => (
-                  <Grid item xs={12} sm={6} md={4} key={prod.code}>
-                    <Card sx={{ cursor: 'pointer', height: '100%' }} onClick={() => setProduct(prod)}>
-                      {prod.image_front_url && <CardMedia component="img" height="120" image={prod.image_front_url} alt={prod.product_name} />}
-                      <CardContent>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{prod.product_name}</Typography>
-                        <Typography variant="body2" color="text.secondary">{prod.brands}</Typography>
+          
+          {selectedCategory && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 700, 
+                color: '#334155',
+                fontSize: '1.25rem',
+                position: 'relative',
+                display: 'inline-block',
+                mb: 2,
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -8,
+                  left: 0,
+                  width: 40,
+                  height: 3,
+                  borderRadius: 2,
+                  background: '#60a5fa',
+                }
+              }}>
+                Products in "{categories.find(c => c.id.replace(/^en:/, "") === selectedCategory)?.name || selectedCategory}"
+              </Typography>
+              
+              {categoryProductsLoading ? (
+                <Box sx={{ py: 3, display: 'flex', justifyContent: 'center' }}>
+                  <CircularProgress size={30} sx={{ color: '#60a5fa' }} />
+                </Box>
+              ) : categoryProductsError ? (
+                <Typography color="error" sx={{ py: 2 }}>{categoryProductsError}</Typography>
+              ) : (
+                <Grid container spacing={2} sx={{ mt: 2 }}>
+                  {categoryProducts.map(prod => (
+                    <Grid item xs={12} sm={6} md={4} key={prod.code}>
+                      <Card 
+                        sx={{ 
+                          cursor: 'pointer', 
+                          height: '100%',
+                          borderRadius: 3,
+                          overflow: 'hidden',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                          '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                          }
+                        }} 
+                        onClick={() => setProduct(prod)}
+                      >
+                        {prod.image_front_url && (
+                          <CardMedia 
+                            component="img" 
+                            height="140" 
+                            image={prod.image_front_url} 
+                            alt={prod.product_name}
+                            sx={{ objectFit: 'cover' }}
+                          />
+                        )}
+                        <CardContent sx={{ p: 2 }}>
+                          <Typography variant="subtitle1" sx={{ 
+                            fontWeight: 700,
+                            fontSize: '1rem',
+                            mb: 0.5,
+                            lineHeight: 1.3,
+                          }}>
+                            {prod.product_name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ 
+                            color: '#64748b',
+                            fontSize: '0.875rem',
+                          }}>
+                            {prod.brands}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Box>
+          )}
+          
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h5" sx={{ 
+              fontWeight: 700, 
+              color: '#334155',
+              fontSize: '1.25rem',
+              position: 'relative',
+              display: 'inline-block',
+              mb: 2,
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: 40,
+                height: 3,
+                borderRadius: 2,
+                background: '#f59e0b',
+              }
+            }}>
+              Trending Foods
+            </Typography>
+            
+            {trendingLoading ? (
+              <Box sx={{ py: 3, display: 'flex', justifyContent: 'center' }}>
+                <CircularProgress size={30} sx={{ color: '#60a5fa' }} />
+              </Box>
+            ) : trendingError ? (
+              <Typography color="error" sx={{ py: 2 }}>{trendingError}</Typography>
+            ) : (
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                {trending.map(prod => (
+                  <Grid item xs={6} sm={4} md={3} key={prod.code}>
+                    <Card 
+                      sx={{ 
+                        cursor: 'pointer', 
+                        height: '100%',
+                        borderRadius: 3,
+                        overflow: 'hidden',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                        }
+                      }} 
+                      onClick={() => setProduct(prod)}
+                    >
+                      {prod.image_front_url && (
+                        <CardMedia 
+                          component="img" 
+                          height="120" 
+                          image={prod.image_front_url} 
+                          alt={prod.product_name}
+                          sx={{ objectFit: 'cover' }}
+                        />
+                      )}
+                      <CardContent sx={{ p: 2 }}>
+                        <Typography variant="subtitle1" sx={{ 
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          mb: 0.5,
+                          lineHeight: 1.3,
+                        }}>
+                          {prod.product_name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                          color: '#64748b',
+                          fontSize: '0.75rem',
+                        }}>
+                          {prod.brands}
+                        </Typography>
                       </CardContent>
                     </Card>
                   </Grid>
@@ -492,23 +1005,7 @@ export default function App() {
               </Grid>
             )}
           </Box>
-        )}
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, mt: 4 }}>Trending Foods</Typography>
-        {trendingLoading ? <CircularProgress /> : trendingError ? <Typography color="error">{trendingError}</Typography> : (
-          <Grid container spacing={2}>
-            {trending.map(prod => (
-              <Grid item xs={12} sm={6} md={3} key={prod.code}>
-                <Card sx={{ cursor: 'pointer', height: '100%' }} onClick={() => setProduct(prod)}>
-                  {prod.image_front_url && <CardMedia component="img" height="120" image={prod.image_front_url} alt={prod.product_name} />}
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{prod.product_name}</Typography>
-                    <Typography variant="body2" color="text.secondary">{prod.brands}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        </Box>
       </Box>
     );
   }
@@ -542,8 +1039,9 @@ export default function App() {
         {/* AppBar/Header */}
         <AppBar position="fixed" color="inherit" elevation={1} sx={{
           background: 'rgba(255,255,255,0.95)',
-          boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
-          borderBottom: '1px solid #e0e0e0',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.06)',
+          borderBottom: '1px solid rgba(226,232,240,0.8)',
           zIndex: 1201,
           width: '100vw',
           left: 0,
@@ -554,7 +1052,33 @@ export default function App() {
           px: { xs: 0, sm: 2 },
         }}>
           <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
-            <EmojiFoodBeverageIcon color="primary" sx={{ fontSize: 28, mr: 1 }} />
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1.5 
+            }}>
+              <Box sx={{ 
+                width: 32, 
+                height: 32, 
+                borderRadius: '10px', 
+                background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+              }}>
+                <EmojiFoodBeverageIcon sx={{ fontSize: 18, color: '#fff' }} />
+              </Box>
+              <Typography variant="h6" sx={{ 
+                fontWeight: 800, 
+                color: '#1e3a8a',
+                fontSize: '1.125rem',
+                letterSpacing: '-0.5px',
+                fontFamily: '"Montserrat", sans-serif',
+              }}>
+                Ingredient <Box component="span" sx={{ color: '#22c55e' }}>Aware</Box>
+              </Typography>
+            </Box>
           </Toolbar>
         </AppBar>
         {/* Main Content */}
@@ -600,10 +1124,11 @@ export default function App() {
           left: 0,
           bottom: 0,
           width: '100vw',
-          boxShadow: '0 -2px 12px 0 rgba(0,0,0,0.08)',
-          background: '#fff',
+          boxShadow: '0 -2px 16px 0 rgba(0,0,0,0.08)',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(10px)',
           zIndex: 1202,
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid rgba(226,232,240,0.8)',
           pb: { xs: 'env(safe-area-inset-bottom)', sm: 0 },
           px: { xs: 0, sm: 0 },
           display: 'flex',
