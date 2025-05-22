@@ -330,7 +330,7 @@ export default function App() {
     // Home
     content = product ? null : (
       <Box sx={{
-        width: '100vw',
+        width: '100%',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -359,7 +359,7 @@ export default function App() {
 
         {/* App name and tagline with bold styling */}
         <Box sx={{
-          width: '100vw',
+          width: '100%',
           textAlign: 'center',
           mb: 2,
           mt: 4,
@@ -391,8 +391,8 @@ export default function App() {
 
         {/* Main content card with unique shape */}
         <Box sx={{
-          width: '100vw',
-          maxWidth: { xs: '100vw', sm: 420 },
+          width: '100%',
+          maxWidth: { xs: '100%', sm: 420 },
           mx: 'auto',
           mb: 4,
           position: 'relative',
@@ -533,8 +533,8 @@ export default function App() {
 
         {/* Feature cards */}
         <Box sx={{
-          width: '100vw',
-          maxWidth: { xs: '100vw', sm: 420 },
+          width: '100%',
+          maxWidth: { xs: '100%', sm: 420 },
           mx: 'auto',
           px: { xs: 3, sm: 0 },
           display: 'flex',
@@ -617,7 +617,7 @@ export default function App() {
     // Scan
     content = (
       <Box sx={{
-        width: '100vw',
+        width: '100%',
         height: 'calc(100vh - 56px - 56px)',
         display: 'flex',
         flexDirection: 'column',
@@ -650,7 +650,7 @@ export default function App() {
     // History
     content = (
       <Box sx={{
-        width: '100vw',
+        width: '100%',
         height: 'calc(100vh - 56px - 56px)',
         display: 'flex',
         flexDirection: 'column',
@@ -740,7 +740,7 @@ export default function App() {
     // Products
     content = (
       <Box sx={{
-        width: '100vw',
+        width: '100%',
         height: 'calc(100vh - 56px - 56px)',
         display: 'flex',
         flexDirection: 'column',
@@ -1014,11 +1014,15 @@ export default function App() {
     <Box sx={{
       minHeight: '100vh',
       height: '100vh',
-      width: '100vw',
+      width: '100%',
+      maxWidth: '100%',
       overflow: 'hidden',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%)',
-      position: 'relative',
-      pb: 0,
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      m: 0,
+      p: 0,
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
@@ -1035,7 +1039,7 @@ export default function App() {
         zIndex: 0,
       },
     }}>
-      <Box sx={{ position: 'relative', zIndex: 1, width: '100vw', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100%', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* AppBar/Header */}
         <AppBar position="fixed" color="inherit" elevation={1} sx={{
           background: 'rgba(255,255,255,0.95)',
@@ -1043,7 +1047,7 @@ export default function App() {
           boxShadow: '0 2px 12px 0 rgba(0,0,0,0.06)',
           borderBottom: '1px solid rgba(226,232,240,0.8)',
           zIndex: 1201,
-          width: '100vw',
+          width: '100%',
           left: 0,
           top: 0,
           display: 'flex',
@@ -1086,8 +1090,8 @@ export default function App() {
           pt: { xs: 0, sm: 0 },
           pb: 0,
           px: { xs: 2, sm: 0 },
-          width: '100vw',
-          maxWidth: '100vw',
+          width: '100%',
+          maxWidth: '100%',
           minHeight: 'calc(100vh - 56px - 56px)',
           height: 'calc(100vh - 56px - 56px)',
           boxSizing: 'border-box',
@@ -1134,7 +1138,7 @@ export default function App() {
           position: 'fixed',
           left: 0,
           bottom: 0,
-          width: '100vw',
+          width: '100%',
           boxShadow: '0 -2px 16px 0 rgba(0,0,0,0.08)',
           background: 'rgba(255,255,255,0.95)',
           backdropFilter: 'blur(10px)',
