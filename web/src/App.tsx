@@ -725,6 +725,7 @@ export default function App() {
             radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
             radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
           `,
+          pointerEvents: 'none',
         }} />
         
         <Box sx={{ 
@@ -760,6 +761,7 @@ export default function App() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
           p: 2,
           WebkitOverflowScrolling: 'touch',
+          maxHeight: 'calc(100% - 120px)',
         }}
         className="scrollable-content"
         >
@@ -821,6 +823,7 @@ export default function App() {
             radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
             radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
           `,
+          pointerEvents: 'none',
         }} />
         
         <Box sx={{ 
@@ -830,6 +833,8 @@ export default function App() {
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
+          pb: 4,
+          maxHeight: 'calc(100% - 20px)',
         }}
         className="scrollable-content"
         >
@@ -1116,6 +1121,7 @@ export default function App() {
           justifyContent: 'flex-start',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
+          position: 'relative',
         }}
         className="scrollable-content"
         >
