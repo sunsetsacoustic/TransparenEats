@@ -54,12 +54,40 @@ const getScoreLabel = (score: number) => {
 // Add allergen and additive descriptions mapping
 const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'critical' | 'caution' }> = {
   // Preservatives
+  'E200': { 
+    description: 'Caution: Common preservative; generally recognized as safe, but may rarely cause mild skin irritation or allergic reactions in very sensitive individuals.',
+    severity: 'caution'
+  },
   'E202': { 
     description: 'Caution: Generally safe, but rarely reported to cause mild skin irritation, digestive upset, or allergic-like reactions in sensitive individuals.',
     severity: 'caution'
   },
+  'E210': { 
+    description: 'Caution: Found naturally in some fruits, also used as a preservative. Similar concerns to sodium benzoate regarding potential for hyperactivity in sensitive individuals, especially with certain colorings.',
+    severity: 'caution'
+  },
   'E211': { 
     description: 'Caution: In rare cases, may trigger hyperactive behavior, especially when combined with artificial colors. Can form harmful benzene in presence of Vitamin C.',
+    severity: 'caution'
+  },
+  'E212': { 
+    description: 'Caution: Preservative, closely related to sodium benzoate. Can cause similar concerns, such as triggering hyperactivity in sensitive individuals or forming harmful benzene in presence of Vitamin C.',
+    severity: 'caution'
+  },
+  'E249': { 
+    description: 'Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake.',
+    severity: 'caution'
+  },
+  'E250': { 
+    description: 'Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake.',
+    severity: 'caution'
+  },
+  'E251': { 
+    description: 'Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake.',
+    severity: 'caution'
+  },
+  'E252': { 
+    description: 'Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake.',
     severity: 'caution'
   },
   'E282': { 
@@ -76,7 +104,39 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   },
   
   // Colorings
+  'E104': { 
+    description: 'Caution: Artificial yellow food coloring. Concerns regarding hyperactivity in children, particularly when combined with benzoates.',
+    severity: 'caution'
+  },
+  'E124': { 
+    description: 'Caution: Artificial red food coloring. Like other azo dyes, it has been linked to hyperactivity in children.',
+    severity: 'caution'
+  },
+  'E132': { 
+    description: 'Caution: Artificial blue food coloring. While generally considered safe, some reports of mild sensitivities or skin reactions exist.',
+    severity: 'caution'
+  },
+  'E143': { 
+    description: 'Caution: Artificial green food coloring. While generally considered safe, some reports of mild sensitivities or skin reactions exist.',
+    severity: 'caution'
+  },
   'E150': { 
+    description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
+    severity: 'caution'
+  },
+  'E150A': { 
+    description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
+    severity: 'caution'
+  },
+  'E150B': { 
+    description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
+    severity: 'caution'
+  },
+  'E150C': { 
+    description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
+    severity: 'caution'
+  },
+  'E150D': { 
     description: 'Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies.',
     severity: 'caution'
   },
@@ -86,6 +146,10 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   },
   'E100': { 
     description: 'Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions.',
+    severity: 'caution'
+  },
+  'E127': { 
+    description: 'Caution: Artificial red coloring (Erythrosine). May cause sensitivities in some individuals.',
     severity: 'caution'
   },
   'E171': { 
@@ -106,6 +170,16 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   },
   'E133': { 
     description: 'Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported.',
+    severity: 'caution'
+  },
+  
+  // Acidity Regulators / Antioxidants
+  'E330': { 
+    description: 'Caution: A common acidifier, flavor enhancer, and preservative naturally found in citrus fruits. While generally safe, very rarely, sensitive individuals may experience mild digestive upset or mouth irritation.',
+    severity: 'caution'
+  },
+  'E338': { 
+    description: 'Caution: Primarily used as an acidifier in soft drinks. High intake may be linked to concerns about bone health (interfering with calcium absorption) and dental enamel erosion.',
     severity: 'caution'
   },
   
@@ -144,6 +218,26 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   },
   
   // Sweeteners
+  'E420': { 
+    description: 'Caution: Sugar alcohol (Sorbitol). Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to its laxative effect.',
+    severity: 'caution'
+  },
+  'E421': { 
+    description: 'Caution: Sugar alcohol (Mannitol). Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to its laxative effect.',
+    severity: 'caution'
+  },
+  'E965': { 
+    description: 'Caution: Sugar alcohol (Maltitol). Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to its laxative effect.',
+    severity: 'caution'
+  },
+  'E967': { 
+    description: 'Caution: Sugar alcohol (Xylitol). Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to its laxative effect.',
+    severity: 'caution'
+  },
+  'E968': { 
+    description: 'Caution: Sugar alcohol (Erythritol). Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to its laxative effect.',
+    severity: 'caution'
+  },
   'E951': { 
     description: 'Caution: Artificial sweetener. Controversial for some consumers; individuals with Phenylketonuria (PKU) must strictly avoid due to its phenylalanine content. Some sensitive individuals report headaches or other symptoms.',
     severity: 'caution'
@@ -164,6 +258,38 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
   // Flavor Enhancers
   'E621': { 
     description: 'Caution: Flavor enhancer; can trigger a set of symptoms (e.g., headache, flushing, sweating, chest pain) in sensitive individuals, often referred to as \'MSG symptom complex\'.',
+    severity: 'caution'
+  },
+  'E626': { 
+    description: 'Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract.',
+    severity: 'caution'
+  },
+  'E627': { 
+    description: 'Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract.',
+    severity: 'caution'
+  },
+  'E628': { 
+    description: 'Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract.',
+    severity: 'caution'
+  },
+  'E629': { 
+    description: 'Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract.',
+    severity: 'caution'
+  },
+  'E630': { 
+    description: 'Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract.',
+    severity: 'caution'
+  },
+  'E631': { 
+    description: 'Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract.',
+    severity: 'caution'
+  },
+  'E632': { 
+    description: 'Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract.',
+    severity: 'caution'
+  },
+  'E633': { 
+    description: 'Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract.',
     severity: 'caution'
   },
   
@@ -205,6 +331,16 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
     severity: 'critical'
   },
   
+  // Anti-caking Agents
+  'E170': { 
+    description: 'Caution: A common mineral used as an anti-caking agent or whitener. Generally safe, but very high doses can cause mild digestive upset like constipation.',
+    severity: 'caution'
+  },
+  'E551': { 
+    description: 'Caution: Anti-caking agent. Concerns about potential effects mainly apply to nanoparticle forms; generally considered inert in the digestive system, but some choose to avoid for caution.',
+    severity: 'caution'
+  },
+  
   // Other common additives
   'E450': { 
     description: 'Caution: Phosphate additive used as an emulsifier, stabilizer and acidity regulator. May contribute to imbalance in calcium-phosphorus metabolism with long-term consumption.',
@@ -233,18 +369,29 @@ const ADDITIVE_DESCRIPTIONS: Record<string, { description: string; severity: 'cr
 };
 
 const ADDITIVE_NAMES: Record<string, string> = {
+  'E100': 'Curcumin',
+  'E102': 'Tartrazine',
+  'E104': 'Quinoline Yellow',
+  'E110': 'Sunset Yellow',
+  'E124': 'Ponceau 4R',
+  'E127': 'Erythrosine',
+  'E129': 'Allura Red AC',
+  'E132': 'Indigo Carmine',
+  'E133': 'Brilliant Blue FCF',
+  'E143': 'Fast Green FCF',
+  'E150': 'Caramel',
+  'E150A': 'Plain Caramel',
+  'E150B': 'Caustic Sulphite Caramel',
+  'E150C': 'Ammonia Caramel',
+  'E150D': 'Sulphite Ammonia Caramel',
+  'E160B': 'Annatto',
+  'E170': 'Calcium Carbonate',
   'E171': 'Titanium Dioxide',
+  'E200': 'Sorbic Acid',
   'E202': 'Potassium Sorbate',
-  'E282': 'Calcium Propionate',
-  'E322': 'Lecithin',
-  'E322I': 'Lecithin',
-  'E450': 'Diphosphates',
-  'E450I': 'Disodium Diphosphate',
-  'E471': 'Mono/Diglycerides',
-  'E472E': 'Mono/Diglyceride Esters',
-  'E500': 'Sodium Carbonates',
-  'E500II': 'Sodium Bicarbonate',
-  'E930': 'Calcium Peroxide',
+  'E210': 'Benzoic Acid',
+  'E211': 'Sodium Benzoate',
+  'E212': 'Potassium Benzoate',
   'E220': 'Sulfur Dioxide',
   'E221': 'Sodium Sulfite',
   'E222': 'Sodium Bisulfite',
@@ -254,25 +401,48 @@ const ADDITIVE_NAMES: Record<string, string> = {
   'E226': 'Calcium Sulfite',
   'E227': 'Calcium Hydrogen Sulfite',
   'E228': 'Potassium Hydrogen Sulfite',
-  'E621': 'Monosodium Glutamate',
-  'E100': 'Curcumin',
-  'E129': 'Allura Red AC',
-  'E102': 'Tartrazine',
-  'E110': 'Sunset Yellow',
-  'E133': 'Brilliant Blue FCF',
-  'E150': 'Caramel',
-  'E160B': 'Annatto',
+  'E249': 'Potassium Nitrite',
+  'E250': 'Sodium Nitrite',
+  'E251': 'Sodium Nitrate',
+  'E252': 'Potassium Nitrate',
+  'E282': 'Calcium Propionate',
   'E320': 'BHA',
   'E321': 'BHT',
+  'E322': 'Lecithin',
+  'E322I': 'Lecithin',
+  'E330': 'Citric Acid',
+  'E338': 'Phosphoric Acid',
   'E407': 'Carrageenan',
   'E412': 'Guar Gum',
   'E415': 'Xanthan Gum',
+  'E420': 'Sorbitol',
+  'E421': 'Mannitol',
   'E433': 'Polysorbate 80',
   'E440': 'Pectin',
+  'E450': 'Diphosphates',
+  'E450I': 'Disodium Diphosphate',
+  'E471': 'Mono/Diglycerides',
+  'E472E': 'Mono/Diglyceride Esters',
+  'E500': 'Sodium Carbonates',
+  'E500II': 'Sodium Bicarbonate',
+  'E551': 'Silicon Dioxide',
+  'E621': 'Monosodium Glutamate',
+  'E626': 'Guanylic Acid',
+  'E627': 'Disodium Guanylate',
+  'E628': 'Dipotassium Guanylate',
+  'E629': 'Calcium Guanylate',
+  'E630': 'Inosinic Acid',
+  'E631': 'Disodium Inosinate',
+  'E632': 'Dipotassium Inosinate',
+  'E633': 'Calcium Inosinate',
+  'E930': 'Calcium Peroxide',
   'E950': 'Acesulfame K',
   'E951': 'Aspartame',
   'E954': 'Saccharin',
   'E955': 'Sucralose',
+  'E965': 'Maltitol',
+  'E967': 'Xylitol',
+  'E968': 'Erythritol'
 };
 
 // Define nutrient fields outside components for reuse
@@ -419,52 +589,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     }
   })();
 
-  // Fetch additive names from Open Food Facts
   useEffect(() => {
-    let cancelled = false;
-    async function fetchAdditives() {
-      setAdditiveLoading(true);
-      const info: Record<string, { name: string; code: string; description?: string }> = {};
-      await Promise.all(additiveCodes.map(async (code) => {
-        try {
-          // Clean up the code for URL - remove colons and non-alphanumeric characters
-          const cleanCode = code.replace(/[^a-zA-Z0-9]/g, '');
-          
-          // Use absolute URL to backend API
-          // Check if we're in development mode based on window.location.hostname
-          const isDevelopment = window.location.hostname === 'localhost';
-          const backendUrl = isDevelopment 
-            ? 'http://localhost:3000'
-            : 'https://transparen-eats-backend.vercel.app';
-          
-          // Use our proxy API endpoint instead of direct OpenFoodFacts API
-          const res = await fetch(`${backendUrl}/api/v1/additiveProxy/${cleanCode}`);
-          const data = await res.json();
-          if (data && data.name && data.name.en) {
-            info[code] = {
-              name: data.name.en,
-              code,
-              description: data.wiki_data && data.wiki_data.description && data.wiki_data.description.en
-                ? data.wiki_data.description.en
-                : data.description && data.description.en
-                  ? data.description.en
-                  : undefined,
-            };
-          } else {
-            info[code] = { name: code.toUpperCase(), code };
-          }
-        } catch {
-          info[code] = { name: code.toUpperCase(), code };
-        }
-      }));
-      if (!cancelled) {
-        setAdditiveInfo(info);
-        setAdditiveLoading(false);
-      }
-    }
-    if (additiveCodes.length > 0) fetchAdditives();
-    else setAdditiveInfo({});
-    return () => { cancelled = true; };
+    // Use local database instead of API
+    const info: Record<string, { name: string; code: string; description?: string }> = {};
+    
+    additiveCodes.forEach(code => {
+      const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      
+      // Get name from our local database
+      const name = ADDITIVE_NAMES[upperCode] || upperCode;
+      
+      // Get description from our local database
+      const description = ADDITIVE_DESCRIPTIONS[upperCode] 
+        ? ADDITIVE_DESCRIPTIONS[upperCode].description 
+        : 'Food additive that may affect taste, appearance, or shelf life of the product.';
+        
+      info[code] = { 
+        name, 
+        code,
+        description
+      };
+    });
+    
+    setAdditiveInfo(info);
+    setAdditiveLoading(false);
   }, [product.additives_tags, product.additives]);
 
   // Update the additive chip click handler to use our description database
@@ -472,13 +620,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
     const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
     const description = ADDITIVE_DESCRIPTIONS[upperCode] 
       ? ADDITIVE_DESCRIPTIONS[upperCode].description 
-      : additiveInfo[code]?.description || 'Food additive that may affect taste, appearance, or shelf life of the product.';
+      : 'Food additive that may affect taste, appearance, or shelf life of the product.';
     
     const severity = ADDITIVE_DESCRIPTIONS[upperCode] ? ADDITIVE_DESCRIPTIONS[upperCode].severity : 'caution';
     
     window.dispatchEvent(new CustomEvent('show-ingredient-info', {
       detail: {
-        name: additiveInfo[code]?.name || ADDITIVE_NAMES[upperCode] || code.toUpperCase(),
+        name: ADDITIVE_NAMES[upperCode] || code.toUpperCase(),
         info: description,
         isFlagged: true,
         isDye: false,
@@ -742,7 +890,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
               {additiveLoading && <CircularProgress size={20} />}
               {additiveCodes.map(code => {
                 const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                const name = additiveInfo[code]?.name || ADDITIVE_NAMES[upperCode] || code.toUpperCase();
+                const name = ADDITIVE_NAMES[upperCode] || upperCode;
                 
                 return (
                   <Chip
