@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, Box, CircularProgress, Chip, Card, CardContent, CardMedia } from '@mui/material';
+import { Typography, Dialog, DialogContent, DialogContentText, Box, CircularProgress, Chip, Card, CardContent, CardMedia } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FOOD_DYES, FLAGGED_INGREDIENTS } from './foodDyes';
 import ProductCard from './components/ProductCard';
@@ -10,6 +10,7 @@ import BarcodeScannerComponent, { type BarcodeScannerComponentHandle } from './c
 import type { Product, Dye, IngredientInfo } from './types';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import WarningIcon from '@mui/icons-material/Warning';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://transpareneats.onrender.com';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
@@ -329,6 +330,21 @@ export default function App() {
         setCategoryProductsLoading(false);
       });
   }, [selectedCategory]);
+
+  // Listen for ingredient info events from ProductCard
+  useEffect(() => {
+    const handleIngredientInfo = (event: CustomEvent) => {
+      if (event.detail) {
+        setIngredientInfo(event.detail);
+      }
+    };
+    
+    window.addEventListener('show-ingredient-info', handleIngredientInfo as EventListener);
+    
+    return () => {
+      window.removeEventListener('show-ingredient-info', handleIngredientInfo as EventListener);
+    };
+  }, []);
 
   // Tab content rendering
   let content = null;
@@ -1133,12 +1149,50 @@ export default function App() {
         className="scrollable-content"
         >
           {content}
-          <Dialog open={!!ingredientInfo} onClose={() => { setIngredientInfo(null); }} fullWidth maxWidth="xs">
-            <DialogTitle>{ingredientInfo?.name}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                {ingredientInfo?.info}
+          <Dialog 
+            open={!!ingredientInfo} 
+            onClose={() => { setIngredientInfo(null); }} 
+            fullWidth 
+            maxWidth="xs"
+            PaperProps={{
+              sx: {
+                borderRadius: 3,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                overflow: 'hidden',
+              }
+            }}
+          >
+            <Box sx={{ 
+              background: ingredientInfo?.type === 'allergen' 
+                ? 'linear-gradient(135deg, #ff9800 0%, #ed6c02 100%)' 
+                : ingredientInfo?.type === 'additive' 
+                ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)' 
+                : ingredientInfo?.isDye 
+                ? 'linear-gradient(135deg, #d32f2f 0%, #9c27b0 100%)' 
+                : 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+              color: 'white',
+              px: 3,
+              py: 2,
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                {ingredientInfo?.name}
+                {ingredientInfo?.code && ` (${ingredientInfo.code})`}
+              </Typography>
+            </Box>
+            <DialogContent sx={{ px: 3, py: 3 }}>
+              <DialogContentText sx={{ color: 'text.primary', fontSize: '1rem', lineHeight: 1.6 }}>
+                {ingredientInfo?.info || 'No information available for this ingredient.'}
               </DialogContentText>
+              {ingredientInfo?.isFlagged && (
+                <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: 'rgba(244, 67, 54, 0.1)', border: '1px solid rgba(244, 67, 54, 0.3)' }}>
+                  <Typography variant="subtitle2" sx={{ color: 'error.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <WarningIcon fontSize="small" /> Warning
+                  </Typography>
+                  <Typography variant="body2" sx={{ mt: 0.5 }}>
+                    This ingredient has been flagged and may cause adverse reactions in some individuals.
+                  </Typography>
+                </Box>
+              )}
             </DialogContent>
           </Dialog>
           {/* Product details dialog for history */}

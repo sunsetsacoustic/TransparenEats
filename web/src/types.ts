@@ -58,4 +58,6 @@ export interface IngredientInfo {
   info: string;
   isFlagged: boolean;
   isDye: boolean;
+  type?: 'allergen' | 'additive' | 'dye' | 'ingredient';
+  code?: string;
 } 
