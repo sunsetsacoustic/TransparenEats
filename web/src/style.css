@@ -109,8 +109,16 @@ html, body, #root {
   top: 0;
 }
 
-/* Content area should be scrollable */
+/* Content area should be scrollable vertically only */
 .scrollable-content {
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Prevent any horizontal overflow */
+body, html, #root {
+  overflow-x: hidden !important;
 }

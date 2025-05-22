@@ -340,6 +340,7 @@ export default function App() {
         py: 2,
         position: 'relative',
         overflow: 'auto',
+        overflowX: 'hidden',
         WebkitOverflowScrolling: 'touch',
       }}
       className="scrollable-content"
@@ -358,6 +359,7 @@ export default function App() {
             radial-gradient(circle at 80% 50%, rgba(3, 169, 244, 0.07) 0%, transparent 50%),
             radial-gradient(circle at 40% 80%, rgba(156, 39, 176, 0.05) 0%, transparent 40%)
           `,
+          pointerEvents: 'none',
         }} />
 
         {/* App name and tagline with bold styling */}
@@ -365,7 +367,7 @@ export default function App() {
           width: '100%',
           textAlign: 'center',
           mb: 2,
-          mt: 4,
+          mt: 1, // Reduced top margin
           position: 'relative',
           zIndex: 1,
         }}>
@@ -539,12 +541,13 @@ export default function App() {
           width: '100%',
           maxWidth: { xs: '100%', sm: 420 },
           mx: 'auto',
-          px: { xs: 3, sm: 0 },
+          px: { xs: 2, sm: 0 },
           display: 'flex',
           flexDirection: 'column',
-          gap: 3,
+          gap: 2,
           zIndex: 1,
           position: 'relative',
+          mb: 2,
         }}>
           {/* Feature 1 */}
           <Box sx={{
@@ -1055,60 +1058,15 @@ export default function App() {
       },
     }}>
       <Box sx={{ position: 'relative', zIndex: 1, width: '100%', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* AppBar/Header */}
-        <AppBar position="fixed" color="inherit" elevation={1} sx={{
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.06)',
-          borderBottom: '1px solid rgba(226,232,240,0.8)',
-          zIndex: 1201,
-          width: '100%',
-          left: 0,
-          top: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: { xs: 0, sm: 2 },
-        }}>
-          <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, width: '100%', maxWidth: 480, mx: 'auto', px: 2 }}>
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 1.5 
-            }}>
-              <Box sx={{ 
-                width: 32, 
-                height: 32, 
-                borderRadius: '10px', 
-                background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
-              }}>
-                <EmojiFoodBeverageIcon sx={{ fontSize: 18, color: '#fff' }} />
-              </Box>
-              <Typography variant="h6" sx={{ 
-                fontWeight: 800, 
-                color: '#1e3a8a',
-                fontSize: '1.125rem',
-                letterSpacing: '-0.5px',
-                fontFamily: '"Montserrat", sans-serif',
-              }}>
-                Ingredient <Box component="span" sx={{ color: '#22c55e' }}>Aware</Box>
-              </Typography>
-            </Box>
-          </Toolbar>
-        </AppBar>
-        {/* Main Content */}
+        {/* Main Content - Adjusted for no app bar */}
         <Box sx={{
-          pt: { xs: 0, sm: 0 },
+          pt: { xs: 2, sm: 2 }, // Reduced padding without app bar
           pb: 0,
           px: { xs: 2, sm: 0 },
           width: '100%',
           maxWidth: '100%',
-          minHeight: 'calc(100vh - 56px - 56px)',
-          height: 'calc(100vh - 56px - 56px)',
+          minHeight: 'calc(100vh - 56px)', // Only accounting for bottom nav now
+          height: 'calc(100vh - 56px)', // Only accounting for bottom nav
           boxSizing: 'border-box',
           flex: 1,
           display: 'flex',
