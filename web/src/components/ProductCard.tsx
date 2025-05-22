@@ -481,7 +481,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const getAdditiveName = (code: string): string => {
     const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (additiveInfo[code]?.name) {
-      return additiveInfo[code].name;
+      return `${additiveInfo[code].name} (${upperCode})`;
     } else if (ADDITIVE_NAMES[upperCode]) {
       return `${ADDITIVE_NAMES[upperCode]} (${upperCode})`;
     } else {

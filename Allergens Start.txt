@@ -11,7 +11,7 @@ Shellfish (Crab, Shrimp, Lobster, Mussels, Oysters, Clams): "Critical allergen: 
 Sesame: "Critical allergen: A growing common allergen that can cause mild to severe allergic reactions, including anaphylaxis."
 Mustard: "Critical allergen: Can cause allergic reactions, usually mild skin or digestive symptoms, but severe reactions are possible in highly sensitive individuals."
 Celery: "Critical allergen: May cause allergic reactions, sometimes including oral allergy syndrome, skin rashes, or digestive issues."
-Sulfite/Sulfites (E220-E228): "Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions."
+Sulfites (E220-E228): "Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions."
 Lupin: "Critical allergen: As a legume, it can cause allergic reactions, especially in those with peanut or soy allergies."
 B. Caution Alerts (Yellow/Orange Warning)
 These ingredients are often associated with concerns about general health, potential mild sensitivities, dietary restrictions, or are frequently avoided as a personal choice.
@@ -25,12 +25,12 @@ Nitrates/Nitrites (E249-E252): "Caution: Used in cured meats. Can form nitrosami
 Colorings:
 Caramel Color (E150a-d): "Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies."
 Annatto (E160b): "Caution: Natural coloring; while safe for most, some individuals have reported allergic-like sensitivities such as hives or swelling."
-Turmeric (E100): "Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions."
+Curcumin (E100): "Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions."
 Titanium Dioxide (E171): "Caution: Used for whiteness. Safety is debated, particularly for nanoparticles; has been categorized as 'possibly carcinogenic to humans' if inhaled. Many consumers avoid it as a precaution."
-Red 40 (E129): "Caution: Artificial red color strongly linked to hyperactivity and behavioral issues in sensitive children. Widely avoided by concerned parents and those avoiding artificial additives."
-Yellow 5 (E102): "Caution: Artificial yellow color often linked to hyperactivity and behavioral issues in sensitive children. Some individuals may experience mild allergic reactions like itching."
-Yellow 6 (E110): "Caution: Artificial orange-yellow color commonly linked to hyperactivity and behavioral issues in sensitive children."
-Blue 1 (E133): "Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported."
+Allura Red AC (E129): "Caution: Artificial red color strongly linked to hyperactivity and behavioral issues in sensitive children. Widely avoided by concerned parents and those avoiding artificial additives."
+Tartrazine (E102): "Caution: Artificial yellow color often linked to hyperactivity and behavioral issues in sensitive children. Some individuals may experience mild allergic reactions like itching."
+Sunset Yellow (E110): "Caution: Artificial orange-yellow color commonly linked to hyperactivity and behavioral issues in sensitive children."
+Brilliant Blue FCF (E133): "Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported."
 Emulsifiers/Stabilizers/Thickeners:
 Lecithin (E322): "Caution: An emulsifier, commonly sourced from soy (be aware if you have a soy allergy) or sunflower. Generally safe, but very rarely reported to cause mild digestive issues."
 Mono- and Diglycerides (E471): "Caution: Emulsifiers that can be derived from animal fats (a concern for vegans/vegetarians). Some recent studies debate their potential impact on gut microbiome and inflammation."
