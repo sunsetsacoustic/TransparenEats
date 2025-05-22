@@ -623,12 +623,26 @@ export default function App() {
     content = (
       <Box sx={{
         width: '100%',
-        height: 'calc(100vh - 56px - 56px)',
-        display: 'flex',
-        flexDirection: 'column',
+        height: '100%',
         position: 'relative',
+        bgcolor: '#000',
+        overflow: 'hidden',
       }}>
-        <BarcodeScannerComponent ref={scannerRef} onDetected={fetchProductByBarcode} autoStart={true} />
+        {/* Full-screen scanner component */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 1,
+        }}>
+          <BarcodeScannerComponent 
+            ref={scannerRef} 
+            onDetected={fetchProductByBarcode} 
+            autoStart={true} 
+          />
+        </Box>
         
         {/* Scanning overlay with improved UI */}
         <Box sx={{
@@ -636,16 +650,28 @@ export default function App() {
           bottom: 0,
           left: 0,
           width: '100%',
-          padding: 3,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+          padding: '16px 24px 24px',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%)',
           color: 'white',
           textAlign: 'center',
           zIndex: 10,
+          pointerEvents: 'none',
         }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography variant="h6" sx={{ 
+            fontWeight: 700, 
+            mb: 1,
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+            fontSize: '1.1rem',
+          }}>
             Scanning for Barcode
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+          <Typography variant="body2" sx={{ 
+            opacity: 0.9,
+            maxWidth: 280,
+            mx: 'auto',
+            fontSize: '0.9rem',
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+          }}>
             Center the barcode within the frame
           </Typography>
         </Box>

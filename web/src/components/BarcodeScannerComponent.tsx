@@ -64,11 +64,10 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
     }, []);
 
     useEffect(() => {
-      if (autoStart) {
-        startScanner();
-      }
+      // Always try to start scanner on mount
+      startScanner();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [autoStart]);
+    }, []);
 
     const startScanner = async () => {
       setError(null);
@@ -79,8 +78,8 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
       try {
         const config = {
           fps: 10,
-          qrbox: { width: 320, height: 220 },
-          aspectRatio: 1.5,
+          qrbox: { width: 300, height: 220 },
+          aspectRatio: window.innerWidth / window.innerHeight,
           formatsToSupport: [
             'QR_CODE',
             'EAN_13',
@@ -106,7 +105,7 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
             onDetected(decodedText);
           },
           () => {
-            setDebug(`Frame processed. No barcode detected.`);
+            // Empty handler to avoid flooding logs
           }
         );
       } catch (err: any) {
@@ -128,151 +127,180 @@ const BarcodeScannerComponent = forwardRef<BarcodeScannerComponentHandle, Barcod
     };
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        width: '100%', 
+        height: '100%',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
         <div
           id="barcode-video"
           ref={videoRef}
           style={{
-            position: 'relative',
-            width: 340,
-            height: 260,
-            margin: '0 auto 16px auto',
-            borderRadius: 24,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
             overflow: 'hidden',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-            background: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(8px)',
-            border: '1.5px solid rgba(255,255,255,0.18)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            zIndex: 1
           }}
-        >
+        />
+        
+        {/* Scan target area */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '80%',
+          maxWidth: 300,
+          height: 220,
+          borderRadius: 16,
+          border: '2px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 0 0 1000px rgba(0, 0, 0, 0.5)',
+          zIndex: 2,
+        }}></div>
+        
+        {/* Scan line animation */}
+        {scanning && (
           <div
             style={{
-              width: 320,
-              height: 220,
-              background: '#222',
-              borderRadius: 16,
-              overflow: 'hidden',
-              position: 'relative',
-              zIndex: 1,
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '75%',
+              maxWidth: 280,
+              height: 2,
+              top: `calc(50% - 110px + ${scanLinePos * 2.2}px)`,
+              background: 'linear-gradient(90deg, rgba(0,234,255,0) 0%, #00eaff 50%, rgba(0,234,255,0) 100%)',
+              opacity: 0.7,
+              borderRadius: 2,
+              boxShadow: '0 0 8px #00eaff',
+              zIndex: 3,
+              pointerEvents: 'none',
             }}
           />
-          {/* Scan line animation */}
-          {scanning && (
-            <div
-              style={{
-                position: 'absolute',
-                left: 20,
-                width: 280,
-                height: 2,
-                top: `${20 + scanLinePos * 1.8}px`,
-                background: 'linear-gradient(90deg, #00eaff 0%, #fff 50%, #00eaff 100%)',
-                opacity: 0.7,
-                borderRadius: 2,
-                boxShadow: '0 0 8px #00eaff',
-                zIndex: 3,
-                transition: 'top 0.05s',
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-          {/* Glassy overlay for scan success */}
-          {scanSuccess && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'rgba(0,255,128,0.18)',
-                border: '2px solid #00ff99',
-                borderRadius: 24,
-                zIndex: 4,
-                boxShadow: '0 0 24px #00ff99',
-                pointerEvents: 'none',
-                transition: 'opacity 0.5s',
-              }}
-            />
-          )}
-          {/* Corners for scan area */}
-          {scanning && [
-            { top: 16, left: 16, rotate: '0deg' },
-            { top: 16, right: 16, rotate: '90deg' },
-            { bottom: 16, right: 16, rotate: '180deg' },
-            { bottom: 16, left: 16, rotate: '270deg' },
-          ].map((style, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                width: 32,
-                height: 32,
-                border: '3px solid #00eaff',
-                borderRadius: 8,
-                zIndex: 3,
-                borderTop: style.top !== undefined ? '3px solid #00eaff' : 'none',
-                borderBottom: style.bottom !== undefined ? '3px solid #00eaff' : 'none',
-                borderLeft: style.left !== undefined ? '3px solid #00eaff' : 'none',
-                borderRight: style.right !== undefined ? '3px solid #00eaff' : 'none',
-                top: style.top,
-                left: style.left,
-                right: style.right,
-                bottom: style.bottom,
-                transform: `rotate(${style.rotate})`,
-                pointerEvents: 'none',
-              }}
-            />
-          ))}
-          {/* Scanning indicator */}
-          {scanning && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 10,
-                left: 0,
-                width: '100%',
-                textAlign: 'center',
-                color: '#00eaff',
-                fontWeight: 500,
-                fontSize: 14,
-                textShadow: '0 0 8px #000',
-                zIndex: 5,
-              }}
-            >
-              Scanning...
+        )}
+        
+        {/* Corners for scan area */}
+        {scanning && [
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-145px, -105px) rotate(0deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(145px, -105px) rotate(90deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(145px, 105px) rotate(180deg)' },
+          { top: '50%', left: '50%', transform: 'translate(-50%, -50%) translate(-145px, 105px) rotate(270deg)' },
+        ].map((style, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              width: 32,
+              height: 32,
+              border: '3px solid #00eaff',
+              borderRight: 'none',
+              borderBottom: 'none',
+              zIndex: 4,
+              top: style.top,
+              left: style.left,
+              transform: style.transform,
+              pointerEvents: 'none',
+            }}
+          />
+        ))}
+        
+        {/* Glassy overlay for scan success */}
+        {scanSuccess && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '80%',
+              maxWidth: 300,
+              height: 220,
+              background: 'rgba(0,255,128,0.18)',
+              border: '2px solid #00ff99',
+              borderRadius: 16,
+              zIndex: 5,
+              boxShadow: '0 0 24px #00ff99',
+              pointerEvents: 'none',
+              transition: 'opacity 0.5s',
+            }}
+          />
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div style={{ 
+            position: 'absolute', 
+            bottom: 70, 
+            left: 0, 
+            width: '100%',
+            background: 'rgba(255,0,0,0.7)',
+            color: 'white',
+            padding: '10px',
+            textAlign: 'center',
+            zIndex: 10
+          }}>
+            {error}
+            <div style={{marginTop: 8}}>
+              <button 
+                onClick={startScanner}
+                style={{
+                  padding: '8px 16px',
+                  background: 'white',
+                  color: 'black',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 'bold'
+                }}
+              >
+                Try Again
+              </button>
             </div>
-          )}
-        </div>
-        <button
-          onClick={scanning ? stopScanner : startScanner}
-          style={{
-            margin: '18px 0 0 0',
-            padding: '12px 32px',
-            borderRadius: 16,
-            border: 'none',
-            background: scanning
-              ? 'linear-gradient(90deg, #00eaff 0%, #00ff99 100%)'
-              : 'linear-gradient(90deg, #fff 0%, #00eaff 100%)',
-            color: scanning ? '#fff' : '#222',
-            fontWeight: 700,
-            fontSize: 18,
-            boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.18)',
-            cursor: 'pointer',
-            outline: 'none',
-            transition: 'background 0.3s, color 0.3s',
-          }}
-        >
-          {scanning ? 'Stop Camera' : 'Start Camera'}
-        </button>
-        <div style={{ marginTop: 8, fontSize: 13, color: '#aaa', textAlign: 'center', maxWidth: 340 }}>
-          Tap the video to try to focus (if supported by your device).
-        </div>
-        {error && <div style={{ marginTop: 8, color: 'red', fontWeight: 500, textAlign: 'center', maxWidth: 340 }}>{error}</div>}
-        {debug && (
-          <div style={{ marginTop: 8, color: '#888', fontSize: 12, textAlign: 'center', maxWidth: 340 }}>{debug}</div>
+          </div>
+        )}
+        
+        {/* Camera permissions hint - only shows on error or long delay */}
+        {(debug && !scanning) && (
+          <div style={{ 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)',
+            color: 'white',
+            textAlign: 'center',
+            maxWidth: '80%',
+            zIndex: 10,
+            background: 'rgba(0,0,0,0.7)',
+            padding: 16,
+            borderRadius: 16
+          }}>
+            {debug}
+            <div style={{marginTop: 12}}>
+              <button 
+                onClick={startScanner}
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(90deg, #00eaff 0%, #00ff99 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 'bold'
+                }}
+              >
+                Start Camera
+              </button>
+            </div>
+          </div>
         )}
       </div>
     );
