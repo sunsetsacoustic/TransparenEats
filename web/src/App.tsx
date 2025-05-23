@@ -540,7 +540,7 @@ export default function App() {
       });
       if (res.ok) {
         handleAdminPasswordDialogClose();
-        window.open(`${BACKEND_URL}/admin`, '_blank');
+        window.location.href = `${BACKEND_URL}/admin`;
       } else {
         setAdminPasswordError(true);
       }
@@ -552,7 +552,7 @@ export default function App() {
   const navigateToAdminDashboard = () => {
     handleAdminMenuClose();
     // Open in a new tab to avoid navigation issues
-    window.open(`${BACKEND_URL}/admin`, '_blank');
+    window.location.href = `${BACKEND_URL}/admin`;
   };
 
   const navigateToAnalyticsDashboard = () => {
