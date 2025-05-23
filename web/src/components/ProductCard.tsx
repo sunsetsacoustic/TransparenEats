@@ -562,7 +562,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const { label: scoreLabel } = getScoreLabel(score);
   const nutriments = product.nutriments || {};
   const [scorePopover, setScorePopover] = useState<{ anchorEl: HTMLElement | null, type: string | null }>({ anchorEl: null, type: null });
-  const [additiveInfo, setAdditiveInfo] = useState<Record<string, { name: string; code: string; description?: string }>>({});
   const [additiveLoading, setAdditiveLoading] = useState(false);
   const [activeNutritionTab, setActiveNutritionTab] = useState<'quick' | 'serving' | 'full'>('quick');
 
@@ -591,27 +590,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
 
   useEffect(() => {
     // Use local database instead of API
-    const info: Record<string, { name: string; code: string; description?: string }> = {};
-    
-    additiveCodes.forEach(code => {
-      const upperCode = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      
-      // Get name from our local database
-      const name = ADDITIVE_NAMES[upperCode] || upperCode;
-      
-      // Get description from our local database
-      const description = ADDITIVE_DESCRIPTIONS[upperCode] 
-        ? ADDITIVE_DESCRIPTIONS[upperCode].description 
-        : 'Food additive that may affect taste, appearance, or shelf life of the product.';
-        
-      info[code] = { 
-        name, 
-        code,
-        description
-      };
-    });
-    
-    setAdditiveInfo(info);
     setAdditiveLoading(false);
   }, [product.additives_tags, product.additives]);
 
