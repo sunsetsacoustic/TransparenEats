@@ -532,7 +532,7 @@ export default function App() {
 
   const handleAdminPasswordSubmit = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/login`, {
+      const res = await fetch(`${BACKEND_URL}/api/v1/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // This is critical for session cookies!

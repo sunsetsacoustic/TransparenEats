@@ -114,6 +114,16 @@ router.post('/uploadProduct', upload.fields([
   }
 });
 
+// Admin login route
+router.post('/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (password === process.env.ADMIN_PASSWORD) {
+    req.session.isAdmin = true;
+    return res.json({ success: true, message: 'Logged in' });
+  }
+  res.status(401).json({ success: false, message: 'Invalid password' });
+});
+
 // Mount logical routers
 router.use('/off', offRouter);
 router.use('/nutritionix', nutritionixRouter);
