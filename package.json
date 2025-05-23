@@ -1,16 +1,35 @@
 {
+  "name": "transpareneats",
+  "version": "1.0.0",
+  "description": "TransparenEats application with backend API and frontend UI",
+  "scripts": {
+    "backend:install": "cd backend && npm install",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:setup": "cd backend && npm run setup",
+    "frontend:install": "cd web && npm install",
+    "frontend:dev": "cd web && npm run dev",
+    "frontend:build": "cd web && npm run build",
+    "install:all": "npm run backend:install && npm run frontend:install",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\""
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
+    "dotenv": "^16.5.0",
     "html5-qrcode": "^2.3.8",
+    "knex": "^3.1.0",
     "multer": "^2.0.0",
     "node-fetch": "^2.7.0",
+    "pg": "^8.16.0",
+    "pg-pool": "^3.10.0",
     "quagga": "^0.12.1",
-    "react-qr-barcode-scanner": "^2.1.4"
+    "react-qr-barcode-scanner": "^2.1.4",
+    "redis": "^5.1.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "nodemon": "^3.1.10"
   }
 }

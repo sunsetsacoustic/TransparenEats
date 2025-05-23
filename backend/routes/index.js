@@ -8,6 +8,16 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+/* GET admin dashboard */
+router.get('/admin', function(req, res) {
+  res.sendFile(path.join(__dirname, '../public/admin/index.html'));
+});
+
+/* GET analytics dashboard */
+router.get('/admin/analytics', function(req, res) {
+  res.sendFile(path.join(__dirname, '../public/admin/analytics.html'));
+});
+
 /* POST analytics event */
 router.post('/analytics', function(req, res, next) {
   const event = req.body;

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransparenEats Analytics</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 2rem;
+    }
+    .top-nav {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-nav d-flex justify-content-between align-items-center mb-4">
+      <h1>TransparenEats Analytics</h1>
+      <div>
+        <a href="/admin" class="btn btn-outline-primary">Back to Admin</a>
+        <button id="refresh-btn" class="btn btn-primary ms-2">Refresh Data</button>
+        <button id="reset-btn" class="btn btn-danger ms-2">Reset Stats</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- API Stats -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">API Usage</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>Total Requests</h6>
+                  <h2 id="total-requests">0</h2>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>Cache Hit Rate</h6>
+                  <h2 id="cache-hit-rate">0%</h2>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>External API Calls</h6>
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Open Food Facts
+                      <span class="badge bg-primary rounded-pill" id="off-calls">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      USDA
+                      <span class="badge bg-primary rounded-pill" id="usda-calls">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Nutritionix
+                      <span class="badge bg-primary rounded-pill" id="nutritionix-calls">0</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>Response Status Codes</h6>
+                  <div id="status-codes"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Database Stats -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Database Stats</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>Products</h6>
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Total Products
+                      <span class="badge bg-primary rounded-pill" id="total-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Verified Products
+                      <span class="badge bg-success rounded-pill" id="verified-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Pending Review
+                      <span class="badge bg-warning rounded-pill" id="pending-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Failed Searches
+                      <span class="badge bg-danger rounded-pill" id="failed-searches">0</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <h6>Product Sources</h6>
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Open Food Facts
+                      <span class="badge bg-primary rounded-pill" id="off-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      USDA
+                      <span class="badge bg-primary rounded-pill" id="usda-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Nutritionix
+                      <span class="badge bg-primary rounded-pill" id="nutritionix-products">0</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Curated
+                      <span class="badge bg-success rounded-pill" id="curated-products">0</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Logs -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Recent API Requests</h5>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-primary active" id="api-logs-btn">API Logs</button>
+          <button type="button" class="btn btn-outline-danger" id="error-logs-btn">Error Logs</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Status</th>
+                <th>Response Time</th>
+                <th>Cache</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody id="logs-table">
+              <tr>
+                <td colspan="7" class="text-center">Loading logs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+          <button id="load-more-btn" class="btn btn-outline-primary">Load More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // State
+    let currentLogType = 'api';
+    let currentLogOffset = 0;
+    const logLimit = 50;
+    
+    // DOM Elements
+    const totalRequestsEl = document.getElementById('total-requests');
+    const cacheHitRateEl = document.getElementById('cache-hit-rate');
+    const offCallsEl = document.getElementById('off-calls');
+    const usdaCallsEl = document.getElementById('usda-calls');
+    const nutritionixCallsEl = document.getElementById('nutritionix-calls');
+    const statusCodesEl = document.getElementById('status-codes');
+    
+    const totalProductsEl = document.getElementById('total-products');
+    const verifiedProductsEl = document.getElementById('verified-products');
+    const pendingProductsEl = document.getElementById('pending-products');
+    const failedSearchesEl = document.getElementById('failed-searches');
+    
+    const offProductsEl = document.getElementById('off-products');
+    const usdaProductsEl = document.getElementById('usda-products');
+    const nutritionixProductsEl = document.getElementById('nutritionix-products');
+    const curatedProductsEl = document.getElementById('curated-products');
+    
+    const logsTableEl = document.getElementById('logs-table');
+    const apiLogsBtn = document.getElementById('api-logs-btn');
+    const errorLogsBtn = document.getElementById('error-logs-btn');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const refreshBtn = document.getElementById('refresh-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load initial data
+      loadStats();
+      loadLogs();
+      
+      // Event listeners
+      apiLogsBtn.addEventListener('click', () => switchLogType('api'));
+      errorLogsBtn.addEventListener('click', () => switchLogType('error'));
+      loadMoreBtn.addEventListener('click', loadMoreLogs);
+      refreshBtn.addEventListener('click', () => {
+        loadStats();
+        loadLogs(true);
+      });
+      resetBtn.addEventListener('click', resetStats);
+    });
+    
+    // Load statistics
+    async function loadStats() {
+      try {
+        const response = await fetch('/api/v1/analytics/stats');
+        if (!response.ok) throw new Error('Failed to load stats');
+        
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'Failed to load stats');
+        
+        updateStatsUI(data.data);
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        alert('Failed to load statistics: ' + error.message);
+      }
+    }
+    
+    // Load logs
+    async function loadLogs(reset = false) {
+      try {
+        if (reset) {
+          currentLogOffset = 0;
+        }
+        
+        const url = `/api/v1/analytics/logs?type=${currentLogType}&offset=${currentLogOffset}&limit=${logLimit}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to load logs');
+        
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'Failed to load logs');
+        
+        updateLogsUI(data.data, reset);
+        currentLogOffset += data.data.length;
+        
+        // Disable load more button if no more logs
+        loadMoreBtn.disabled = data.data.length < logLimit;
+      } catch (error) {
+        console.error('Error loading logs:', error);
+        logsTableEl.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: ${error.message}</td></tr>`;
+      }
+    }
+    
+    // Load more logs
+    function loadMoreLogs() {
+      loadLogs(false);
+    }
+    
+    // Switch log type
+    function switchLogType(type) {
+      currentLogType = type;
+      currentLogOffset = 0;
+      
+      // Update UI
+      if (type === 'api') {
+        apiLogsBtn.classList.add('active');
+        errorLogsBtn.classList.remove('active');
+      } else {
+        apiLogsBtn.classList.remove('active');
+        errorLogsBtn.classList.add('active');
+      }
+      
+      loadLogs(true);
+    }
+    
+    // Reset statistics
+    async function resetStats() {
+      if (!confirm('Are you sure you want to reset all analytics counters?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/v1/analytics/reset', {
+          method: 'POST'
+        });
+        if (!response.ok) throw new Error('Failed to reset stats');
+        
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'Failed to reset stats');
+        
+        alert('Analytics counters reset successfully');
+        loadStats();
+      } catch (error) {
+        console.error('Error resetting stats:', error);
+        alert('Failed to reset statistics: ' + error.message);
+      }
+    }
+    
+    // Update statistics UI
+    function updateStatsUI(stats) {
+      // API stats
+      totalRequestsEl.textContent = stats.total || 0;
+      
+      const totalProductRequests = (stats.cacheHits || 0) + (stats.cacheMisses || 0);
+      const hitRate = totalProductRequests > 0 
+        ? Math.round((stats.cacheHits / totalProductRequests) * 100) 
+        : 0;
+      cacheHitRateEl.textContent = `${hitRate}%`;
+      
+      offCallsEl.textContent = stats.externalApiCalls?.off || 0;
+      usdaCallsEl.textContent = stats.externalApiCalls?.usda || 0;
+      nutritionixCallsEl.textContent = stats.externalApiCalls?.nutritionix || 0;
+      
+      // Status codes
+      let statusHtml = '<ul class="list-group">';
+      Object.entries(stats.byStatusCode || {}).forEach(([code, count]) => {
+        const badgeClass = code.startsWith('2') ? 'bg-success' : 
+                        code.startsWith('4') ? 'bg-warning' : 
+                        code.startsWith('5') ? 'bg-danger' : 'bg-primary';
+        statusHtml += `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            ${code}
+            <span class="badge ${badgeClass} rounded-pill">${count}</span>
+          </li>
+        `;
+      });
+      statusHtml += '</ul>';
+      statusCodesEl.innerHTML = statusHtml;
+      
+      // Database stats
+      if (stats.database) {
+        totalProductsEl.textContent = stats.database.products.total || 0;
+        verifiedProductsEl.textContent = stats.database.products.verified || 0;
+        pendingProductsEl.textContent = stats.database.products.pendingReview || 0;
+        failedSearchesEl.textContent = stats.database.failedSearches || 0;
+        
+        offProductsEl.textContent = stats.database.sources.openfoodfacts || 0;
+        usdaProductsEl.textContent = stats.database.sources.usda || 0;
+        nutritionixProductsEl.textContent = stats.database.sources.nutritionix || 0;
+        curatedProductsEl.textContent = stats.database.sources.curated || 0;
+      }
+    }
+    
+    // Update logs UI
+    function updateLogsUI(logs, reset) {
+      if (reset) {
+        logsTableEl.innerHTML = '';
+      }
+      
+      if (logs.length === 0) {
+        if (reset) {
+          logsTableEl.innerHTML = '<tr><td colspan="7" class="text-center">No logs found</td></tr>';
+        }
+        return;
+      }
+      
+      let html = '';
+      logs.forEach(log => {
+        const statusClass = log.statusCode >= 200 && log.statusCode < 300 ? 'table-success' :
+                         log.statusCode >= 400 && log.statusCode < 500 ? 'table-warning' :
+                         log.statusCode >= 500 ? 'table-danger' : '';
+        
+        const cacheInfo = log.fromCache 
+          ? `<span class="badge bg-success">Hit (${log.cacheType || 'unknown'})</span>` 
+          : '<span class="badge bg-secondary">Miss</span>';
+        
+        html += `
+          <tr class="${statusClass}">
+            <td>${formatDate(log.timestamp)}</td>
+            <td>${log.method || 'GET'}</td>
+            <td>${log.url || '-'}</td>
+            <td>${log.statusCode || '-'}</td>
+            <td>${log.responseTime ? log.responseTime + 'ms' : '-'}</td>
+            <td>${cacheInfo}</td>
+            <td>${log.source || '-'}</td>
+          </tr>
+        `;
+      });
+      
+      if (reset) {
+        logsTableEl.innerHTML = html;
+      } else {
+        logsTableEl.innerHTML += html;
+      }
+    }
+    
+    // Format date
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      
+      const date = new Date(dateString);
+      return date.toLocaleTimeString() + ' ' + date.toLocaleDateString();
+    }
+  </script>
+</body>
+</html> 

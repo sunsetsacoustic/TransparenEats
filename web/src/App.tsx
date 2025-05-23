@@ -11,6 +11,14 @@ import type { Product, Dye, IngredientInfo } from './types';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import WarningIcon from '@mui/icons-material/Warning';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://transpareneats.onrender.com';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
@@ -58,6 +66,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  // Admin menu state
+  const [adminMenuAnchor, setAdminMenuAnchor] = useState<null | HTMLElement>(null);
+  const adminMenuOpen = Boolean(adminMenuAnchor);
+  const [adminPasswordDialogOpen, setAdminPasswordDialogOpen] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminPasswordError, setAdminPasswordError] = useState(false);
   // Products tab state
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -501,6 +515,45 @@ export default function App() {
     };
   }, []);
 
+  // Admin menu handlers
+  const handleAdminButtonClick = () => {
+    setAdminPasswordDialogOpen(true);
+  };
+
+  const handleAdminMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAdminMenuAnchor(event.currentTarget);
+  };
+
+  const handleAdminMenuClose = () => {
+    setAdminMenuAnchor(null);
+  };
+
+  const handleAdminPasswordDialogClose = () => {
+    setAdminPasswordDialogOpen(false);
+    setAdminPassword('');
+    setAdminPasswordError(false);
+  };
+
+  const handleAdminPasswordSubmit = () => {
+    // Replace "admin123" with the actual admin password or implement proper authentication
+    if (adminPassword === "admin123") {
+      handleAdminPasswordDialogClose();
+      handleAdminMenuOpen({ currentTarget: document.getElementById('admin-button') as HTMLElement } as React.MouseEvent<HTMLButtonElement>);
+    } else {
+      setAdminPasswordError(true);
+    }
+  };
+
+  const navigateToAdminDashboard = () => {
+    handleAdminMenuClose();
+    window.location.href = `${BACKEND_URL}/admin`;
+  };
+
+  const navigateToAnalyticsDashboard = () => {
+    handleAdminMenuClose();
+    window.location.href = `${BACKEND_URL}/admin/analytics`;
+  };
+
   // Tab content rendering
   let content = null;
   if (tab === 0) {
@@ -711,6 +764,164 @@ export default function App() {
               Scan Product Barcode
             </Button>
           </Box>
+        </Box>
+
+        {/* Admin Button */}
+        <Box sx={{
+          width: '100%',
+          maxWidth: { xs: '100%', sm: 420 },
+          mx: 'auto',
+          px: { xs: 2, sm: 0 },
+          mb: 3,
+          zIndex: 1,
+        }}>
+          <Button
+            id="admin-button"
+            variant="outlined"
+            fullWidth
+            size="medium"
+            endIcon={<KeyboardArrowDownIcon />}
+            startIcon={<AdminPanelSettingsIcon />}
+            sx={{
+              borderRadius: 99,
+              fontWeight: 600,
+              fontSize: 16,
+              py: 1.5,
+              px: 2,
+              borderColor: '#3b82f6',
+              color: '#1e40af',
+              background: 'rgba(255,255,255,0.7)',
+              backdropFilter: 'blur(8px)',
+              textTransform: 'none',
+              transition: 'all 0.2s',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.9)',
+                borderColor: '#2563eb',
+                boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
+              },
+            }}
+            onClick={handleAdminButtonClick}
+            aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={adminMenuOpen ? 'true' : undefined}
+          >
+            Admin Options
+          </Button>
+          <Menu
+            id="admin-menu"
+            anchorEl={adminMenuAnchor}
+            open={adminMenuOpen}
+            onClose={handleAdminMenuClose}
+            MenuListProps={{
+              'aria-labelledby': 'admin-button',
+            }}
+            PaperProps={{
+              sx: {
+                borderRadius: 2,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              }
+            }}
+          >
+            <MenuItem 
+              onClick={navigateToAdminDashboard}
+              sx={{ 
+                py: 1.5,
+                px: 2, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5,
+                minWidth: 200,
+              }}
+            >
+              <AdminPanelSettingsIcon fontSize="small" sx={{ color: '#3b82f6' }} />
+              <Typography variant="body1">Admin Dashboard</Typography>
+            </MenuItem>
+            <MenuItem 
+              onClick={navigateToAnalyticsDashboard}
+              sx={{ 
+                py: 1.5, 
+                px: 2, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5,
+                minWidth: 200,
+              }}
+            >
+              <AnalyticsIcon fontSize="small" sx={{ color: '#3b82f6' }} />
+              <Typography variant="body1">Analytics Dashboard</Typography>
+            </MenuItem>
+          </Menu>
+
+          {/* Admin Password Dialog */}
+          <Dialog 
+            open={adminPasswordDialogOpen} 
+            onClose={handleAdminPasswordDialogClose}
+            PaperProps={{
+              sx: {
+                borderRadius: 3,
+                width: '100%',
+                maxWidth: 360,
+                p: 1,
+              }
+            }}
+          >
+            <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>
+              Administrator Access
+            </DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Admin Password"
+                type="password"
+                fullWidth
+                variant="outlined"
+                value={adminPassword}
+                onChange={(e) => {
+                  setAdminPassword(e.target.value);
+                  setAdminPasswordError(false);
+                }}
+                error={adminPasswordError}
+                helperText={adminPasswordError ? "Invalid password" : ""}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAdminPasswordSubmit();
+                  }
+                }}
+                sx={{
+                  mt: 1,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  }
+                }}
+              />
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
+              <Button 
+                onClick={handleAdminPasswordDialogClose}
+                sx={{ 
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleAdminPasswordSubmit} 
+                variant="contained"
+                sx={{ 
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
+                }}
+              >
+                Login
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
 
         {/* Feature cards */}

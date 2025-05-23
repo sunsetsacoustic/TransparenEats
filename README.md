@@ -6,6 +6,55 @@
 
 TransparenEats is a web application that helps users identify what's really in their food and personal care products. By scanning barcodes or searching for products, users can quickly check ingredients, view nutritional information, and get alerts about potentially concerning additives like artificial food dyes.
 
+## Quick Start
+
+### Local Development
+
+1. **Install Dependencies**
+   ```bash
+   npm run install:all
+   ```
+
+2. **Set Up Backend Environment**
+   - Copy `.env.example` to `.env` in the `backend` directory
+   - Fill in your database credentials and API keys
+
+3. **Set Up Database**
+   ```bash
+   npm run backend:setup
+   ```
+
+4. **Run Development Servers**
+   ```bash
+   npm run dev
+   ```
+   This will start both backend and frontend development servers.
+
+5. **Access the Application**
+   - Backend API: http://localhost:3001
+   - Frontend: http://localhost:5173
+
+## Project Structure
+
+- **backend/** - Node.js Express API
+  - **src/** - Source code
+  - **routes/** - API routes
+  - **db/** - Database models and migrations
+- **web/** - React frontend
+  - **src/** - Source code
+  - **components/** - React components
+
+## API Implementation
+
+The API implementation follows the checklist in the [API Implementation Guide](./transpareneats_api_implementation.md), which includes:
+
+- Database schema
+- Product caching system
+- External API integration
+- Admin curation endpoints
+- User contribution system
+- Performance optimizations
+
 ## Features
 
 ### Core Features
@@ -128,15 +177,11 @@ TransparenEats integrates with multiple food databases to provide comprehensive 
 
 ## Deployment
 
-The application can be deployed on any hosting service that supports Node.js:
+This project is deployed with:
+- Backend: Render.com
+- Frontend: Vercel
 
-1. Build the frontend:
-```bash
-cd web
-npm run build
-```
-
-2. Deploy the backend and the frontend build directory to your hosting service
+For detailed deployment instructions, see the [Deployment Guide](./DEPLOYMENT.md).
 
 ## Contributing
 

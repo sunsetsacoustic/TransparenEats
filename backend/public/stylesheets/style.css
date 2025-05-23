@@ -1,8 +1,112 @@
+/* TransparenEats Main Stylesheet */
+
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
 }
 
-a {
-  color: #00B7FF;
+/* Header styling */
+header {
+  background-color: #fff;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #0d6efd;
+}
+
+/* Hero section */
+.hero {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.hero h1 {
+  font-weight: 600;
+  color: #212529;
+}
+
+.hero .lead {
+  color: #6c757d;
+  font-size: 1.25rem;
+}
+
+/* Feature cards */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #0d6efd;
+}
+
+/* Footer styling */
+footer {
+  color: #6c757d;
+}
+
+footer h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+footer .text-muted {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+footer .text-muted:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+/* Admin panel */
+.admin-panel {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 100;
+}
+
+.admin-panel .btn {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Product display */
+.product-detail {
+  margin-top: 2rem;
+}
+
+.ingredient-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.ingredient-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.nutrition-table th {
+  width: 40%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 0;
+  }
+  
+  .admin-panel {
+    bottom: 1rem;
+    right: 1rem;
+  }
 }
