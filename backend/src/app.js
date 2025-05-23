@@ -7,8 +7,9 @@ const fs = require('fs');
 
 require('dotenv').config();
 
-// Import requestLogger middleware
+// Import middlewares
 const requestLogger = require('./middlewares/requestLogger');
+const adminMiddleware = require('./middlewares/adminMiddleware');
 const api = require('./api');
 
 const app = express();
@@ -23,6 +24,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Admin routes middleware (must be before static files)
+app.use(adminMiddleware);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../public')));

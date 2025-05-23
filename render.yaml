@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: transpareneats-api
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    routes:
+      - type: rewrite
+        source: /admin
+        destination: /admin/index.html
+      - type: rewrite
+        source: /admin/analytics
+        destination: /admin/analytics.html 
