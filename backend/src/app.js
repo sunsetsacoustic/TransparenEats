@@ -4,12 +4,14 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
+const session = require('express-session');
 
 require('dotenv').config();
 
 // Import middlewares
 const requestLogger = require('./middlewares/requestLogger');
 const adminMiddleware = require('./middlewares/adminMiddleware');
+const adminAuth = require('./middlewares/auth');
 const api = require('./api');
 
 const app = express();
@@ -20,10 +22,22 @@ app.use(cors());
 // Basic request logging
 app.use(logger('dev'));
 
+// Session support for admin login
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'changeme',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }
+}));
+
 // Request body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Admin password protection
+app.use('/admin', adminAuth);
+app.use('/admin/analytics', adminAuth);
 
 // Admin routes middleware (must be before static files)
 app.use(adminMiddleware);
@@ -42,13 +56,6 @@ app.use(express.static(path.join(__dirname, '../public'), {
 
 // Add analytics and detailed request logging
 app.use(requestLogger.requestLogger);
-
-// Home route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'TransparenEats API - Welcome to the API',
-  });
-});
 
 // Admin dashboard route
 app.get('/admin', (req, res) => {
