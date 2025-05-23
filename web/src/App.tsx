@@ -11,14 +11,7 @@ import type { Product, Dye, IngredientInfo } from './types';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import WarningIcon from '@mui/icons-material/Warning';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
-import DialogActions from '@mui/material/DialogActions';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
@@ -66,12 +59,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
-  // Admin menu state
-  const [adminMenuAnchor, setAdminMenuAnchor] = useState<null | HTMLElement>(null);
-  const adminMenuOpen = Boolean(adminMenuAnchor);
-  const [adminPasswordDialogOpen, setAdminPasswordDialogOpen] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [adminPasswordError, setAdminPasswordError] = useState(false);
   // Products tab state
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -381,53 +368,6 @@ export default function App() {
       window.removeEventListener('show-ingredient-info', handleIngredientInfo as EventListener);
     };
   }, []);
-
-  // Admin menu handlers
-  const handleAdminButtonClick = () => {
-    setAdminPasswordDialogOpen(true);
-  };
-
-  const handleAdminMenuClose = () => {
-    setAdminMenuAnchor(null);
-  };
-
-  const handleAdminPasswordDialogClose = () => {
-    setAdminPasswordDialogOpen(false);
-    setAdminPassword('');
-    setAdminPasswordError(false);
-  };
-
-  const handleAdminPasswordSubmit = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/v1/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // This is critical for session cookies!
-        body: JSON.stringify({ password: adminPassword })
-      });
-      if (res.ok) {
-        handleAdminPasswordDialogClose();
-        // Temporary: Redirect to main site instead of /admin for testing
-        window.location.href = `${BACKEND_URL}/`;
-      } else {
-        setAdminPasswordError(true);
-      }
-    } catch (err) {
-      setAdminPasswordError(true);
-    }
-  };
-
-  const navigateToAdminDashboard = () => {
-    handleAdminMenuClose();
-    // Go directly to the products admin page which now has authentication bypass
-    window.open(`${BACKEND_URL}/api/v1/products/admin/list`, '_blank');
-  };
-
-  const navigateToAnalyticsDashboard = () => {
-    handleAdminMenuClose();
-    // Open in a new tab to avoid navigation issues
-    window.open(`${BACKEND_URL}/admin/analytics`, '_blank');
-  };
 
   // Tab content rendering
   let content = null;
