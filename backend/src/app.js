@@ -16,16 +16,20 @@ const api = require('./api');
 
 const app = express();
 
-// Enable CORS for all routes with credentials and Vercel frontend domain
+// Enable CORS for all routes with credentials and multiple frontend domains
 app.use(cors({
-  origin: 'https://transparen-eats.vercel.app',
+  origin: [
+    'https://transparen-eats.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
   credentials: true
 }));
 
 // Basic request logging
 app.use(logger('dev'));
 
-// Simple session with memory store for now - will add Redis later
+// Simple session with memory store for now
 app.use(session({
   name: 'transpareneats.sid',
   secret: process.env.SESSION_SECRET || 'changeme',
@@ -34,7 +38,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production', 
     httpOnly: true,
-    sameSite: 'none', // Required for cross-origin cookies
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-origin in production, 'lax' for development
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
