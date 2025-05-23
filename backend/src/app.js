@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 const session = require('express-session');
-const RedisStore = require('connect-redis');
+const RedisStore = require('connect-redis').default;
 const Redis = require('ioredis');
 
 require('dotenv').config();
@@ -32,7 +32,7 @@ const redisClient = new Redis(redisUrl);
 
 // Session support for admin login with Redis store
 app.use(session({
-  store: new (RedisStore.default || RedisStore)({ client: redisClient }),
+  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
