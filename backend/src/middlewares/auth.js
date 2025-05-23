@@ -10,17 +10,9 @@ module.exports = (req, res, next) => {
     return next();
   }
 
-  // If not authenticated, show a login form (for GET requests)
+  // If not authenticated, show a 401 for GET requests
   if (req.method === 'GET') {
-    return res.send(`
-      <html><body style="font-family:sans-serif;max-width:400px;margin:40px auto;">
-        <h2>Admin Login</h2>
-        <form method="POST">
-          <input type="password" name="password" placeholder="Password" style="width:100%;padding:8px;" autofocus required />
-          <button type="submit" style="margin-top:10px;padding:8px 16px;">Login</button>
-        </form>
-      </body></html>
-    `);
+    return res.status(401).send('Unauthorized');
   }
 
   // Otherwise, unauthorized
