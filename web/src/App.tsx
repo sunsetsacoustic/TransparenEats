@@ -655,7 +655,6 @@ export default function App() {
             variant="outlined"
             fullWidth
             size="medium"
-            endIcon={<KeyboardArrowDownIcon />}
             startIcon={<AdminPanelSettingsIcon />}
             sx={{
               borderRadius: 99,
@@ -675,128 +674,10 @@ export default function App() {
                 boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
               },
             }}
-            onClick={handleAdminButtonClick}
-            aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={adminMenuOpen ? 'true' : undefined}
+            onClick={() => window.open(`${BACKEND_URL}/products-admin`, '_blank')}
           >
-            Admin Options
+            Manage Products (No Login)
           </Button>
-          <Menu
-            id="admin-menu"
-            anchorEl={adminMenuAnchor}
-            open={adminMenuOpen}
-            onClose={handleAdminMenuClose}
-            MenuListProps={{
-              'aria-labelledby': 'admin-button',
-            }}
-            PaperProps={{
-              sx: {
-                borderRadius: 2,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              }
-            }}
-          >
-            <MenuItem 
-              onClick={navigateToAdminDashboard}
-              sx={{ 
-                py: 1.5,
-                px: 2, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1.5,
-                minWidth: 200,
-              }}
-            >
-              <AdminPanelSettingsIcon fontSize="small" sx={{ color: '#3b82f6' }} />
-              <Typography variant="body1">Admin Dashboard</Typography>
-            </MenuItem>
-            <MenuItem 
-              onClick={navigateToAnalyticsDashboard}
-              sx={{ 
-                py: 1.5, 
-                px: 2, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1.5,
-                minWidth: 200,
-              }}
-            >
-              <AnalyticsIcon fontSize="small" sx={{ color: '#3b82f6' }} />
-              <Typography variant="body1">Analytics Dashboard</Typography>
-            </MenuItem>
-          </Menu>
-
-          {/* Admin Password Dialog */}
-          <Dialog 
-            open={adminPasswordDialogOpen} 
-            onClose={handleAdminPasswordDialogClose}
-            PaperProps={{
-              sx: {
-                borderRadius: 3,
-                width: '100%',
-                maxWidth: 360,
-                p: 1,
-              }
-            }}
-          >
-            <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>
-              Administrator Access
-            </DialogTitle>
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Admin Password"
-                type="password"
-                fullWidth
-                variant="outlined"
-                value={adminPassword}
-                onChange={(e) => {
-                  setAdminPassword(e.target.value);
-                  setAdminPasswordError(false);
-                }}
-                error={adminPasswordError}
-                helperText={adminPasswordError ? "Invalid password" : ""}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAdminPasswordSubmit();
-                  }
-                }}
-                sx={{
-                  mt: 1,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  }
-                }}
-              />
-            </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
-              <Button 
-                onClick={handleAdminPasswordDialogClose}
-                sx={{ 
-                  textTransform: 'none',
-                  fontWeight: 600,
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleAdminPasswordSubmit} 
-                variant="contained"
-                sx={{ 
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
-                }}
-              >
-                Login
-              </Button>
-            </DialogActions>
-          </Dialog>
         </Box>
 
         {/* Feature cards */}

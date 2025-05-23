@@ -52,6 +52,11 @@ app.use(cookieParser());
 app.use('/admin', adminAuth);
 app.use('/admin/analytics', adminAuth);
 
+// Special route for products admin - NO AUTH REQUIRED
+app.get('/products-admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin/products.html'));
+});
+
 // Admin routes middleware (must be before static files)
 app.use(adminMiddleware);
 
