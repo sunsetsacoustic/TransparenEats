@@ -17,22 +17,25 @@ const adminMiddleware = (req, res, next) => {
     return next();
   }
 
-  // Check if this is a direct request to /admin or /admin/analytics
-  const adminRegex = /^\/admin(\/analytics)?$/;
-  if (adminRegex.test(req.path)) {
+  // Check if this is a direct request to /admin or /admin/analytics or any admin subpath
+  if (req.path.startsWith('/admin')) {
     console.log(`Admin middleware handling route: ${req.path}`);
     
     // Determine which file to serve
     let filePath;
     if (req.path === '/admin/analytics') {
       filePath = path.join(__dirname, '../../public/admin/analytics.html');
-    } else if (req.path === '/admin') {
+    } else if (req.path === '/admin' || req.path.startsWith('/admin/')) {
       filePath = path.join(__dirname, '../../public/admin/index.html');
     }
     
     // Check if file exists
     if (filePath && fs.existsSync(filePath)) {
       console.log(`Serving admin file: ${filePath}`);
+      // Set cache control to prevent caching
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.sendFile(filePath);
     } else {
       console.error(`Admin file not found: ${filePath}`);

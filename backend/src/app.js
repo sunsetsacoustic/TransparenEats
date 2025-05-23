@@ -28,8 +28,17 @@ app.use(cookieParser());
 // Admin routes middleware (must be before static files)
 app.use(adminMiddleware);
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files with appropriate caching headers
+app.use(express.static(path.join(__dirname, '../public'), {
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Set no-cache for HTML files
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 // Add analytics and detailed request logging
 app.use(requestLogger.requestLogger);
@@ -82,6 +91,7 @@ app.get('/admin', (req, res) => {
       console.log(`File size: ${fs.statSync(adminPath).size} bytes`);
     }
     
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(adminPath);
   } catch (err) {
     console.error('Error serving admin file:', err);
@@ -130,6 +140,7 @@ app.get('/admin/analytics', (req, res) => {
       console.log(`File size: ${fs.statSync(analyticsPath).size} bytes`);
     }
     
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(analyticsPath);
   } catch (err) {
     console.error('Error serving analytics file:', err);
@@ -144,6 +155,11 @@ app.get('/contribute', (req, res) => {
 
 // API routes
 app.use('/api/v1', api);
+
+// Special catch-all route for admin SPA
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin/index.html'));
+});
 
 // Not Found middleware
 const notFound = (req, res, next) => {

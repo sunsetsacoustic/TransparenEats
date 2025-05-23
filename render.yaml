@@ -7,10 +7,19 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
     routes:
       - type: rewrite
         source: /admin
         destination: /admin/index.html
       - type: rewrite
         source: /admin/analytics
-        destination: /admin/analytics.html 
+        destination: /admin/analytics.html
+    buildFilter:
+      paths:
+        - backend/**/*
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache 

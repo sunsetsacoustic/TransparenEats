@@ -21,6 +21,16 @@ if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
   console.warn('⚠️ Warning: DATABASE_URL is not set. Database connections may fail.');
 }
 
+// Run the copy-public script first to ensure admin files exist
+console.log('Ensuring admin files are created...');
+try {
+  require('./copy-public');
+  console.log('Admin files setup completed');
+} catch (err) {
+  console.error('Error setting up admin files:', err);
+  // Continue anyway
+}
+
 // Check if public files exist
 const publicDir = path.join(__dirname, '../public');
 const adminDir = path.join(publicDir, 'admin');
@@ -37,7 +47,7 @@ if (process.env.NODE_ENV === 'production' && (!fs.existsSync(adminDir) || !fs.ex
   
   // Create admin directory if it doesn't exist
   if (!fs.existsSync(adminDir)) {
-    fs.mkdirSync(adminDir, { recursive: true });
+    fs.mkdirSync(adminDir, { recursive: true, mode: 0o755 });
     console.log('Created admin directory');
   }
   
@@ -61,7 +71,7 @@ if (process.env.NODE_ENV === 'production' && (!fs.existsSync(adminDir) || !fs.ex
 </body>
 </html>`;
     
-    fs.writeFileSync(adminIndexFile, basicHtml);
+    fs.writeFileSync(adminIndexFile, basicHtml, { mode: 0o644 });
     console.log('Created basic admin index.html');
     
     // Create a basic analytics.html too
@@ -83,7 +93,7 @@ if (process.env.NODE_ENV === 'production' && (!fs.existsSync(adminDir) || !fs.ex
 </body>
 </html>`;
     
-    fs.writeFileSync(path.join(adminDir, 'analytics.html'), analyticsHtml);
+    fs.writeFileSync(path.join(adminDir, 'analytics.html'), analyticsHtml, { mode: 0o644 });
     console.log('Created basic analytics.html');
   }
 }
@@ -92,6 +102,10 @@ if (process.env.NODE_ENV === 'production' && (!fs.existsSync(adminDir) || !fs.ex
 console.log('Starting application...');
 const app = spawn('node', ['src/index.js'], {
   stdio: 'inherit',
+  env: {
+    ...process.env,
+    PORT: process.env.PORT || 10000
+  }
 });
 
 app.on('close', (code) => {
