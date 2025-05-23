@@ -546,12 +546,14 @@ export default function App() {
 
   const navigateToAdminDashboard = () => {
     handleAdminMenuClose();
-    window.location.href = `${BACKEND_URL}/admin`;
+    // Open in a new tab to avoid navigation issues
+    window.open(`${BACKEND_URL}/admin`, '_blank');
   };
 
   const navigateToAnalyticsDashboard = () => {
     handleAdminMenuClose();
-    window.location.href = `${BACKEND_URL}/admin/analytics`;
+    // Open in a new tab to avoid navigation issues
+    window.open(`${BACKEND_URL}/admin/analytics`, '_blank');
   };
 
   // Tab content rendering
