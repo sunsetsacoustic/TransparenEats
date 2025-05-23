@@ -16,18 +16,26 @@ const api = require('./api');
 
 const app = express();
 
-// Enable CORS for all routes
-app.use(cors());
+// Enable CORS for all routes with credentials and Vercel frontend domain
+app.use(cors({
+  origin: 'https://transparen-eats.vercel.app',
+  credentials: true
+}));
 
 // Basic request logging
 app.use(logger('dev'));
 
-// Session support for admin login
+// Session support for admin login with secure cookie and sameSite: 'none'
 app.use(session({
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }
+  cookie: {
+    secure: true, // true because both frontend and backend are HTTPS
+    httpOnly: true,
+    sameSite: 'none', // required for cross-site cookies
+    maxAge: 24 * 60 * 60 * 1000
+  }
 }));
 
 // Request body parsing
