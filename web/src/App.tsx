@@ -419,8 +419,8 @@ export default function App() {
 
   const navigateToAdminDashboard = () => {
     handleAdminMenuClose();
-    // Open in a new tab to avoid navigation issues
-    window.location.href = `${BACKEND_URL}/admin`;
+    // Go directly to the products admin page which now has authentication bypass
+    window.open(`${BACKEND_URL}/api/v1/products/admin/list`, '_blank');
   };
 
   const navigateToAnalyticsDashboard = () => {

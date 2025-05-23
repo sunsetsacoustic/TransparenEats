@@ -11,6 +11,7 @@ const usdaRouter = require('./usda');
 const additiveProxyRouter = require('./additiveProxy');
 const productsRouter = require('./products');
 const analyticsRouter = require('./analytics');
+const productsAuth = require('../middlewares/productsAuth');
 
 const router = express.Router();
 
@@ -129,6 +130,8 @@ router.use('/off', offRouter);
 router.use('/nutritionix', nutritionixRouter);
 router.use('/usda', usdaRouter);
 router.use('/additiveProxy', additiveProxyRouter);
+// Apply products auth bypass for products routes - allows access without password
+router.use('/products/admin', productsAuth);
 router.use('/products', productsRouter);
 router.use('/analytics', analyticsRouter);
 
