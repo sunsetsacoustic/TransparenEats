@@ -540,7 +540,8 @@ export default function App() {
       });
       if (res.ok) {
         handleAdminPasswordDialogClose();
-        window.location.href = `${BACKEND_URL}/admin`;
+        // Temporary: Redirect to main site instead of /admin for testing
+        window.location.href = `${BACKEND_URL}/`;
       } else {
         setAdminPasswordError(true);
       }
