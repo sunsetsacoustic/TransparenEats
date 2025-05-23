@@ -104,7 +104,7 @@ const app = spawn('node', ['src/index.js'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    PORT: process.env.PORT || 10000
+    PORT: process.env.PORT || 3000
   }
 });
 

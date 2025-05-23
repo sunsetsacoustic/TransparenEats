@@ -2,7 +2,7 @@ const app = require('./app');
 const db = require('./db/db');
 const cacheService = require('./services/cacheService');
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // Test database connection before starting server
 async function startServer() {
