@@ -5,7 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require('connect-redis');
 const Redis = require('ioredis');
 
 require('dotenv').config();
