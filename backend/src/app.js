@@ -5,8 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 const session = require('express-session');
-const RedisStore = require('connect-redis').default;
-const Redis = require('ioredis');
+const redis = require('redis');
 
 require('dotenv').config();
 
@@ -27,22 +26,70 @@ app.use(cors({
 // Basic request logging
 app.use(logger('dev'));
 
-const redisUrl = process.env.REDIS_URL || 'redis://red-d0oarcre5dus73ba40i0:6379';
-const redisClient = new Redis(redisUrl);
+// Robust connect-redis import
+let RedisStore;
+try {
+  const connectRedis = require('connect-redis');
+  RedisStore = connectRedis.default || connectRedis;
+} catch (err1) {
+  try {
+    RedisStore = require('connect-redis')(session);
+  } catch (err2) {
+    console.error('Could not import RedisStore:', err2);
+    console.log('Continuing without Redis store...');
+    RedisStore = null;
+  }
+}
 
-// Session support for admin login with Redis store
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
+// Create Redis client only if RedisStore is available
+let redisClient = null;
+if (RedisStore && process.env.REDIS_URL) {
+  redisClient = redis.createClient({
+    url: process.env.REDIS_URL
+  });
+
+  redisClient.on('error', (err) => {
+    console.error('Redis error:', err);
+  });
+
+  redisClient.on('connect', () => {
+    console.log('✅ Connected to Redis');
+  });
+
+  // Connect to Redis
+  redisClient.connect().catch((err) => {
+    console.error('Redis connection failed:', err);
+    redisClient = null;
+  });
+}
+
+// Session configuration
+const sessionConfig = {
+  name: 'transpareneats.sid',
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, // true because both frontend and backend are HTTPS
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'none', // required for cross-site cookies
-    maxAge: 24 * 60 * 60 * 1000
+    sameSite: 'none', // CRITICAL for cross-origin cookies!
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
-}));
+};
+
+// Add Redis store if available
+if (RedisStore && redisClient) {
+  sessionConfig.store = new RedisStore({
+    client: redisClient,
+    prefix: 'transpareneats:'
+  });
+  console.log('✅ Using Redis session store');
+} else {
+  console.log('⚠️  Using memory session store');
+}
+
+// Apply session middleware
+app.use(session(sessionConfig));
 
 // Request body parsing
 app.use(express.json());
