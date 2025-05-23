@@ -9,19 +9,23 @@ const fs = require('fs');
 const path = require('path');
 
 console.log('Ensuring public directory is properly set up...');
+console.log(`Current working directory: ${process.cwd()}`);
 
 // Define directories
 const publicDir = path.join(__dirname, '../public');
 const adminDir = path.join(publicDir, 'admin');
 
+console.log(`Public directory path: ${publicDir}`);
+console.log(`Admin directory path: ${adminDir}`);
+
 // Create directories if they don't exist
 if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true });
+  fs.mkdirSync(publicDir, { recursive: true, mode: 0o755 });
   console.log('Created public directory');
 }
 
 if (!fs.existsSync(adminDir)) {
-  fs.mkdirSync(adminDir, { recursive: true });
+  fs.mkdirSync(adminDir, { recursive: true, mode: 0o755 });
   console.log('Created admin directory');
 }
 
@@ -46,8 +50,14 @@ if (!fs.existsSync(adminIndexFile)) {
 </body>
 </html>`;
   
-  fs.writeFileSync(adminIndexFile, basicHtml);
-  console.log('Created basic admin index.html');
+  try {
+    fs.writeFileSync(adminIndexFile, basicHtml, { mode: 0o644 });
+    console.log('Created basic admin index.html');
+    console.log(`File exists after creation: ${fs.existsSync(adminIndexFile)}`);
+    console.log(`File size: ${fs.statSync(adminIndexFile).size} bytes`);
+  } catch (err) {
+    console.error(`Error creating admin index.html: ${err.message}`);
+  }
 }
 
 // Create analytics.html if it doesn't exist
@@ -71,8 +81,14 @@ if (!fs.existsSync(analyticsFile)) {
 </body>
 </html>`;
   
-  fs.writeFileSync(analyticsFile, analyticsHtml);
-  console.log('Created basic analytics.html');
+  try {
+    fs.writeFileSync(analyticsFile, analyticsHtml, { mode: 0o644 });
+    console.log('Created basic analytics.html');
+    console.log(`File exists after creation: ${fs.existsSync(analyticsFile)}`);
+    console.log(`File size: ${fs.statSync(analyticsFile).size} bytes`);
+  } catch (err) {
+    console.error(`Error creating analytics.html: ${err.message}`);
+  }
 }
 
 console.log('Public directory setup complete');

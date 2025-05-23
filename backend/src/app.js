@@ -49,7 +49,7 @@ app.get('/admin', (req, res) => {
       // Ensure directory exists
       const adminDir = path.join(__dirname, '../public/admin');
       if (!fs.existsSync(adminDir)) {
-        fs.mkdirSync(adminDir, { recursive: true });
+        fs.mkdirSync(adminDir, { recursive: true, mode: 0o755 });
         console.log('Created admin directory');
       }
       
@@ -72,14 +72,16 @@ app.get('/admin', (req, res) => {
 </body>
 </html>`;
       
-      fs.writeFileSync(adminPath, basicHtml);
+      fs.writeFileSync(adminPath, basicHtml, { mode: 0o644 });
       console.log('Created admin file');
+      console.log(`File exists after creation: ${fs.existsSync(adminPath)}`);
+      console.log(`File size: ${fs.statSync(adminPath).size} bytes`);
     }
     
     res.sendFile(adminPath);
   } catch (err) {
     console.error('Error serving admin file:', err);
-    res.status(500).send('Error serving admin dashboard');
+    res.status(500).send('Error serving admin dashboard: ' + err.message);
   }
 });
 
@@ -95,7 +97,7 @@ app.get('/admin/analytics', (req, res) => {
       // Ensure directory exists
       const adminDir = path.join(__dirname, '../public/admin');
       if (!fs.existsSync(adminDir)) {
-        fs.mkdirSync(adminDir, { recursive: true });
+        fs.mkdirSync(adminDir, { recursive: true, mode: 0o755 });
         console.log('Created admin directory');
       }
       
@@ -118,14 +120,16 @@ app.get('/admin/analytics', (req, res) => {
 </body>
 </html>`;
       
-      fs.writeFileSync(analyticsPath, analyticsHtml);
+      fs.writeFileSync(analyticsPath, analyticsHtml, { mode: 0o644 });
       console.log('Created analytics file');
+      console.log(`File exists after creation: ${fs.existsSync(analyticsPath)}`);
+      console.log(`File size: ${fs.statSync(analyticsPath).size} bytes`);
     }
     
     res.sendFile(analyticsPath);
   } catch (err) {
     console.error('Error serving analytics file:', err);
-    res.status(500).send('Error serving analytics dashboard');
+    res.status(500).send('Error serving analytics dashboard: ' + err.message);
   }
 });
 

@@ -8,8 +8,13 @@ const port = process.env.PORT || 5000;
 async function startServer() {
   try {
     // Test database connection
-    await db.raw('SELECT 1');
-    console.log('✅ Database connection established');
+    try {
+      await db.raw('SELECT 1');
+      console.log('✅ Database connection established');
+    } catch (dbError) {
+      console.warn('⚠️ Database connection failed:', dbError.message);
+      console.warn('Continuing without database connection...');
+    }
     
     // Initialize cache service
     try {
@@ -24,7 +29,7 @@ async function startServer() {
       console.log(`🚀 Server running at http://localhost:${port}`);
     });
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error('❌ Server startup failed:', error);
     process.exit(1);
   }
 }
