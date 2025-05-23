@@ -1,29 +1,35 @@
+Expanded Allergen & Sensitivity List
+Disclaimer: This list provides common allergens and sensitivities. Individual reactions may vary. Always consult with a healthcare professional regarding specific dietary needs or concerns. This list is a simplified guide and should not replace professional medical advice or official allergen information on product packaging.
 A. Critical Alerts (Red Warning)
 These are allergens or substances that can cause serious, life-threatening allergic reactions, or medically recognized severe intolerances.
 Milk (Lactose, Casein, Whey): "Critical allergen: Can trigger severe allergic reactions (e.g., hives, swelling, breathing issues) or digestive distress (e.g., bloating, diarrhea) for those with lactose intolerance."
 Eggs: "Critical allergen: May cause allergic reactions from mild (e.g., hives, stomach upset) to severe (e.g., breathing difficulty, anaphylaxis)."
 Peanuts: "Critical allergen: High risk for severe, life-threatening allergic reactions, including anaphylaxis. Strict avoidance is crucial."
-Tree Nuts (Almonds, Walnuts, Cashews, Pecans, Hazelnuts, Pistachios): "Critical allergen group: Can cause severe allergic reactions (e.g., swelling, breathing issues, anaphylaxis). Avoid if allergic to any tree nut."
+Tree Nuts (Almonds, Walnuts, Cashews, Pecans, Hazelnuts, Pistachios, Brazil Nuts, Macadamia Nuts): "Critical allergen group: Can cause severe allergic reactions (e.g., swelling, breathing issues, anaphylaxis). Avoid if allergic to any tree nut."
 Soy (Soybean, Soy Lecithin): "Critical allergen: May cause allergic reactions, ranging from mild skin/digestive issues to more severe systemic reactions."
 Wheat (Gluten): "Critical allergen: Contains gluten; triggers severe autoimmune reaction in Celiac disease, or digestive/other symptoms in non-celiac gluten sensitivity."
 Fish (any fin fish): "Critical allergen: Can cause allergic reactions, from hives and swelling to severe anaphylaxis."
-Shellfish (Crab, Shrimp, Lobster, Mussels, Oysters, Clams): "Critical allergen: Common cause of severe, sometimes life-threatening allergic reactions (e.g., rapid swelling, breathing issues)."
+Shellfish (Crab, Shrimp, Lobster, Mussels, Oysters, Clams, Scallops): "Critical allergen: Common cause of severe, sometimes life-threatening allergic reactions (e.g., rapid swelling, breathing issues)."
 Sesame: "Critical allergen: A growing common allergen that can cause mild to severe allergic reactions, including anaphylaxis."
 Mustard: "Critical allergen: Can cause allergic reactions, usually mild skin or digestive symptoms, but severe reactions are possible in highly sensitive individuals."
 Celery: "Critical allergen: May cause allergic reactions, sometimes including oral allergy syndrome, skin rashes, or digestive issues."
 Sulfites (E220-E228): "Critical sensitivity: Can trigger asthma symptoms (e.g., wheezing, shortness of breath) in sensitive individuals, or other allergic-like reactions."
 Lupin: "Critical allergen: As a legume, it can cause allergic reactions, especially in those with peanut or soy allergies."
+Corn: "Critical sensitivity/allergen: While not among the 'top allergens' for everyone, corn and its derivatives can cause allergic reactions (e.g., skin rash, asthma) or sensitivities in some individuals."
 B. Caution Alerts (Yellow/Orange Warning)
 These ingredients are often associated with concerns about general health, potential mild sensitivities, dietary restrictions, or are frequently avoided as a personal choice.
 Preservatives:
 Potassium Sorbate (E202): "Caution: Generally safe, but rarely reported to cause mild skin irritation, digestive upset, or allergic-like reactions in sensitive individuals."
 Sodium Benzoate (E211): "Caution: In rare cases, may trigger hyperactive behavior, especially when combined with artificial colors. Can form harmful benzene in presence of Vitamin C."
+Potassium Benzoate (E212): "Caution: Preservative, closely related to sodium benzoate. Can cause similar concerns, such as triggering hyperactivity in sensitive individuals or forming harmful benzene in presence of Vitamin C."
 Calcium Propionate (E282): "Caution: Considered safe for most, but some anecdotal reports link it to mild digestive discomfort, headaches, or behavioral changes in children."
 BHA (E320): "Caution: Antioxidant preservative. Some debate exists regarding its long-term health effects; often avoided by those seeking 'clean label' products."
 BHT (E321): "Caution: Antioxidant preservative with similar debated health concerns to BHA; often avoided by consumers prioritizing natural ingredients."
 Nitrates/Nitrites (E249-E252): "Caution: Used in cured meats. Can form nitrosamines when cooked at high temperatures, which are classified as possible carcinogens, a concern at high intake."
-Colorings:
-Caramel Color (E150a-d): "Caution: While mostly safe, types E150c and E150d may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies."
+Sorbic Acid (E200): "Caution: Common preservative; generally recognized as safe, but may rarely cause mild skin irritation or allergic reactions in very sensitive individuals."
+Benzoic Acid (E210): "Caution: Found naturally in some fruits, also used as a preservative. Similar concerns to sodium benzoate regarding potential for hyperactivity in sensitive individuals, especially with certain colorings."
+Colorings (Artificial / Often Avoided):
+Caramel Color (E150a, E150b, E150c, E150d): "Caution: While mostly safe, types E150c and E150d (Ammonia caramel, Sulphite ammonia caramel) may contain 4-MeI, a compound with some debated health concerns in large amounts based on animal studies."
 Annatto (E160b): "Caution: Natural coloring; while safe for most, some individuals have reported allergic-like sensitivities such as hives or swelling."
 Curcumin (E100): "Caution: Natural yellow spice extract and coloring. Generally safe, but excessive intake could lead to digestive upset or, rarely, allergic reactions."
 Titanium Dioxide (E171): "Caution: Used for whiteness. Safety is debated, particularly for nanoparticles; has been categorized as 'possibly carcinogenic to humans' if inhaled. Many consumers avoid it as a precaution."
@@ -31,6 +37,12 @@ Allura Red AC (E129): "Caution: Artificial red color strongly linked to hyperact
 Tartrazine (E102): "Caution: Artificial yellow color often linked to hyperactivity and behavioral issues in sensitive children. Some individuals may experience mild allergic reactions like itching."
 Sunset Yellow (E110): "Caution: Artificial orange-yellow color commonly linked to hyperactivity and behavioral issues in sensitive children."
 Brilliant Blue FCF (E133): "Caution: Artificial blue food coloring. While less frequently linked to hyperactivity, some minor concerns about sensitivities have been reported."
+Indigotine (E132): "Caution: Artificial blue food coloring. While generally considered safe, some reports of mild sensitivities or skin reactions exist."
+Ponceau 4R (E124): "Caution: Artificial red food coloring. Like other azo dyes, it has been linked to hyperactivity in children."
+Quinoline Yellow (E104): "Caution: Artificial yellow food coloring. Concerns regarding hyperactivity in children, particularly when combined with benzoates."
+Acidity Regulators / Antioxidants:
+Citric Acid (E330): "Caution: A common acidifier, flavor enhancer, and preservative naturally found in citrus fruits. While generally safe, very rarely, sensitive individuals may experience mild digestive upset or mouth irritation. Sometimes avoided by those with specific intolerances."
+Phosphoric Acid (E338): "Caution: Primarily used as an acidifier in soft drinks. High intake may be linked to concerns about bone health (interfering with calcium absorption) and dental enamel erosion. Also has been a point of debate for kidney health with excessive consumption."
 Emulsifiers/Stabilizers/Thickeners:
 Lecithin (E322): "Caution: An emulsifier, commonly sourced from soy (be aware if you have a soy allergy) or sunflower. Generally safe, but very rarely reported to cause mild digestive issues."
 Mono- and Diglycerides (E471): "Caution: Emulsifiers that can be derived from animal fats (a concern for vegans/vegetarians). Some recent studies debate their potential impact on gut microbiome and inflammation."
@@ -39,15 +51,23 @@ Guar Gum (E412): "Caution: Thickener and stabilizer. A natural fiber, it can cau
 Carrageenan (E407): "Caution: Derived from seaweed; controversial additive. Some animal studies suggest it may contribute to inflammation and digestive issues; avoided by many for these concerns."
 Pectin (E440): "Caution: A natural gelling agent from fruits. Generally very safe, but can cause mild digestive discomfort (e.g., bloating, gas) if consumed in very high amounts due to its fiber content."
 Polysorbate 80 (E433): "Caution: Emulsifier. Some animal and in-vitro studies suggest a potential link to gut microbiome disruption and inflammation, though human effects are still being debated."
-Sweeteners (Artificial/High-Intensity):
+Sweeteners (Artificial/High-Intensity & Sugar Alcohols):
 Aspartame (E951): "Caution: Artificial sweetener. Controversial for some consumers; individuals with Phenylketonuria (PKU) must strictly avoid due to its phenylalanine content. Some sensitive individuals report headaches or other symptoms."
 Sucralose (E955): "Caution: Artificial sweetener. While generally regarded as safe, some studies suggest potential negative effects on gut bacteria and blood sugar regulation in certain individuals."
 Saccharin (E954): "Caution: Artificial sweetener. One of the oldest synthetic sweeteners. Historically had cancer concerns (since debunked for humans), but still viewed with caution by some consumers."
 Acesulfame Potassium (E950): "Caution: Artificial sweetener. Some animal studies raise questions about its metabolic effects, but it is generally regarded as safe for human consumption at approved levels."
+Sugar Alcohols (Sorbitol E420, Xylitol E967, Mannitol E421, Erythritol E968, Maltitol E965): "Caution: Can cause digestive discomfort (e.g., bloating, gas, diarrhea) in some individuals, especially when consumed in large quantities, due to their laxative effect."
 Flavor Enhancers:
 Monosodium Glutamate (MSG, E621): "Caution: Flavor enhancer; can trigger a set of symptoms (e.g., headache, flushing, sweating, chest pain) in sensitive individuals, often referred to as 'MSG symptom complex'."
 Disodium Guanylate (E626-E629): "Caution: Flavor enhancer, often used with MSG. Those sensitive to MSG may react to these as well, especially if derived from yeast extract."
 Disodium Inosinate (E630-E633): "Caution: Flavor enhancer, often used with MSG and Disodium Guanylate. Those sensitive to MSG may also react to this, especially if derived from animal products (for vegans) or yeast extract."
+Yeast Extract: "Caution: Naturally contains glutamates and often used for flavor enhancement. May trigger similar reactions to MSG in sensitive individuals. Concern for those avoiding MSG."
+Fats & Oils:
+Partially Hydrogenated Oils / Trans Fats: "Caution: Primary source of artificial trans fats. Consumption is strongly linked to increased risk of heart disease and raised 'bad' cholesterol levels. Widely avoided by health-conscious consumers."
+Palm Oil: "Caution: While not an allergen, often a concern for ethical (deforestation, habitat destruction) and environmental reasons. Some debate on its saturated fat content impacts on health."
 Anti-caking Agents:
 Silicon Dioxide (E551): "Caution: Anti-caking agent. Concerns about potential effects mainly apply to nanoparticle forms; generally considered inert in the digestive system, but some choose to avoid for caution."
 Calcium Carbonate (E170): "Caution: A common mineral used as an anti-caking agent or whitener. Generally safe, but very high doses can cause mild digestive upset like constipation."
+Other / Broad Categories:
+Artificial Flavors: "Caution: Flavor compounds not derived from natural sources. While generally safe, often avoided by those seeking a 'clean label' or 'natural' product."
+High Fructose Corn Syrup (HFCS): "Caution: Sweetener commonly used in processed foods. Often avoided by consumers due to concerns regarding its role in weight gain, metabolic syndrome, and other health issues."
