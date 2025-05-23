@@ -32,7 +32,7 @@ const redisClient = new Redis(redisUrl);
 
 // Session support for admin login with Redis store
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
+  store: new (RedisStore.default || RedisStore)({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
