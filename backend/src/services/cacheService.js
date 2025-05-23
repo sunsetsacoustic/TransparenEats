@@ -4,7 +4,12 @@ const { promisify } = require('util');
 // Environment variables
 const REDIS_URL = process.env.REDIS_URL || 'localhost:6379';
 const CACHE_TTL = parseInt(process.env.CACHE_TTL) || 3600; // Default 1 hour in seconds
-const ENABLE_REDIS = process.env.ENABLE_REDIS !== 'false'; // Enable by default unless explicitly disabled
+
+// Default to disabled in production unless explicitly enabled
+const isProd = process.env.NODE_ENV === 'production';
+const ENABLE_REDIS = isProd 
+  ? process.env.ENABLE_REDIS === 'true' // Explicitly enable in production
+  : process.env.ENABLE_REDIS !== 'false'; // Enable by default in dev unless explicitly disabled
 
 // Create Redis client
 let client = null;
@@ -51,6 +56,13 @@ const createNoOpClient = () => {
 async function initRedisClient() {
   // If Redis is disabled, use no-op client
   if (!ENABLE_REDIS) {
+    client = createNoOpClient();
+    return;
+  }
+  
+  // Don't try to connect to Redis if URL is not set
+  if (!process.env.REDIS_URL && isProd) {
+    console.log('No REDIS_URL provided in production. Using in-memory cache.');
     client = createNoOpClient();
     return;
   }
