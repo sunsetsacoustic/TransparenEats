@@ -520,10 +520,6 @@ export default function App() {
     setAdminPasswordDialogOpen(true);
   };
 
-  const handleAdminMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAdminMenuAnchor(event.currentTarget);
-  };
-
   const handleAdminMenuClose = () => {
     setAdminMenuAnchor(null);
   };
