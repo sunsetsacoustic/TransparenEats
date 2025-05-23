@@ -128,7 +128,7 @@ export default function App() {
               brands: hit.brand_name,
               ingredients_text: hit.nf_ingredient_statement,
               nutriments: {
-                'energy-kcal_100g': hit.nf_calories,
+                'energy-kcal_100g': hit.fields.nf_calories,
               },
               // Nutritionix is primarily US-based
               countries: 'United States',
@@ -534,12 +534,21 @@ export default function App() {
     setAdminPasswordError(false);
   };
 
-  const handleAdminPasswordSubmit = () => {
-    // Replace "admin123" with the actual admin password or implement proper authentication
-    if (adminPassword === "admin123") {
-      handleAdminPasswordDialogClose();
-      handleAdminMenuOpen({ currentTarget: document.getElementById('admin-button') as HTMLElement } as React.MouseEvent<HTMLButtonElement>);
-    } else {
+  const handleAdminPasswordSubmit = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // This is critical for session cookies!
+        body: JSON.stringify({ password: adminPassword })
+      });
+      if (res.ok) {
+        handleAdminPasswordDialogClose();
+        window.open(`${BACKEND_URL}/admin`, '_blank');
+      } else {
+        setAdminPasswordError(true);
+      }
+    } catch (err) {
       setAdminPasswordError(true);
     }
   };
