@@ -38,7 +38,7 @@ module.exports = {
   
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: process.env.postgresql://transpareneatsdb_user:S4gQ2wjfWsKnEu0dSyOqAzzURqy5Tqpk@dpg-d0ntn8umcj7s73dtd2r0-a.oregon-postgres.render.com/transpareneatsdb,
     migrations: {
       directory: './migrations',
     },
