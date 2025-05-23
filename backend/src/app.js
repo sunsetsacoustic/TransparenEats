@@ -5,8 +5,6 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 const session = require('express-session');
-const RedisStore = require('connect-redis').default;
-const { createClient } = require('redis');
 
 require('dotenv').config();
 
@@ -27,37 +25,19 @@ app.use(cors({
 // Basic request logging
 app.use(logger('dev'));
 
-// Create Redis client
-const redisClient = createClient({
-  url: process.env.REDIS_URL
-});
-redisClient.on('error', (err) => {
-  console.error('Redis error:', err);
-});
-redisClient.on('connect', () => {
-  console.log('✅ Connected to Redis');
-});
-redisClient.connect().catch((err) => {
-  console.error('Redis connection failed:', err);
-});
-
-// Session configuration
-const sessionConfig = {
+// Simple session with memory store for now - will add Redis later
+app.use(session({
   name: 'transpareneats.sid',
-  store: new RedisStore({ client: redisClient, prefix: 'transpareneats:' }),
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', 
     httpOnly: true,
-    sameSite: 'none', // CRITICAL for cross-origin cookies!
-    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    sameSite: 'none', // Required for cross-origin cookies
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
-};
-
-// Apply session middleware
-app.use(session(sessionConfig));
+}));
 
 // Request body parsing
 app.use(express.json());
