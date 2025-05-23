@@ -115,174 +115,41 @@ export default function App() {
     setLoading(true);
     setProduct(null);
     try {
-      // 1. Try Nutritionix
-      try {
-        const nutriRes = await fetch(`${BACKEND_URL}/api/v1/nutritionix/search?query=${encodeURIComponent(barcode)}`);
-        if (nutriRes.ok) {
-          const nutriData = await nutriRes.json();
-          if (nutriData && nutriData.hits && nutriData.hits.length > 0) {
-            const hit = nutriData.hits[0].fields;
-            const nutriProduct: Product = {
-              code: barcode,
-              product_name: hit.item_name,
-              brands: hit.brand_name,
-              ingredients_text: hit.nf_ingredient_statement,
-              nutriments: {
-                'energy-kcal_100g': hit.fields.nf_calories,
-              },
-              // Nutritionix is primarily US-based
-              countries: 'United States',
-              countries_tags: ['en:united-states'],
-            };
-            setProduct(nutriProduct);
-            setSelectedHistoryProduct(nutriProduct);
-            addToHistory(nutriProduct);
-            setTab(0);
-            setSearch('');
-            setLoading(false);
-            return;
-          }
+      // Use the backend caching API which checks database first, then external APIs
+      const response = await fetch(`${BACKEND_URL}/api/v1/products/${barcode}`, {
+        credentials: 'include' // Include cookies for authenticated requests if needed
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success) {
+          console.log(`Product found from source: ${result.source}, cache: ${result.fromCache ? 'yes' : 'no'}`);
+          
+          const productData = result.data;
+          const formattedProduct: Product = {
+            code: barcode,
+            product_name: productData.name,
+            brands: productData.brand,
+            ingredients_text: productData.ingredients_raw,
+            nutriments: productData.nutrition_data?.nutrients || {},
+            countries: "United States",
+            countries_tags: ["en:united-states"],
+            image_url: productData.image_url
+          };
+          
+          setProduct(formattedProduct);
+          setSelectedHistoryProduct(formattedProduct);
+          addToHistory(formattedProduct);
+          setSearch('');
+        } else {
+          // Product not found in database or external APIs
+          console.log('Product not found:', result.message);
         }
-      } catch (e) {
-        console.log('Nutritionix barcode search failed:', e);
-        // Continue to next API
+      } else {
+        console.error('Error fetching product data:', response.statusText);
       }
       
-      // 2. Try USDA
-      try {
-        const usdaRes = await fetch(`${BACKEND_URL}/api/v1/usda/search?query=${encodeURIComponent(barcode)}`);
-        if (usdaRes.ok) {
-          const usdaData = await usdaRes.json();
-          if (usdaData && usdaData.foods && usdaData.foods.length > 0) {
-            const food = usdaData.foods[0];
-            const getNutrient = (name: string) => food.foodNutrients?.find((n: any) => n.nutrientName === name)?.value;
-            const usdaProduct: Product = {
-              code: food.gtinUpc || food.fdcId?.toString() || barcode,
-              product_name: food.description,
-              brands: food.brandOwner,
-              ingredients_text: food.ingredients,
-              nutriments: {
-                'energy-kcal_100g': getNutrient('Energy'),
-                'proteins_100g': getNutrient('Protein'),
-                'fat_100g': getNutrient('Total lipid (fat)'),
-                'carbohydrates_100g': getNutrient('Carbohydrate, by difference'),
-                'fiber_100g': getNutrient('Fiber, total dietary'),
-                'sugars_100g': getNutrient('Sugars, total including NLEA'),
-                'sodium_100g': getNutrient('Sodium, Na'),
-              },
-              // USDA is US-specific
-              countries: 'United States',
-              countries_tags: ['en:united-states'],
-            };
-            setProduct(usdaProduct);
-            setSelectedHistoryProduct(usdaProduct);
-            addToHistory(usdaProduct);
-            setTab(0);
-            setSearch('');
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (e) {
-        console.log('USDA barcode search failed:', e);
-        // Continue to next API
-      }
-      
-      // 3. Try Open Food Facts - look for US product first
-      try {
-        const res = await fetch(`${OPEN_FOOD_FACTS_URL}/api/v2/product/${barcode}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.product) {
-            // Check if this is a US product
-            const isUSProduct = data.product.countries_tags && 
-              Array.isArray(data.product.countries_tags) &&
-              data.product.countries_tags.some((c: string) => c.includes('united-states'));
-            
-            // If not a US product, try to find a US version
-            if (!isUSProduct) {
-              try {
-                const usSearchRes = await fetch(`${OPEN_FOOD_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(barcode)}&search_simple=1&action=process&json=1&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
-                if (usSearchRes.ok) {
-                  const usSearchData = await usSearchRes.json();
-                  if (usSearchData && usSearchData.products && usSearchData.products.length > 0) {
-                    // Use the US version instead
-                    setProduct(usSearchData.products[0]);
-                    setSelectedHistoryProduct(usSearchData.products[0]);
-                    addToHistory(usSearchData.products[0]);
-                    setTab(0);
-                    setSearch('');
-                    setLoading(false);
-                    return;
-                  }
-                }
-              } catch (usSearchErr) {
-                console.log('US product search failed:', usSearchErr);
-              }
-            }
-            
-            // If we're here, either it's a US product or we couldn't find a US version
-            setProduct(data.product);
-            setSelectedHistoryProduct(data.product);
-            addToHistory(data.product);
-            setTab(0);
-            setSearch('');
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (e) {
-        console.log('Open Food Facts barcode search failed:', e);
-        // Continue to next API
-      }
-      
-      // 4. Final fallback: Open Beauty Facts - prefer US products
-      try {
-        const beautyRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/api/v2/product/${barcode}`);
-        if (beautyRes.ok) {
-          const beautyData = await beautyRes.json();
-          if (beautyData && beautyData.product) {
-            // Check if this is a US product
-            const isUSProduct = beautyData.product.countries_tags && 
-              Array.isArray(beautyData.product.countries_tags) &&
-              beautyData.product.countries_tags.some((c: string) => c.includes('united-states'));
-            
-            // If not a US product, try to find a US version
-            if (!isUSProduct) {
-              try {
-                const usSearchRes = await fetch(`${OPEN_BEAUTY_FACTS_URL}/cgi/search.pl?search_terms=${encodeURIComponent(barcode)}&search_simple=1&action=process&json=1&tagtype_0=countries&tag_contains_0=contains&tag_0=united-states`);
-                if (usSearchRes.ok) {
-                  const usSearchData = await usSearchRes.json();
-                  if (usSearchData && usSearchData.products && usSearchData.products.length > 0) {
-                    // Use the US version instead
-                    setProduct(usSearchData.products[0]);
-                    setSelectedHistoryProduct(usSearchData.products[0]);
-                    addToHistory(usSearchData.products[0]);
-                    setTab(0);
-                    setSearch('');
-                    setLoading(false);
-                    return;
-                  }
-                }
-              } catch (usSearchErr) {
-                console.log('US product search failed:', usSearchErr);
-              }
-            }
-            
-            setProduct(beautyData.product);
-            setSelectedHistoryProduct(beautyData.product);
-            addToHistory(beautyData.product);
-            setTab(0);
-            setSearch('');
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (e) {
-        console.log('Open Beauty Facts barcode search failed:', e);
-      }
-      
-      // If we got here, no product was found
       setLoading(false);
     } catch (e) {
       console.error('Product barcode search failed:', e);
