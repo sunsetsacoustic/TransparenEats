@@ -5,7 +5,8 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 const session = require('express-session');
-const redis = require('redis');
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
 
 require('dotenv').config();
 
@@ -26,46 +27,24 @@ app.use(cors({
 // Basic request logging
 app.use(logger('dev'));
 
-// Robust connect-redis import
-let RedisStore;
-try {
-  const connectRedis = require('connect-redis');
-  RedisStore = connectRedis.default || connectRedis;
-} catch (err1) {
-  try {
-    RedisStore = require('connect-redis')(session);
-  } catch (err2) {
-    console.error('Could not import RedisStore:', err2);
-    console.log('Continuing without Redis store...');
-    RedisStore = null;
-  }
-}
-
-// Create Redis client only if RedisStore is available
-let redisClient = null;
-if (RedisStore && process.env.REDIS_URL) {
-  redisClient = redis.createClient({
-    url: process.env.REDIS_URL
-  });
-
-  redisClient.on('error', (err) => {
-    console.error('Redis error:', err);
-  });
-
-  redisClient.on('connect', () => {
-    console.log('✅ Connected to Redis');
-  });
-
-  // Connect to Redis
-  redisClient.connect().catch((err) => {
-    console.error('Redis connection failed:', err);
-    redisClient = null;
-  });
-}
+// Create Redis client
+const redisClient = createClient({
+  url: process.env.REDIS_URL
+});
+redisClient.on('error', (err) => {
+  console.error('Redis error:', err);
+});
+redisClient.on('connect', () => {
+  console.log('✅ Connected to Redis');
+});
+redisClient.connect().catch((err) => {
+  console.error('Redis connection failed:', err);
+});
 
 // Session configuration
 const sessionConfig = {
   name: 'transpareneats.sid',
+  store: new RedisStore({ client: redisClient, prefix: 'transpareneats:' }),
   secret: process.env.SESSION_SECRET || 'changeme',
   resave: false,
   saveUninitialized: false,
@@ -76,17 +55,6 @@ const sessionConfig = {
     maxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
 };
-
-// Add Redis store if available
-if (RedisStore && redisClient) {
-  sessionConfig.store = new RedisStore({
-    client: redisClient,
-    prefix: 'transpareneats:'
-  });
-  console.log('✅ Using Redis session store');
-} else {
-  console.log('⚠️  Using memory session store');
-}
 
 // Apply session middleware
 app.use(session(sessionConfig));
