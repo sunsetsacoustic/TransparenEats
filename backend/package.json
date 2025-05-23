@@ -11,7 +11,8 @@
     "migrate": "knex --knexfile src/db/knexfile.js migrate:latest",
     "migrate:rollback": "knex --knexfile src/db/knexfile.js migrate:rollback",
     "seed": "knex --knexfile src/db/knexfile.js seed:run",
-    "postinstall": "node scripts/run-migrations.js || true"
+    "copy-public": "node scripts/copy-public.js",
+    "postinstall": "node scripts/run-migrations.js || true && npm run copy-public"
   },
   "dependencies": {
     "cors": "^2.8.5",
