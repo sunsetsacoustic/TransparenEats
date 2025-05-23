@@ -1,52 +1,62 @@
-// Database configuration for different environments
-require('dotenv').config({ path: '../.env' });
+// Update with your config settings
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
+/**
+ * Database connection configuration for development, testing, and production
+ */
 module.exports = {
   development: {
     client: 'pg',
     connection: {
       host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5432,
       user: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'transpareneats_dev'
+      database: process.env.DB_NAME || 'transpareneats',
+      charset: 'utf8'
     },
     migrations: {
       directory: './migrations',
+      tableName: 'knex_migrations'
     },
     seeds: {
-      directory: './seeds',
+      directory: './seeds'
     },
+    debug: false
   },
-  
+
   test: {
     client: 'pg',
     connection: {
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5432,
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'transpareneats_test'
+      host: process.env.TEST_DB_HOST || 'localhost',
+      user: process.env.TEST_DB_USER || 'postgres',
+      password: process.env.TEST_DB_PASSWORD || 'postgres',
+      database: process.env.TEST_DB_NAME || 'transpareneats_test',
+      charset: 'utf8'
     },
     migrations: {
       directory: './migrations',
+      tableName: 'knex_migrations'
     },
     seeds: {
-      directory: './seeds',
+      directory: './seeds'
     },
+    debug: false
   },
-  
+
   production: {
     client: 'pg',
-    connection: {
-      connectionString: process.env.DATABASE_URL || 'postgresql://transpareneatsdb_user:S4gQ2wjfWsKnEu0dSyOqAzzURqy5Tqpk@dpg-d0ntn8umcj7s73dtd2r0-a.oregon-postgres.render.com/transpareneatsdb',
-      ssl: { rejectUnauthorized: false }
+    connection: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    pool: {
+      min: 2,
+      max: 10
     },
     migrations: {
       directory: './migrations',
+      tableName: 'knex_migrations'
     },
     seeds: {
-      directory: './seeds',
+      directory: './seeds'
     }
   }
 };

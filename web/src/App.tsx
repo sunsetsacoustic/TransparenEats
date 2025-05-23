@@ -20,7 +20,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://transpareneats.onrender.com';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
 const OPEN_BEAUTY_FACTS_URL = 'https://world.openbeautyfacts.org';
 
