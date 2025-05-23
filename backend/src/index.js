@@ -24,9 +24,9 @@ async function startServer() {
       console.warn('⚠️ Cache service initialization failed, continuing without caching:', cacheError.message);
     }
     
-    // Start server
-    app.listen(port, () => {
-      console.log(`🚀 Server running at http://localhost:${port}`);
+    // Start server - explicitly bind to 0.0.0.0 to listen on all network interfaces
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`🚀 Server running at http://0.0.0.0:${port}`);
     });
   } catch (error) {
     console.error('❌ Server startup failed:', error);
