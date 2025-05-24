@@ -8,11 +8,12 @@
     "dev": "nodemon src/index.js",
     "setup": "node start.js",
     "setup:redis": "node scripts/setup-redis.js",
-    "migrate": "knex --knexfile src/db/knexfile.js migrate:latest",
+    "migrate": "knex migrate:latest --knexfile src/db/knexfile.js",
     "migrate:rollback": "knex --knexfile src/db/knexfile.js migrate:rollback",
     "seed": "knex --knexfile src/db/knexfile.js seed:run",
     "copy-public": "node scripts/copy-public.js",
-    "postinstall": "node scripts/run-migrations.js || true && npm run copy-public"
+    "postinstall": "node scripts/run-migrations.js || true && npm run copy-public",
+    "migrate:prod": "NODE_ENV=production knex migrate:latest --knexfile src/db/knexfile.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",

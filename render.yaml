@@ -9,6 +9,10 @@ services:
         value: production
       - key: PORT
         value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: transpareneats-db
+          property: connectionString
     routes:
       - type: rewrite
         source: /admin
@@ -22,4 +26,27 @@ services:
     headers:
       - path: /*
         name: Cache-Control
-        value: no-cache 
+        value: no-cache
+    autoDeploy: true
+
+  # Frontend web app
+  - type: web
+    name: transpareneats-web
+    env: node
+    buildCommand: cd web && npm install && npm run build
+    startCommand: cd web && npm start
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://transpareneats-api.onrender.com
+
+databases:
+  - name: transpareneats-db
+    databaseName: transpareneats
+    user: transpareneats
+    plan: free
+
+# Add this section to run migrations after deploy
+hooks:
+  postDeploy:
+    - path: backend/scripts/run-migrations.js
+      command: cd backend && npm run migrate:prod 
