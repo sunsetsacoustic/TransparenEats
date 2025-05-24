@@ -223,7 +223,11 @@ router.post('/contribute/:barcode', async (req, res) => {
       image_url,
       source: 'user',
       status: 'pending_review',
-      user_contributed: true
+      user_contributed: true,
+      // Add empty JSON objects for required jsonb fields
+      ingredients_list: [],
+      flagged_additives: { additives: [] },
+      nutrition_data: { nutrients: {} }
     };
     
     const product = await Product.findByBarcode(barcode);
