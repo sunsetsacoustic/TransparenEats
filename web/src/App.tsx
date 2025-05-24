@@ -7,6 +7,7 @@ import BottomNav from './components/BottomNav';
 import HistoryList from './components/HistoryList';
 import SearchBar from './components/SearchBar';
 import BarcodeScannerComponent, { type BarcodeScannerComponentHandle } from './components/BarcodeScannerComponent';
+import UserContributionForm from './components/UserContributionForm';
 import type { Product, Dye, IngredientInfo } from './types';
 import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -15,6 +16,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
+import { fetchProductData } from './api';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
@@ -78,6 +80,13 @@ export default function App() {
   const [categoryProductsLoading, setCategoryProductsLoading] = useState(false);
   const [categoryProductsError, setCategoryProductsError] = useState<string | null>(null);
 
+  // New state variables for the API integration
+  const [apiSource, setApiSource] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState<boolean | null>(null);
+  const [notFoundSuggestions, setNotFoundSuggestions] = useState<string[]>([]);
+  const [showContributionForm, setShowContributionForm] = useState(false);
+  const [currentBarcode, setCurrentBarcode] = useState<string | null>(null);
+
   useEffect(() => {
     // Ensure viewport meta tag for mobile scaling
     let viewport = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null;
@@ -108,46 +117,50 @@ export default function App() {
     setTab(0); // Immediately switch to Home tab to unmount scanner and release camera
     setLoading(true);
     setProduct(null);
+    setApiSource(null);
+    setIsFromCache(null);
+    setNotFoundSuggestions([]);
+    setShowContributionForm(false);
+    setCurrentBarcode(barcode);
+    
     try {
-      // Use the backend caching API which checks database first, then external APIs
-      const response = await fetch(`${BACKEND_URL}/api/v1/products/${barcode}`, {
-        credentials: 'include' // Include cookies for authenticated requests if needed
-      });
+      const result = await fetchProductData(barcode);
       
-      if (response.ok) {
-        const result = await response.json();
+      if (result.success && result.data) {
+        console.log(`Product found from source: ${result.source}, cache: ${result.fromCache ? 'yes' : 'no'}`);
+        setApiSource(result.source || null);
+        setIsFromCache(result.fromCache || false);
         
-        if (result.success) {
-          console.log(`Product found from source: ${result.source}, cache: ${result.fromCache ? 'yes' : 'no'}`);
-          
-          const productData = result.data;
-          const formattedProduct: Product = {
-            code: barcode,
-            product_name: productData.name,
-            brands: productData.brand,
-            ingredients_text: productData.ingredients_raw,
-            nutriments: productData.nutrition_data?.nutrients || {},
-            countries: "United States",
-            countries_tags: ["en:united-states"],
-            image_url: productData.image_url
-          };
-          
-          setProduct(formattedProduct);
-          setSelectedHistoryProduct(formattedProduct);
-          addToHistory(formattedProduct);
-          setSearch('');
-        } else {
-          // Product not found in database or external APIs
-          console.log('Product not found:', result.message);
-        }
+        const productData = result.data;
+        const formattedProduct: Product = {
+          code: barcode,
+          product_name: productData.name,
+          brands: productData.brand,
+          ingredients_text: productData.ingredients_raw,
+          nutriments: productData.nutrition_data?.nutrients || {},
+          countries: "United States",
+          countries_tags: ["en:united-states"],
+          image_url: productData.image_url
+        };
+        
+        setProduct(formattedProduct);
+        setSelectedHistoryProduct(formattedProduct);
+        addToHistory(formattedProduct);
+        setSearch('');
       } else {
-        console.error('Error fetching product data:', response.statusText);
+        // Product not found in database or external APIs
+        console.log('Product not found:', result.message);
+        if (result.suggestions && result.suggestions.length > 0) {
+          setNotFoundSuggestions(result.suggestions);
+        }
+        setShowContributionForm(true);
       }
       
       setLoading(false);
     } catch (e) {
       console.error('Product barcode search failed:', e);
       setLoading(false);
+      setShowContributionForm(true);
     }
   };
 
@@ -1284,6 +1297,8 @@ export default function App() {
                 product={selectedHistoryProduct}
                 flaggedIngredients={findFlaggedIngredients(selectedHistoryProduct.ingredients_text)}
                 dyes={findDyes(selectedHistoryProduct.ingredients_text)}
+                apiSource={apiSource}
+                isFromCache={isFromCache}
               />
             ) : null}
           </Dialog>
@@ -1358,6 +1373,20 @@ export default function App() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* UserContributionForm */}
+      <UserContributionForm
+        open={showContributionForm && !!currentBarcode}
+        barcode={currentBarcode || ''}
+        onClose={() => setShowContributionForm(false)}
+        onSuccess={() => {
+          setShowContributionForm(false);
+          // Optionally refetch the product data after contribution
+          if (currentBarcode) {
+            fetchProductByBarcode(currentBarcode);
+          }
+        }}
+        suggestions={notFoundSuggestions}
+      />
     </Box>
   );
 } 

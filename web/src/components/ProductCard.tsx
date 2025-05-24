@@ -11,6 +11,8 @@ import type { Product, Dye } from '../types';
  * @property product - The product object to display.
  * @property flaggedIngredients - Array of flagged ingredient objects.
  * @property dyes - Array of dye objects found in the product.
+ * @property apiSource - The source of the data (optional).
+ * @property isFromCache - Indicates if the data is from cache (optional).
  */
 interface FlaggedIngredient {
   name: string;
@@ -23,6 +25,8 @@ interface ProductCardProps {
   product: Product;
   flaggedIngredients: FlaggedIngredient[];
   dyes: Dye[];
+  apiSource?: string | null;
+  isFromCache?: boolean | null;
 }
 
 const getScore = (flaggedIngredients: FlaggedIngredient[], dyes: Dye[]) => {
@@ -461,38 +465,62 @@ interface ProductHeaderProps {
   product: Product;
   score: number;
   scoreLabel: string;
+  apiSource?: string | null;
+  isFromCache?: boolean | null;
 }
 
-const ProductHeader: React.FC<ProductHeaderProps> = ({ product, score, scoreLabel }) => {
+const ProductHeader: React.FC<ProductHeaderProps> = ({ product, score, scoreLabel, apiSource, isFromCache }) => {
   const barcode = product.code || product.gtinUpc || product.fdcId;
   const image = product.image_front_url || product.image_url || product.photo || '';
 
   return (
-    <>
-      {/* Modern gradient banner */}
-      <Box sx={{ 
-        background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-        color: 'white',
-        p: 3,
-        borderRadius: '24px 24px 0 0',
-        position: 'relative',
-      }}>
-        {/* Product name & brand */}
-        <Box sx={{ mb: 2 }}>
-          {barcode && <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'block', mb: 1 }}>
-            Barcode: {barcode}
-          </Typography>}
-          <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
-            {product.product_name || 'No name'}
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+            {product.product_name || 'Unknown Product'}
           </Typography>
-          {product.brands && 
-            <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-              {product.brands}
-            </Typography>
-          }
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {product.brands || 'Unknown Brand'}
+          </Typography>
+          
+          {/* Display API source and cache status if available */}
+          {(apiSource || isFromCache !== null) && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
+              {apiSource && (
+                <Chip 
+                  label={`Source: ${apiSource}`} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: '#e3f2fd', 
+                    color: '#1565c0',
+                    fontSize: '0.7rem',
+                    height: '20px'
+                  }} 
+                />
+              )}
+              {isFromCache !== null && (
+                <Chip 
+                  label={isFromCache ? 'From cache' : 'Live data'} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: isFromCache ? '#e8f5e9' : '#fff3e0', 
+                    color: isFromCache ? '#2e7d32' : '#e65100',
+                    fontSize: '0.7rem',
+                    height: '20px'
+                  }} 
+                />
+              )}
+            </Box>
+          )}
+          
+          {/* Existing code for barcode */}
+          <Typography variant="caption" color="text.secondary">
+            Barcode: {barcode}
+          </Typography>
         </Box>
         
-        {/* Score in circle */}
+        {/* Score display */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
           <Box sx={{ 
             background: 'rgba(255,255,255,1)', 
@@ -523,7 +551,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({ product, score, scoreLabe
         </Box>
       </Box>
       
-      {/* Centered product image */}
+      {/* Product image */}
       {image && (
         <Box sx={{ 
           display: 'flex', 
@@ -547,14 +575,20 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({ product, score, scoreLabe
           />
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 
 /**
  * Displays a product card with image, name, score, negatives, positives, and ingredients.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, dyes }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ 
+  product, 
+  flaggedIngredients, 
+  dyes,
+  apiSource,
+  isFromCache
+}) => {
   if (!product) return null;
   const [showAllIngredients, setShowAllIngredients] = useState(false);
   const [showAllFlagged, setShowAllFlagged] = useState(false);
@@ -641,23 +675,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flaggedIngredients, 
   const toggleFlagged = () => setShowAllFlagged(prev => !prev);
 
   return (
-    <Paper sx={{ 
-      p: 0, 
-      borderRadius: '24px', 
-      maxWidth: 480, 
-      mx: 'auto', 
-      boxShadow: '0 12px 24px rgba(0,0,0,0.08)', 
-      background: '#fff', 
-      color: '#222', 
-      maxHeight: '90vh', 
-      overflowY: 'auto',
-      position: 'relative'
-    }}>
-      {/* Product Header Component */}
+    <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden', mb: 2 }}>
       <ProductHeader 
         product={product} 
         score={score} 
-        scoreLabel={scoreLabel} 
+        scoreLabel={scoreLabel}
+        apiSource={apiSource}
+        isFromCache={isFromCache}
       />
       
       {/* Barcode section */}
