@@ -32,9 +32,9 @@ app.use(logger('dev'));
 // Simple session with memory store for now
 app.use(session({
   name: 'transpareneats.sid',
-  secret: process.env.SESSION_SECRET || 'changeme',
+  secret: process.env.SESSION_SECRET || 'Juicewrld32SecretKey',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
     secure: process.env.NODE_ENV === 'production', 
     httpOnly: true,
@@ -67,6 +67,12 @@ app.get('/products-admin', (req, res) => {
   // Mark user as authenticated in their session
   req.session.isAuthenticated = true;
   res.sendFile(path.join(__dirname, '../public/admin/products.html'));
+});
+
+// Redirect from root to the frontend app
+app.get('/', (req, res) => {
+  const frontendURL = process.env.FRONTEND_URL || 'https://transparen-eats.vercel.app';
+  res.redirect(frontendURL);
 });
 
 // Admin routes middleware (must be before static files)
