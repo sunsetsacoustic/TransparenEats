@@ -127,7 +127,7 @@ const UserContributionForm: React.FC<UserContributionFormProps> = ({
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
                 <Button variant="outlined" component="label">
                   Choose Image
-                  <input type="file" accept="image/*" hidden onChange={e => setImage(e.target.files?.[0])} />
+                  <input type="file" accept="image/*" capture="environment" hidden onChange={e => setImage(e.target.files?.[0])} />
                 </Button>
                 {image && <Typography variant="caption">{image.name}</Typography>}
               </Box>

@@ -50,7 +50,7 @@ export async function contributeProduct(barcode: string, data: { name: string; b
   if (data.image) formData.append('image', data.image);
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/contribute/product/${barcode}`, formData, {
+    const response = await axios.post(`${BASE_URL}/api/v1/products/contribute/${barcode}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
