@@ -21,9 +21,37 @@
       background-color: #e9ecef;
     }
     .pagination-container { margin-top: 30px; }
+    .admin-nav { 
+      background-color: #343a40; 
+      padding: 10px 0; 
+      margin-bottom: 20px;
+    }
+    .admin-nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .admin-nav a.active {
+      border-bottom: 2px solid #4caf50;
+    }
   </style>
 </head>
 <body>
+  <!-- Admin Navigation -->
+  <div class="admin-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div>
+        <a href="/" class="me-4">← Back to Main Site</a>
+        <a href="/products-admin" class="active">Products</a>
+        <a href="/admin/analytics">Analytics</a>
+      </div>
+      <div>
+        <span class="text-white">TransparenEats Admin</span>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <div class="row mb-4">
       <div class="col">

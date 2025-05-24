@@ -118,8 +118,11 @@ router.post('/uploadProduct', upload.fields([
 // Admin login route
 router.post('/admin/login', (req, res) => {
   const { password } = req.body;
-  if (password === process.env.ADMIN_PASSWORD) {
+  const correctPassword = process.env.ADMIN_PASSWORD || 'Juicewrld32'; // Fallback to hardcoded password
+  
+  if (password === correctPassword) {
     req.session.isAdmin = true;
+    req.session.isAuthenticated = true; // Add this flag for our new auth check
     return res.json({ success: true, message: 'Logged in' });
   }
   res.status(401).json({ success: false, message: 'Invalid password' });

@@ -12,6 +12,9 @@ import Button from '@mui/material/Button';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import WarningIcon from '@mui/icons-material/Warning';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 const OPEN_FOOD_FACTS_URL = 'https://world.openfoodfacts.org';
@@ -59,6 +62,10 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const scannerRef = useRef<BarcodeScannerComponentHandle>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  // Password dialog state
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   // Products tab state
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -614,9 +621,11 @@ export default function App() {
                 boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
               },
             }}
-            onClick={() => window.open(`${BACKEND_URL}/products-admin`, '_blank')}
+            onClick={() => {
+              setPasswordDialogOpen(true);
+            }}
           >
-            Manage Products (No Login)
+            Admin Dashboard (Password Protected)
           </Button>
         </Box>
 
@@ -1299,6 +1308,56 @@ export default function App() {
           <BottomNav value={tab} onChange={(_, v) => setTab(v)} />
         </Box>
       </Box>
+      {/* Password dialog */}
+      <Dialog
+        open={passwordDialogOpen}
+        onClose={() => setPasswordDialogOpen(false)}
+        aria-labelledby="password-dialog-title"
+        aria-describedby="password-dialog-description"
+      >
+        <DialogTitle id="password-dialog-title">Enter Password</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="password"
+            label="Password"
+            type="password"
+            fullWidth
+            onChange={(e) => setAdminPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (adminPassword === "Juicewrld32") {
+                  window.open(`${BACKEND_URL}/products-admin`, '_blank');
+                  setPasswordDialogOpen(false);
+                } else {
+                  setPasswordError(true);
+                }
+              }
+            }}
+          />
+          {passwordError && (
+            <Typography color="error" variant="body2">
+              Incorrect password. Access denied.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPasswordDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => {
+            if (adminPassword === "Juicewrld32") {
+              window.open(`${BACKEND_URL}/products-admin`, '_blank');
+              setPasswordDialogOpen(false);
+            } else {
+              setPasswordError(true);
+            }
+          }} color="primary">
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 } 

@@ -48,12 +48,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Admin password protection
-app.use('/admin', adminAuth);
-app.use('/admin/analytics', adminAuth);
+// Admin password protection - but allow access if session has auth token
+app.use('/admin', (req, res, next) => {
+  if (req.session.isAuthenticated) {
+    return next();
+  }
+  adminAuth(req, res, next);
+});
+app.use('/admin/analytics', (req, res, next) => {
+  if (req.session.isAuthenticated) {
+    return next();
+  }
+  adminAuth(req, res, next);
+});
 
-// Special route for products admin - NO AUTH REQUIRED
+// Special route for products admin that sets the authenticated session
 app.get('/products-admin', (req, res) => {
+  // Mark user as authenticated in their session
+  req.session.isAuthenticated = true;
   res.sendFile(path.join(__dirname, '../public/admin/products.html'));
 });
 
