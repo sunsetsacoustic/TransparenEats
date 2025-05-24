@@ -30,7 +30,7 @@ export async function fetchProductData(barcode: string): Promise<FetchProductRes
   try {
     const response = await axios.get(`${BASE_URL}/api/products/${barcode}`);
     // Prefer backend fields, fallback logic can be added in the component if needed
-    return response.data;
+    return response.data as FetchProductResult;
   } catch (error: any) {
     if (error.response && error.response.data) {
       return error.response.data;
