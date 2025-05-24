@@ -111,9 +111,13 @@ const productService = {
    */
   async queryExternalAPIs(barcode) {
     try {
+      console.log(`Querying external APIs for barcode: ${barcode}`);
+      
       // Try Open Food Facts first
+      console.log('Trying OpenFoodFacts API...');
       const offResult = await this.queryOpenFoodFacts(barcode);
       if (offResult) {
+        console.log('Product found in OpenFoodFacts');
         return {
           found: true,
           data: offResult,
@@ -122,8 +126,10 @@ const productService = {
       }
 
       // Try USDA next
+      console.log('Trying USDA API...');
       const usdaResult = await this.queryUSDA(barcode);
       if (usdaResult) {
+        console.log('Product found in USDA');
         return {
           found: true,
           data: usdaResult,
@@ -132,8 +138,10 @@ const productService = {
       }
 
       // Try Nutritionix last
+      console.log('Trying Nutritionix API...');
       const nutritionixResult = await this.queryNutritionix(barcode);
       if (nutritionixResult) {
+        console.log('Product found in Nutritionix');
         return {
           found: true,
           data: nutritionixResult,
@@ -141,6 +149,7 @@ const productService = {
         };
       }
 
+      console.log(`Product with barcode ${barcode} not found in any external API`);
       // Not found in any API
       return { found: false };
     } catch (error) {
@@ -158,7 +167,9 @@ const productService = {
     try {
       // Create a fetch function that matches the expected API from the router
       const fetchData = async (url) => {
+        console.log(`Fetching from URL: ${url}`);
         const response = await fetch(url);
+        console.log(`Response status: ${response.status}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -168,9 +179,11 @@ const productService = {
       const url = `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`;
       const data = await fetchData(url);
       
+      console.log(`OpenFoodFacts API status: ${data.status}`);
+      
       if (data.status === 1 && data.product) {
         // Normalize data for our database schema
-        return {
+        const productData = {
           barcode,
           name: data.product.product_name || '',
           brand: data.product.brands || '',
@@ -184,8 +197,12 @@ const productService = {
           image_url: data.product.image_url || '',
           category: data.product.categories_tags?.[0] || '',
         };
+        
+        console.log('OpenFoodFacts product found:', productData.name);
+        return productData;
       }
       
+      console.log('Product not found in OpenFoodFacts');
       return null;
     } catch (error) {
       console.error('Error querying Open Food Facts:', error);

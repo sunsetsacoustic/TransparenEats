@@ -123,8 +123,15 @@ export default function App() {
     setShowContributionForm(false);
     setCurrentBarcode(barcode);
     
+    console.log(`Fetching product data for barcode: ${barcode}`);
+    
     try {
+      // Log the API URL being called
+      const apiUrl = `${BACKEND_URL}/api/v1/products/${barcode}`;
+      console.log(`Calling API: ${apiUrl}`);
+      
       const result = await fetchProductData(barcode);
+      console.log('API Response:', result);
       
       if (result.success && result.data) {
         console.log(`Product found from source: ${result.source}, cache: ${result.fromCache ? 'yes' : 'no'}`);
@@ -143,13 +150,14 @@ export default function App() {
           image_url: productData.image_url
         };
         
+        console.log('Formatted product data:', formattedProduct);
         setProduct(formattedProduct);
         setSelectedHistoryProduct(formattedProduct);
         addToHistory(formattedProduct);
         setSearch('');
       } else {
         // Product not found in database or external APIs
-        console.log('Product not found:', result.message);
+        console.log('Product not found:', result);
         if (result.suggestions && result.suggestions.length > 0) {
           setNotFoundSuggestions(result.suggestions);
         }

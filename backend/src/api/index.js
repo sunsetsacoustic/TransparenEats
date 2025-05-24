@@ -63,6 +63,17 @@ router.get('/', (req, res) => {
   });
 });
 
+// Add a debug route to check API connection
+router.get('/debug', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is working correctly',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    version: '1.0.0'
+  });
+});
+
 // Upload product and images to Open Food Facts
 router.post('/uploadProduct', upload.fields([
   { name: 'image_front', maxCount: 1 },

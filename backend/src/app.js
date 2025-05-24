@@ -199,6 +199,26 @@ app.get('/contribute', (req, res) => {
 // API routes
 app.use('/api/v1', api);
 
+// Add a backward compatibility route for apps still using the old URL pattern
+app.use('/api', (req, res, next) => {
+  // Special case for products endpoint to maintain compatibility
+  if (req.path.startsWith('/products/')) {
+    const newPath = '/api/v1' + req.path;
+    console.log(`Redirecting legacy API request from ${req.path} to ${newPath}`);
+    req.url = req.path;
+    return api(req, res, next);
+  }
+  
+  // For other API endpoints, forward to the v1 router
+  if (!req.path.startsWith('/v1/')) {
+    console.log(`Forwarding API request to v1: ${req.path}`);
+    req.url = '/v1' + req.path;
+    return api(req, res, next);
+  }
+  
+  next();
+});
+
 // Special catch-all route for admin SPA
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/admin/index.html'));
