@@ -28,7 +28,7 @@ export interface FetchProductResult {
 
 export async function fetchProductData(barcode: string): Promise<FetchProductResult> {
   try {
-    const response = await axios.get(`${BASE_URL}/api/products/${barcode}`);
+    const response = await axios.get(`${BASE_URL}/api/v1/products/${barcode}`);
     // Prefer backend fields, fallback logic can be added in the component if needed
     return response.data as FetchProductResult;
   } catch (error: any) {
