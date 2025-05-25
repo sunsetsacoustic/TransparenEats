@@ -400,6 +400,7 @@ const productService = {
    */
   async saveToLocalDatabase(barcode, productData, source) {
     try {
+      console.log('[saveToLocalDatabase] Attempting to save product:', { barcode, productData, source });
       const product = await Product.findByBarcode(barcode);
       
       // Analyze ingredients for additives
@@ -413,14 +414,18 @@ const productService = {
         is_verified: false,
         flagged_additives: flaggedAdditives
       };
-      
+      console.log('[saveToLocalDatabase] productToSave:', productToSave);
+      let result;
       if (product) {
-        return await Product.update(barcode, productToSave);
+        result = await Product.update(barcode, productToSave);
+        console.log('[saveToLocalDatabase] Product updated:', result);
       } else {
-        return await Product.create(productToSave);
+        result = await Product.create(productToSave);
+        console.log('[saveToLocalDatabase] Product created:', result);
       }
+      return result;
     } catch (error) {
-      console.error('Error saving to local database:', error);
+      console.error('[saveToLocalDatabase] Error saving to local database:', error.stack || error);
       throw error;
     }
   },

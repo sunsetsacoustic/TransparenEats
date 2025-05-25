@@ -16,8 +16,15 @@ const Product = {
    * @returns {Promise<Object>}
    */
   async create(product) {
-    const [newProduct] = await db('products').insert(product).returning('*');
-    return newProduct;
+    try {
+      console.log('[Product.create] Creating product:', product);
+      const [newProduct] = await db('products').insert(product).returning('*');
+      console.log('[Product.create] Product created:', newProduct);
+      return newProduct;
+    } catch (error) {
+      console.error('[Product.create] Error:', error.stack || error);
+      throw error;
+    }
   },
 
   /**
@@ -27,12 +34,19 @@ const Product = {
    * @returns {Promise<Object>}
    */
   async update(barcode, updates) {
-    updates.updated_at = db.fn.now();
-    const [updatedProduct] = await db('products')
-      .where({ barcode })
-      .update(updates)
-      .returning('*');
-    return updatedProduct;
+    try {
+      console.log('[Product.update] Updating product:', { barcode, updates });
+      updates.updated_at = db.fn.now();
+      const [updatedProduct] = await db('products')
+        .where({ barcode })
+        .update(updates)
+        .returning('*');
+      console.log('[Product.update] Product updated:', updatedProduct);
+      return updatedProduct;
+    } catch (error) {
+      console.error('[Product.update] Error:', error.stack || error);
+      throw error;
+    }
   },
 
   /**
