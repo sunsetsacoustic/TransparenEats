@@ -33,4 +33,11 @@ function printRoutes(stack, prefix = '') {
 }
 printRoutes(app._router.stack);
 
+app.get('/products-admin', (req, res, next) => {
+  if (req.hostname === 'transpareneats-api.onrender.com') {
+    return res.redirect('https://transpareneats.onrender.com/products-admin');
+  }
+  next();
+});
+
 module.exports = app;
